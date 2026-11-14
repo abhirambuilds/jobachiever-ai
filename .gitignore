@@ -1,0 +1,173 @@
+# ==============================================================================
+# JobAchiever AI - Monorepo .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Operating System Files
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# ------------------------------------------------------------------------------
+# Environment Variables, Secrets & Credentials (NEVER COMMIT)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.pkcs12
+*.keystore
+*.jks
+credentials.json
+client_secret*.json
+service-account*.json
+secrets/
+private-keys/
+
+# ------------------------------------------------------------------------------
+# IDEs and Editors
+# ------------------------------------------------------------------------------
+# JetBrains (IntelliJ IDEA, PyCharm, WebStorm, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# Sublime Text & Vim
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+*~
+*.bak
+
+# ------------------------------------------------------------------------------
+# Logs & Diagnostic Files
+# ------------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ------------------------------------------------------------------------------
+# Frontend (Node.js / React / Vite)
+# ------------------------------------------------------------------------------
+frontend/node_modules/
+node_modules/
+.npm/
+.yarn/
+.pnpm-store/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.cache/
+frontend/coverage/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# ------------------------------------------------------------------------------
+# Main Backend (Java / Spring Boot / Maven / Gradle)
+# ------------------------------------------------------------------------------
+backend/target/
+target/
+*.class
+backend/build/
+build/
+.gradle/
+backend/.gradle/
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# ------------------------------------------------------------------------------
+# AI Service (Python / FastAPI)
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+ai-service/.venv/
+.venv/
+venv/
+ENV/
+env/
+ai-service/build/
+ai-service/develop-eggs/
+ai-service/dist/
+ai-service/downloads/
+ai-service/eggs/
+ai-service/.eggs/
+ai-service/lib/
+ai-service/lib64/
+ai-service/parts/
+ai-service/sdist/
+ai-service/var/
+ai-service/wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.pyre/
+
+# ------------------------------------------------------------------------------
+# Local Storage, Uploads & Temporary Files
+# ------------------------------------------------------------------------------
+uploads/
+storage/
+media/
+temp/
+tmp/
+*.tmp
+*.temp
+/data/
+/pgdata/
+
+# ------------------------------------------------------------------------------
+# Docker & Infrastructure
+# ------------------------------------------------------------------------------
+docker-compose.override.yml
