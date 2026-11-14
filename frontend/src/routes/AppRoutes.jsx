@@ -1,16 +1,22 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { AppLayout } from '@/layouts/AppLayout';
+import { LandingPage } from '@/features/landing/LandingPage';
 import { DesignSystemShowcase } from '@/pages/DesignSystemShowcase';
+import { LoginPage } from '@/pages/LoginPage';
+import { RegisterPage } from '@/pages/RegisterPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export function AppRoutes() {
   return (
     <Routes>
+      {/* Landing page has its own dedicated rich navbar & footer */}
+      <Route path="/" element={<LandingPage />} />
+
+      {/* Internal & Secondary pages wrapped in AppLayout */}
       <Route element={<AppLayout />}>
-        {/* Showcase is the initial landing view for Milestone 2 */}
-        <Route path="/" element={<Navigate to="/showcase" replace />} />
         <Route path="/showcase" element={<DesignSystemShowcase />} />
-        {/* 404 Catch-All */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

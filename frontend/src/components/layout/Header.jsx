@@ -6,6 +6,8 @@ import {
   Menu,
   X,
   Layers,
+  Home,
+  ArrowRight,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/ui/button';
@@ -16,6 +18,7 @@ export function Header() {
   const location = useLocation();
 
   const navItems = [
+    { label: 'Home', path: '/', icon: Home },
     { label: 'Design System', path: '/showcase', icon: Layers },
   ];
 
@@ -83,6 +86,19 @@ export function Header() {
           </a>
 
           <ThemeToggle className="h-9 w-9" />
+
+          <Link to="/login" className="hidden sm:inline-block">
+            <Button variant="ghost" size="sm" className="text-sm">
+              Sign In
+            </Button>
+          </Link>
+
+          <Link to="/register" className="hidden sm:inline-block">
+            <Button variant="ai" size="sm" className="gap-1 font-semibold">
+              <span>Get Started</span>
+              <ArrowRight className="h-3 w-3" />
+            </Button>
+          </Link>
 
           {/* Mobile menu trigger */}
           <Button
