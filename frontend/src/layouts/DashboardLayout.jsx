@@ -52,7 +52,7 @@ const navItems = [
   { label: 'My Profile', path: '/profile', icon: UserCheck },
   { label: 'Career Tracks', path: '/tracks', icon: Layers },
   { label: 'Resume Library', path: '/resumes', icon: FileText },
-  { label: 'Resume Analyzer', path: '/resume-analyzer', icon: FileSearch, upcoming: true },
+  { label: 'Resume Analyzer', path: '/resume-analyzer', icon: FileSearch },
   { label: 'Job Discovery', path: '/jobs', icon: Compass, upcoming: true },
   { label: 'Job Matching', path: '/job-match', icon: Target, upcoming: true },
   { label: 'Applications', path: '/applications', icon: Kanban, upcoming: true },

@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import {
   Layers,
-  FileSearch,
   Compass,
   Target,
   Kanban,
@@ -26,6 +25,7 @@ import { OnboardingPage } from '@/pages/OnboardingPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { ResumeLibraryPage } from '@/pages/ResumeLibraryPage';
+import { ResumeAnalyzerPage } from '@/pages/ResumeAnalyzerPage';
 import { FeaturePlaceholderPage } from '@/pages/FeaturePlaceholderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -63,17 +63,7 @@ export function AppRoutes() {
           }
         />
         <Route path="/resumes" element={<ResumeLibraryPage />} />
-        <Route
-          path="/resume-analyzer"
-          element={
-            <FeaturePlaceholderPage
-              title="Resume Diagnostic Analyzer"
-              description="Deep structural analysis evaluating formatting, phrasing, missing impact metrics, and keyword coverage."
-              milestone="Milestone 7"
-              icon={FileSearch}
-            />
-          }
-        />
+        <Route path="/resume-analyzer" element={<ResumeAnalyzerPage />} />
         <Route
           path="/jobs"
           element={
