@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import {
   Layers,
-  FileText,
   FileSearch,
   Compass,
   Target,
@@ -26,6 +25,7 @@ import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
 import { OnboardingPage } from '@/pages/OnboardingPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { DashboardPage } from '@/pages/DashboardPage';
+import { ResumeLibraryPage } from '@/pages/ResumeLibraryPage';
 import { FeaturePlaceholderPage } from '@/pages/FeaturePlaceholderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -62,17 +62,7 @@ export function AppRoutes() {
             />
           }
         />
-        <Route
-          path="/resumes"
-          element={
-            <FeaturePlaceholderPage
-              title="Resume Studio &amp; Tailoring Engine"
-              description="Generate targeted, ATS-optimized resumes customized to specific role descriptions without manual rework or fabricated claims."
-              milestone="Milestone 7"
-              icon={FileText}
-            />
-          }
-        />
+        <Route path="/resumes" element={<ResumeLibraryPage />} />
         <Route
           path="/resume-analyzer"
           element={
