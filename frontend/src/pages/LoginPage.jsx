@@ -39,8 +39,8 @@ export function LoginPage() {
     try {
       const response = await authService.login(data);
       toast.success(response.message || 'Login successful!');
-      // Navigate to showcase/dashboard
-      navigate('/showcase');
+      // Navigate to career command center dashboard
+      navigate('/dashboard');
     } catch (err) {
       toast.error(err.message || 'Login failed. Please verify your credentials.');
     } finally {

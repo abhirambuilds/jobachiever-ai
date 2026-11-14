@@ -26,8 +26,8 @@ export function ProfileReview({ onBack, onJumpToStep }) {
   const { percentage, missingSections } = calculateCompleteness();
 
   const handleComplete = () => {
-    toast.success('Master Career Profile initialized! Entering Profile Dashboard.');
-    navigate('/profile');
+    toast.success('Master Career Profile initialized! Entering Career Command Center.');
+    navigate('/dashboard');
   };
 
   return (

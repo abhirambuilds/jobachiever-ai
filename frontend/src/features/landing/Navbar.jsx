@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Menu, X, ArrowRight, Layers, UserCheck } from 'lucide-react';
+import { Sparkles, Menu, X, ArrowRight, Layers, UserCheck, LayoutDashboard } from 'lucide-react';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -91,6 +91,13 @@ export function Navbar() {
 
         {/* Right CTA Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <Link to="/dashboard" className="hidden xl:inline-flex">
+            <Button variant="ghost" size="sm" className="gap-1 text-xs text-muted-foreground hover:text-foreground">
+              <LayoutDashboard className="h-3.5 w-3.5 text-primary" />
+              <span>Dashboard</span>
+            </Button>
+          </Link>
+
           <Link to="/profile" className="hidden xl:inline-flex">
             <Button variant="ghost" size="sm" className="gap-1 text-xs text-muted-foreground hover:text-foreground">
               <UserCheck className="h-3.5 w-3.5 text-primary" />
@@ -170,6 +177,14 @@ export function Navbar() {
             >
               <span>Why JobAchiever</span>
             </button>
+            <Link
+              to="/dashboard"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
+            >
+              <LayoutDashboard className="h-4 w-4 text-primary" />
+              <span>Career Dashboard</span>
+            </Link>
             <Link
               to="/showcase"
               onClick={() => setMobileMenuOpen(false)}

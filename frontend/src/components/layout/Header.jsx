@@ -9,6 +9,7 @@ import {
   Home,
   UserCheck,
   ArrowRight,
+  LayoutDashboard,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ export function Header() {
 
   const navItems = [
     { label: 'Home', path: '/', icon: Home },
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Master Profile', path: '/profile', icon: UserCheck },
     { label: 'Onboarding', path: '/onboarding', icon: Sparkles },
     { label: 'Design System', path: '/showcase', icon: Layers },
