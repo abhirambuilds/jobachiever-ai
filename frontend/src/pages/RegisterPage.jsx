@@ -1,55 +1,194 @@
-import { Link } from 'react-router-dom';
-import { Sparkles, ArrowLeft, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { motion } from 'framer-motion';
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+
+import { AuthLayout } from '@/features/auth/components/AuthLayout';
+import { PasswordStrengthMeter } from '@/features/auth/components/PasswordStrengthMeter';
+import { SocialAuthButtons } from '@/features/auth/components/SocialAuthButtons';
+import { registerSchema } from '@/features/auth/schemas/authSchemas';
+import { authService } from '@/services/authService';
+
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { toast } from '@/components/ui/toast';
 
 export function RegisterPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      fullName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      acceptTerms: false,
+    },
+    mode: 'onChange',
+  });
+
+  const passwordValue = watch('password');
+
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const response = await authService.register(data);
+      toast.success(response.message || 'Account registration initiated!');
+      // Navigate to email verification with email passed in location state
+      navigate('/verify-email', { state: { email: data.email } });
+    } catch (err) {
+      toast.error(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="container mx-auto flex min-h-[80vh] max-w-lg items-center justify-center px-4 py-16">
-      <Card className="w-full border-border/80 bg-card/70 shadow-2xl backdrop-blur-xl">
-        <CardHeader className="text-center space-y-2">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-primary to-cyan-400 text-white shadow-glow-sm">
-            <Sparkles className="h-6 w-6" />
-          </div>
-          <Badge variant="ai" className="mx-auto text-[10px]">
-            Milestone Preview
-          </Badge>
-          <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
-            Get Started with JobAchiever AI
-          </CardTitle>
-          <CardDescription className="text-xs sm:text-sm text-muted-foreground">
-            User registration and profile building will be connected with our Spring Boot backend
-            and PostgreSQL database in subsequent milestones.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="rounded-xl border border-border/60 bg-muted/40 p-4 text-xs text-muted-foreground space-y-2">
-            <div className="flex items-center gap-2 font-semibold text-foreground">
-              <Shield className="h-4 w-4 text-emerald-500" />
-              <span>Multi-User Isolation</span>
-            </div>
-            <p>
-              Every registered user receives cryptographically isolated profile graphs, resumes,
-              career tracks, and application records.
-            </p>
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-3">
-          <Link to="/" className="w-full">
-            <Button variant="default" className="w-full gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              <span>Return to Landing Page</span>
-            </Button>
-          </Link>
-          <div className="text-center text-xs text-muted-foreground">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary hover:underline font-medium">
+    <AuthLayout
+      headline="Create Your Master Career Account"
+      subtitle="Establish your master profile graph, configure your career tracks, and empower your job search."
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card className="border-border/80 bg-card/80 shadow-2xl backdrop-blur-xl">
+          <CardHeader className="space-y-1.5 pb-4">
+            <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
+              Get Started
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm text-muted-foreground">
+              Sign up to build your truthful, AI-powered Career Operating System.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+              {/* Full Name */}
+              <Input
+                label="Full Name"
+                placeholder="Jane Doe"
+                leftIcon={User}
+                error={errors.fullName?.message}
+                {...register('fullName')}
+              />
+
+              {/* Email Address */}
+              <Input
+                label="Email Address"
+                type="email"
+                placeholder="jane.doe@example.com"
+                leftIcon={Mail}
+                error={errors.email?.message}
+                {...register('email')}
+              />
+
+              {/* Password */}
+              <div className="space-y-1.5">
+                <div className="relative">
+                  <Input
+                    label="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Create a strong password"
+                    leftIcon={Lock}
+                    error={errors.password?.message}
+                    {...register('password')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-8 text-muted-foreground hover:text-foreground focus:outline-none"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {/* Live Password Strength Meter */}
+                <PasswordStrengthMeter password={passwordValue} />
+              </div>
+
+              {/* Confirm Password */}
+              <div className="relative">
+                <Input
+                  label="Confirm Password"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Repeat your password"
+                  leftIcon={Lock}
+                  error={errors.confirmPassword?.message}
+                  {...register('confirmPassword')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-8 text-muted-foreground hover:text-foreground focus:outline-none"
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+
+              {/* Terms & Privacy Checkbox */}
+              <div className="space-y-1 pt-1">
+                <label className="flex items-start gap-2.5 text-xs text-muted-foreground cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary/30"
+                    {...register('acceptTerms')}
+                  />
+                  <span>
+                    I acknowledge the{' '}
+                    <span className="text-foreground underline underline-offset-2">
+                      Terms of Service
+                    </span>{' '}
+                    and understand the platform&apos;s Zero-Fabrication guarantee.
+                  </span>
+                </label>
+                {errors.acceptTerms && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.acceptTerms.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                variant="ai"
+                size="lg"
+                isLoading={isLoading}
+                loadingText="Creating Master Profile..."
+                className="w-full gap-2 font-semibold shadow-glow-sm"
+              >
+                <span>Create Account</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </form>
+
+            {/* Social Auth Divider & Google Option */}
+            <SocialAuthButtons action="Sign up" />
+          </CardContent>
+
+          <CardFooter className="pt-2 border-t border-border/50 text-center text-xs text-muted-foreground justify-center">
+            <span>Already have an account? </span>
+            <Link to="/login" className="ml-1 text-primary hover:underline font-semibold">
               Sign In
             </Link>
-          </div>
-        </CardFooter>
-      </Card>
-    </div>
+          </CardFooter>
+        </Card>
+      </motion.div>
+    </AuthLayout>
   );
 }

@@ -4,19 +4,27 @@ import { LandingPage } from '@/features/landing/LandingPage';
 import { DesignSystemShowcase } from '@/pages/DesignSystemShowcase';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
+import { VerifyEmailPage } from '@/pages/VerifyEmailPage';
+import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Landing page has its own dedicated rich navbar & footer */}
+      {/* Public Landing Page */}
       <Route path="/" element={<LandingPage />} />
 
-      {/* Internal & Secondary pages wrapped in AppLayout */}
+      {/* Authentication Suite (Asymmetric AuthLayout with Theme Support) */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      {/* General & Internal Views Wrapped in Standard AppLayout */}
       <Route element={<AppLayout />}>
         <Route path="/showcase" element={<DesignSystemShowcase />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
