@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import {
   UploadCloud,
   FilePlus2,
@@ -18,7 +19,6 @@ import { DeleteConfirmDialog } from '@/features/resumes/components/dialogs/Delet
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { toast } from '@/components/ui/toast';
 
 function ResumeLibraryContent() {
   const {
@@ -41,10 +41,10 @@ function ResumeLibraryContent() {
     setStatusFilter,
   } = useDocuments();
 
+  const navigate = useNavigate();
+
   const handleCreateResumeNotice = () => {
-    toast.info(
-      'AI Tailored Resume Generation will be enabled in an upcoming milestone. Ingest your master PDF / DOCX resumes via "Upload Resume".'
-    );
+    navigate('/resume-studio');
   };
 
   const handleResetFilters = () => {

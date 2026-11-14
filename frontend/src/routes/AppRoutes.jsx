@@ -25,6 +25,7 @@ import { ProfilePage } from '@/pages/ProfilePage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { ResumeLibraryPage } from '@/pages/ResumeLibraryPage';
 import { ResumeAnalyzerPage } from '@/pages/ResumeAnalyzerPage';
+import ResumeStudioPage from '@/pages/ResumeStudioPage';
 import { JobMatcherPage } from '@/pages/JobMatcherPage';
 import { FeaturePlaceholderPage } from '@/pages/FeaturePlaceholderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -63,6 +64,8 @@ export function AppRoutes() {
           }
         />
         <Route path="/resumes" element={<ResumeLibraryPage />} />
+        <Route path="/resume-studio" element={<ResumeStudioPage />} />
+        <Route path="/studio" element={<ResumeStudioPage />} />
         <Route path="/resume-analyzer" element={<ResumeAnalyzerPage />} />
         <Route
           path="/jobs"

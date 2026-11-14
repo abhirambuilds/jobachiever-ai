@@ -27,7 +27,7 @@ const actions = [
     description: 'Generate targeted, ATS-optimized resumes customized to specific JDs.',
     icon: FileSignature,
     color: 'from-primary/20 to-indigo-500/10 text-primary border-primary/30',
-    link: '/resumes',
+    link: '/resume-studio',
     badge: 'Zero Fabrication',
   },
   {
