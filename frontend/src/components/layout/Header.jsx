@@ -7,6 +7,7 @@ import {
   X,
   Layers,
   Home,
+  UserCheck,
   ArrowRight,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
@@ -19,6 +20,8 @@ export function Header() {
 
   const navItems = [
     { label: 'Home', path: '/', icon: Home },
+    { label: 'Master Profile', path: '/profile', icon: UserCheck },
+    { label: 'Onboarding', path: '/onboarding', icon: Sparkles },
     { label: 'Design System', path: '/showcase', icon: Layers },
   ];
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Menu, X, ArrowRight, Layers } from 'lucide-react';
+import { Sparkles, Menu, X, ArrowRight, Layers, UserCheck } from 'lucide-react';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -91,6 +91,13 @@ export function Navbar() {
 
         {/* Right CTA Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <Link to="/profile" className="hidden xl:inline-flex">
+            <Button variant="ghost" size="sm" className="gap-1 text-xs text-muted-foreground hover:text-foreground">
+              <UserCheck className="h-3.5 w-3.5 text-primary" />
+              <span>Master Profile</span>
+            </Button>
+          </Link>
+
           <Link to="/showcase" className="hidden sm:inline-flex">
             <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-foreground">
               <Layers className="h-3.5 w-3.5" />

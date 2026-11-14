@@ -7,6 +7,8 @@ import { RegisterPage } from '@/pages/RegisterPage';
 import { VerifyEmailPage } from '@/pages/VerifyEmailPage';
 import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage';
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
+import { OnboardingPage } from '@/pages/OnboardingPage';
+import { ProfilePage } from '@/pages/ProfilePage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export function AppRoutes() {
@@ -14,6 +16,9 @@ export function AppRoutes() {
     <Routes>
       {/* Public Landing Page */}
       <Route path="/" element={<LandingPage />} />
+
+      {/* Dedicated Multi-Step Onboarding Wizard */}
+      <Route path="/onboarding" element={<OnboardingPage />} />
 
       {/* Authentication Suite (Asymmetric AuthLayout with Theme Support) */}
       <Route path="/login" element={<LoginPage />} />
@@ -24,6 +29,7 @@ export function AppRoutes() {
 
       {/* General & Internal Views Wrapped in Standard AppLayout */}
       <Route element={<AppLayout />}>
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/showcase" element={<DesignSystemShowcase />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

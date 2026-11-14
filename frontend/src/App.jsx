@@ -1,6 +1,7 @@
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { ProfileProvider } from '@/features/profile/context/ProfileContext';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { AppRoutes } from '@/routes/AppRoutes';
 
@@ -19,9 +20,11 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="dark" storageKey="jobachiever-theme">
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
+          <ProfileProvider>
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </ProfileProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
