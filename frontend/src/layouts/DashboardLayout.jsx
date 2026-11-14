@@ -54,7 +54,7 @@ const navItems = [
   { label: 'Resume Library', path: '/resumes', icon: FileText },
   { label: 'Resume Analyzer', path: '/resume-analyzer', icon: FileSearch },
   { label: 'Job Discovery', path: '/jobs', icon: Compass, upcoming: true },
-  { label: 'Job Matching', path: '/job-match', icon: Target, upcoming: true },
+  { label: 'Job Matching', path: '/job-matcher', icon: Target },
   { label: 'Applications', path: '/applications', icon: Kanban, upcoming: true },
   { label: 'Cover Letters', path: '/cover-letters', icon: FileSignature, upcoming: true },
   { label: 'Portfolio', path: '/portfolio', icon: Globe, upcoming: true },
@@ -112,7 +112,9 @@ export function DashboardLayout() {
   };
 
   // Determine current section breadcrumb
-  const currentNavItem = navItems.find((item) => item.path === location.pathname);
+  const currentNavItem = navItems.find(
+    (item) => item.path === location.pathname || (item.path === '/job-matcher' && location.pathname === '/job-match')
+  );
   const breadcrumbTitle = currentNavItem?.label || 'Command Center';
 
   return (
@@ -172,7 +174,9 @@ export function DashboardLayout() {
           <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path;
+              const isActive =
+                location.pathname === item.path ||
+                (item.path === '/job-matcher' && location.pathname === '/job-match');
 
               const linkContent = (
                 <Link
@@ -449,7 +453,9 @@ export function DashboardLayout() {
               <nav className="flex flex-col space-y-1">
                 {navItems.map((item) => {
                   const Icon = item.icon;
-                  const isActive = location.pathname === item.path;
+                  const isActive =
+                location.pathname === item.path ||
+                (item.path === '/job-matcher' && location.pathname === '/job-match');
                   return (
                     <Link
                       key={item.path}

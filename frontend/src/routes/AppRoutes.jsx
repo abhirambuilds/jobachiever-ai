@@ -2,7 +2,6 @@ import { Routes, Route } from 'react-router-dom';
 import {
   Layers,
   Compass,
-  Target,
   Kanban,
   FileSignature,
   Globe,
@@ -26,6 +25,7 @@ import { ProfilePage } from '@/pages/ProfilePage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { ResumeLibraryPage } from '@/pages/ResumeLibraryPage';
 import { ResumeAnalyzerPage } from '@/pages/ResumeAnalyzerPage';
+import { JobMatcherPage } from '@/pages/JobMatcherPage';
 import { FeaturePlaceholderPage } from '@/pages/FeaturePlaceholderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -75,17 +75,8 @@ export function AppRoutes() {
             />
           }
         />
-        <Route
-          path="/job-match"
-          element={
-            <FeaturePlaceholderPage
-              title="Explainable Job Matching Engine"
-              description="Granular compatibility scoring breaking down skill alignments, seniority fit, and actionable gap analysis."
-              milestone="Milestone 8"
-              icon={Target}
-            />
-          }
-        />
+        <Route path="/job-match" element={<JobMatcherPage />} />
+        <Route path="/job-matcher" element={<JobMatcherPage />} />
         <Route
           path="/applications"
           element={
