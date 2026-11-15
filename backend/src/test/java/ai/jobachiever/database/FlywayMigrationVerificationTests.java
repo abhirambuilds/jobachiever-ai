@@ -41,7 +41,8 @@ class FlywayMigrationVerificationTests {
                 "V8__create_job_applications.sql",
                 "V9__create_revoked_tokens.sql",
                 "V10__create_verification_and_reset_tokens.sql",
-                "V11__add_user_roles_and_security_audit.sql"
+                "V11__add_user_roles_and_security_audit.sql",
+                "V12__add_profile_contact_fields.sql"
         );
 
         for (Resource resource : resources) {
@@ -78,8 +79,7 @@ class FlywayMigrationVerificationTests {
                 "revoked_tokens",
                 "email_verification_tokens",
                 "password_reset_tokens",
-                "security_audit_logs"
-        );
+                "security_audit_logs");
 
         for (String table : expectedTables) {
             assertThat(allSql)
@@ -166,8 +166,7 @@ class FlywayMigrationVerificationTests {
                 Map.entry(ai.jobachiever.auth.entity.RevokedToken.class, "revoked_tokens"),
                 Map.entry(ai.jobachiever.auth.entity.EmailVerificationToken.class, "email_verification_tokens"),
                 Map.entry(ai.jobachiever.auth.entity.PasswordResetToken.class, "password_reset_tokens"),
-                Map.entry(ai.jobachiever.security.audit.SecurityAuditLog.class, "security_audit_logs")
-        );
+                Map.entry(ai.jobachiever.security.audit.SecurityAuditLog.class, "security_audit_logs"));
 
         for (Map.Entry<Class<?>, String> entry : entityTableMap.entrySet()) {
             Class<?> entityClass = entry.getKey();

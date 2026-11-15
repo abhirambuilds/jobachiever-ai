@@ -281,7 +281,23 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 15. Unhandled Internal Server Errors (sanitized to avoid leaking implementation details)
+     * 15. Invalid Request / Business Validation Exception (400 Bad Request)
+     */
+    @ExceptionHandler({InvalidRequestException.class, IllegalArgumentException.class})
+    public ResponseEntity<ErrorResponse> handleInvalidRequest(
+            RuntimeException ex, HttpServletRequest request) {
+        log.warn("Invalid request rejected at {}: {}", request.getRequestURI(), ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * 16. Unhandled Internal Server Errors (sanitized to avoid leaking implementation details)
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(

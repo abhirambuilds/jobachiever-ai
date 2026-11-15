@@ -7,6 +7,12 @@ import ai.jobachiever.auth.repository.PasswordResetTokenRepository;
 import ai.jobachiever.auth.repository.RevokedTokenRepository;
 import ai.jobachiever.careertracks.repository.CareerTrackRepository;
 import ai.jobachiever.profiles.repository.CareerProfileRepository;
+import ai.jobachiever.profiles.repository.ProfileAchievementRepository;
+import ai.jobachiever.profiles.repository.ProfileCertificationRepository;
+import ai.jobachiever.profiles.repository.ProfileEducationRepository;
+import ai.jobachiever.profiles.repository.ProfileExperienceRepository;
+import ai.jobachiever.profiles.repository.ProfileProjectRepository;
+import ai.jobachiever.profiles.repository.ProfileSkillRepository;
 import ai.jobachiever.resumes.repository.ResumeDocumentRepository;
 import ai.jobachiever.resumes.repository.ResumeVersionRepository;
 import ai.jobachiever.security.audit.SecurityAuditLogRepository;
@@ -36,6 +42,42 @@ public class TestRepositoryConfig {
     @ConditionalOnMissingBean
     public CareerProfileRepository careerProfileRepository() {
         return Mockito.mock(CareerProfileRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProfileEducationRepository profileEducationRepository() {
+        return Mockito.mock(ProfileEducationRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProfileSkillRepository profileSkillRepository() {
+        return Mockito.mock(ProfileSkillRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProfileExperienceRepository profileExperienceRepository() {
+        return Mockito.mock(ProfileExperienceRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProfileProjectRepository profileProjectRepository() {
+        return Mockito.mock(ProfileProjectRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProfileCertificationRepository profileCertificationRepository() {
+        return Mockito.mock(ProfileCertificationRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProfileAchievementRepository profileAchievementRepository() {
+        return Mockito.mock(ProfileAchievementRepository.class);
     }
 
     @Bean

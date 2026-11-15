@@ -160,9 +160,10 @@ jobachiever-ai/
 | **Milestone 11** | Secure Registration, Login and JWT Authentication (Prompt 15) | **Completed** |
 | **Milestone 12** | Email OTP Verification, Resend & Password Recovery (Prompt 16) | **Completed** |
 | **Milestone 13** | Centralized Authorization, User Ownership & Security Hardening (Prompt 17) | **Completed** |
-| **Milestone 14+** | AI Microservice (FastAPI), Parsing & Integrations | *Upcoming* |
+| **Milestone 14** | Master Career Profile APIs & Profile Management (Prompt 18) | **Completed** |
+| **Milestone 15+** | AI Microservice (FastAPI), Parsing & Integrations | *Upcoming* |
 
-> *Current State:* Frontend client application, Spring Boot backend foundation, PostgreSQL schema (19 tables, Flyway migrations V1–V11, JPA entities), hardened Spring Security 6.x architecture, centralized user authorization (`CurrentUserService`, `ResourceOwnershipService`), role-based access control (`USER` vs `ADMIN`), account state enforcement, transactional security audit logging, and email OTP verification & recovery subsystems verified with automated test suites. Profile persistence and AI integration will be introduced in subsequent milestones.
+> *Current State:* Frontend client application, Spring Boot backend foundation, PostgreSQL schema (19 tables, Flyway migrations V1–V12, JPA entities), hardened Spring Security 6.x architecture, centralized user authorization (`CurrentUserService`, `ResourceOwnershipService`), role-based access control (`USER` vs `ADMIN`), account state enforcement, transactional security audit logging, email OTP verification & recovery subsystems, and complete Master Career Profile management (`/api/v1/profiles`) with deterministic adaptive completeness calculation verified with automated test suites. Career tracks, resume upload, and AI integration will be introduced in subsequent milestones.
 
 ---
 

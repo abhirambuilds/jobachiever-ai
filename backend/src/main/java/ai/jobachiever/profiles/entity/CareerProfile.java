@@ -28,6 +28,12 @@ public class CareerProfile {
     @Column(name = "current_location", length = 255)
     private String currentLocation;
 
+    @Column(name = "country", length = 100)
+    private String country;
+
+    @Column(name = "phone_number", length = 50)
+    private String phoneNumber;
+
     @Column(name = "preferred_locations", columnDefinition = "JSONB")
     private String preferredLocations = "[]";
 
@@ -128,6 +134,22 @@ public class CareerProfile {
 
     public void setCurrentLocation(String currentLocation) {
         this.currentLocation = currentLocation;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getPreferredLocations() {

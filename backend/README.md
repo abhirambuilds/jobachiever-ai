@@ -332,7 +332,36 @@ Stateless JWT bearer authentication with BCrypt hashing and server-side token re
 
 ---
 
-## 9. Email Notification System
+## 9. Master Career Profile APIs (`/api/v1/profiles`)
+
+The Master Career Profile acts as the authoritative career graph for each candidate. All endpoints are protected by Spring Security and strictly derive identity via `CurrentUserService` (client-supplied IDs are rejected).
+
+Detailed architecture, DTO schemas, and validation contracts are documented in [`docs/master-career-profile.md`](file:///c:/Projects/JobAchieverAI/docs/master-career-profile.md).
+
+### 9.1 Get Current User Profile (`GET /api/v1/profiles/me`)
+- **Requires:** `Authorization: Bearer <access_token>`
+- **Behavior:** Auto-provisions an initial `CareerProfile` if accessing for the first time. Returns complete nested structure: personal info, professional summary, education, skills, work experience, projects, certifications, achievements, career preferences, and completion percentage. Email is read-only.
+
+### 9.2 Full Profile Update (`PUT /api/v1/profiles/me`)
+- **Requires:** `Authorization: Bearer <access_token>`
+- **Behavior:** Idempotently replaces/updates profile sections transactionally.
+- **Validations & Protections:**
+  - Prohibits email modification (throws `400 Bad Request`).
+  - Validates date ranges (start date $\le$ end date).
+  - Deduplicates skills case-insensitively.
+  - Automatically recalculates profile completion percentage.
+
+### 9.3 Partial Profile Patch (`PATCH /api/v1/profiles/me`)
+- **Requires:** `Authorization: Bearer <access_token>`
+- **Behavior:** Selectively updates designated sections without modifying or overwriting omitted sections with nulls.
+
+### 9.4 Profile Completion & Recommendations (`GET /api/v1/profiles/me/completion`)
+- **Requires:** `Authorization: Bearer <access_token>`
+- **Behavior:** Deterministic scoring across 8 sections (100% total). Features adaptive weight redistribution for students and freshers (`STUDENT`, `ENTRY_LEVEL`) so corporate work experience is waived without penalizing profile completeness. Returns score breakdown and targeted, actionable recommendations.
+
+---
+
+## 10. Email Notification System
 
 The platform provides a provider-independent notification architecture in package `ai.jobachiever.notifications`:
 - **`EmailProvider`:** Abstract interface with implementations `SmtpEmailProvider` (Spring JavaMailSender) and `SimulatedEmailProvider` (safe metadata logging).
@@ -374,6 +403,7 @@ Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL
 | **V9** | `V9__create_revoked_tokens.sql` | Creates `revoked_tokens` table for logout and token invalidation |
 | **V10** | `V10__create_verification_and_reset_tokens.sql` | Creates `email_verification_tokens` and `password_reset_tokens` tables |
 | **V11** | `V11__add_user_roles_and_security_audit.sql` | Adds `role` column to `users` and creates `security_audit_logs` table |
+| **V12** | `V12__add_profile_contact_fields.sql` | Adds `phone_number` and `country` columns to `career_profiles` |
 
 ### 9.2 Migration Execution
 Migrations execute automatically when the Spring Boot backend starts with an active database connection:
