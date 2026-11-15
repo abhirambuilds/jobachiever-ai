@@ -227,10 +227,10 @@ The primary backend interacts via `AIServiceClient`:
 
 ---
 
-## 9. Future Gemini Integration (Milestone 23 Preview)
+## 9. Google Gemini Integration (Milestone 23)
 
-The provider architecture is designed to accommodate Google Gemini seamlessly:
-- Create `app/providers/gemini_provider.py` implementing `BaseLLMProvider`.
-- Configure `GEMINI_API_KEY` in `ai-config.py`.
-- Register in `ProviderRegistry`:
-  - When a user selects `provider: "GEMINI"`, `ProviderRegistry.get_provider("GEMINI")` will return the Gemini provider without altering any existing generation controllers or client contracts.
+Google Gemini has been integrated as the platform's secondary AI provider (see `docs/gemini-integration.md`):
+- Implemented in `app/providers/gemini_provider.py` conforming strictly to `BaseLLMProvider`.
+- Configured via `GEMINI_API_KEY` and `GEMINI_DEFAULT_MODEL` (`gemini-2.0-flash`).
+- Users can explicitly select either `provider: "GROQ"` (Primary) or `provider: "GEMINI"` (Secondary).
+- Both providers share the exact same generation request/response schemas, structured JSON validation, and error normalization without code duplication. Zero automatic fallback is maintained between providers.

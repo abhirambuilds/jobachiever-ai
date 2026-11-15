@@ -11,7 +11,8 @@ The AI Microservice acts as a dedicated computational engine within the JobAchie
 - **Spring Boot as Single Source of Truth:** Spring Boot manages identity, document ownership, authorization, and persistence.
 - **Service-to-Service Security:** Protected via pre-shared internal secret header (`X-Internal-Service-Key`).
 - **Provider-Independent AI Architecture:** Modular architecture decoupling high-level career advisory features from concrete LLM providers.
-- **Groq as Primary Provider (Milestone 22):** Leverages Groq Cloud LPU inference (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`) for fast career advice and structured JSON analysis.
+- **Groq as Primary Provider (Milestone 22):** Leverages Groq Cloud LPU inference (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`) for ultra-fast career advice and structured JSON analysis.
+- **Google Gemini as Secondary Provider (Milestone 23):** Integrates Google Gemini (`gemini-2.0-flash`, `gemini-1.5-pro`) using the official `google-genai` SDK for high-context reasoning and extensive career portfolio synthesis.
 - **Zero Silent Fallback & Strict Selection:** User selects their provider explicitly; the platform never automatically routes or falls back silently.
 - **Strict Verification Policy:** All extracted resume fields carry `verificationStatus: "UNVERIFIED"` until reviewed and approved by the user.
 
@@ -24,10 +25,12 @@ The AI Microservice acts as a dedicated computational engine within the JobAchie
 - **DOCX Extraction:** Structural extraction via `python-docx` traversing paragraphs, heading styles (Heading 1-6), and tabular data row-by-row (` | ` cell delineation).
 - **Rule-Based Parsing & Normalization:** Section classifier detecting 10 resume sections, normalizers for contact details, degree taxonomies, GPA, date ranges, and skills categorization.
 
-### 2.2 LLM Generation & Groq Engine (Milestone 22)
-- **Text Generation:** Unstructured creative drafting (executive summaries, cover letters, STAR response phrasing).
-- **Structured JSON Generation:** Strict JSON output mode (`response_format={"type": "json_object"}`) with markdown stripping and bounded 1-shot repair.
-- **Model Flexibility:** Configurable default model (`llama-3.3-70b-versatile`) with support for `llama-3.1-8b-instant`, `mixtral-8x7b-32768`, and `gemma2-9b-it`.
+### 2.2 LLM Generation & Multi-Provider Engine (Milestones 22 & 23)
+- **Text Generation:** Creative drafting (executive summaries, cover letters, STAR response phrasing) supported across both Groq and Gemini.
+- **Structured JSON Generation:** Strict JSON output mode (Groq: `json_object`, Gemini: `application/json`) with markdown stripping and bounded 1-shot repair.
+- **Model Flexibility:**
+  - Groq models: `llama-3.3-70b-versatile` (default), `llama-3.1-8b-instant`, `mixtral-8x7b-32768`, `gemma2-9b-it`.
+  - Gemini models: `gemini-2.0-flash` (default), `gemini-1.5-pro`, `gemini-1.5-flash`.
 - **Resource & Concurrency Control:** Concurrency bounded via `asyncio.Semaphore`, retry limits on transient errors, and token limit clamping.
 - **Privacy Enforcement:** Full prompts and candidate data are masked in diagnostic logs; explicit user consent is required before invoking external AI endpoints.
 
@@ -52,6 +55,7 @@ ai-service/
 │   │   └── security.py               # X-Internal-Service-Key validation
 │   ├── providers/
 │   │   ├── base.py                   # BaseLLMProvider & domain exceptions
+│   │   ├── gemini_provider.py        # Google Gemini concrete implementation
 │   │   ├── groq_provider.py          # Groq Cloud concrete implementation
 │   │   └── provider_registry.py      # Provider registry & manual selection
 │   ├── schemas/
@@ -70,7 +74,7 @@ ai-service/
 │   │       └── section_detector.py   # Section heuristic classifier
 │   └── utils/
 │       └── file_validation.py        # Magic bytes, MIME, size, Zip-Slip prevention
-├── tests/                            # 78 automated pytest unit & integration tests
+├── tests/                            # 95 automated pytest unit & integration tests
 ├── .env.example                      # Configuration template
 ├── requirements.txt                  # Pinned Python dependencies
 └── main.py                           # FastAPI application entrypoint
@@ -120,6 +124,13 @@ GROQ_TIMEOUT_SECONDS=30.0
 GROQ_MAX_RETRIES=2
 GROQ_MAX_OUTPUT_TOKENS=4096
 GROQ_MAX_CONCURRENCY=10
+
+# Google Gemini Settings (Secondary)
+GEMINI_API_KEY=AIzaSy_your_gemini_api_key_placeholder
+GEMINI_DEFAULT_MODEL=gemini-2.0-flash
+GEMINI_TIMEOUT_SECONDS=30.0
+GEMINI_MAX_OUTPUT_TOKENS=4096
+GEMINI_MAX_CONCURRENCY=10
 ```
 
 ### Running the Server
@@ -137,7 +148,7 @@ Interactive OpenAPI documentation:
 ### 5.1 Provider Discovery
 - **Endpoint:** `GET /api/v1/providers`
 - **Authentication:** None required
-- **Response (200 OK):** Returns metadata for registered providers (`GROQ`, and upcoming `GEMINI`).
+- **Response (200 OK):** Returns metadata for registered providers (`GROQ` as PRIMARY, `GEMINI` as SECONDARY).
 
 ### 5.2 Text & Structured Generation
 - **Endpoint:** `POST /api/v1/generate`

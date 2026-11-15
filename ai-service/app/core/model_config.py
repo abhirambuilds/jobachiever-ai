@@ -55,6 +55,40 @@ GROQ_SUPPORTED_MODELS: Dict[str, ModelInfo] = {
 DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile"
 
 
+# Supported models for Google Gemini provider
+GEMINI_SUPPORTED_MODELS: Dict[str, ModelInfo] = {
+    "gemini-2.0-flash": ModelInfo(
+        id="gemini-2.0-flash",
+        name="Gemini 2.0 Flash",
+        provider="GEMINI",
+        context_window=1048576,
+        max_output_tokens=8192,
+        description="Google's next-generation multimodal model with 1M context, high speed and strong multimodal reasoning.",
+        is_default=True,
+    ),
+    "gemini-1.5-pro": ModelInfo(
+        id="gemini-1.5-pro",
+        name="Gemini 1.5 Pro",
+        provider="GEMINI",
+        context_window=2097152,
+        max_output_tokens=8192,
+        description="Google's flagship reasoning model with 2M context for complex career analysis and extensive portfolio evaluation.",
+        is_default=False,
+    ),
+    "gemini-1.5-flash": ModelInfo(
+        id="gemini-1.5-flash",
+        name="Gemini 1.5 Flash",
+        provider="GEMINI",
+        context_window=1048576,
+        max_output_tokens=8192,
+        description="High-frequency, lightweight model optimized for rapid text transformation.",
+        is_default=False,
+    ),
+}
+
+DEFAULT_GEMINI_MODEL = "gemini-2.0-flash"
+
+
 def get_supported_groq_models() -> List[str]:
     """Returns list of supported Groq model IDs."""
     return list(GROQ_SUPPORTED_MODELS.keys())
@@ -68,3 +102,18 @@ def is_valid_groq_model(model_id: str) -> bool:
 def get_groq_model_info(model_id: str) -> Optional[ModelInfo]:
     """Retrieves metadata for a Groq model if supported."""
     return GROQ_SUPPORTED_MODELS.get(model_id)
+
+
+def get_supported_gemini_models() -> List[str]:
+    """Returns list of supported Gemini model IDs."""
+    return list(GEMINI_SUPPORTED_MODELS.keys())
+
+
+def is_valid_gemini_model(model_id: str) -> bool:
+    """Validates if a given model identifier is supported for Gemini."""
+    return model_id in GEMINI_SUPPORTED_MODELS
+
+
+def get_gemini_model_info(model_id: str) -> Optional[ModelInfo]:
+    """Retrieves metadata for a Gemini model if supported."""
+    return GEMINI_SUPPORTED_MODELS.get(model_id)

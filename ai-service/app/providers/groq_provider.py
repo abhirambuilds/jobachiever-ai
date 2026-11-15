@@ -38,6 +38,7 @@ from app.schemas.ai_response import (
     AIGenerationResponse,
     FinishReason,
     ProviderMetadata,
+    ProviderPriority,
     ProviderStatus,
     TokenUsage,
 )
@@ -201,7 +202,7 @@ class GroqProvider(BaseLLMProvider):
             # Perform a lightweight models list probe
             if hasattr(client, "models") and hasattr(client.models, "list"):
                 await client.models.list()
-                self._cached_status = ProviderStatus.VERIFIED
+                self._cached_status = ProviderStatus.CONNECTION_VERIFIED
             else:
                 self._cached_status = ProviderStatus.CONFIGURED
         except AuthenticationError:
@@ -369,9 +370,12 @@ class GroqProvider(BaseLLMProvider):
         return ProviderMetadata(
             id=self.provider_id,
             name=self.provider_name,
-            available=is_ready and (status in (ProviderStatus.CONFIGURED, ProviderStatus.VERIFIED)),
+            priority=ProviderPriority.PRIMARY,
+            available=is_ready and (status in (ProviderStatus.CONFIGURED, ProviderStatus.CONNECTION_VERIFIED)),
+            configured=is_ready,
             default=True,
             status=status,
+            connection_status=status,
             supported_models=get_supported_groq_models(),
             default_model=self.settings.default_model
         )

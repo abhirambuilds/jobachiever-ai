@@ -1,10 +1,20 @@
 import logging
 from typing import Dict, List, Optional
 
-from app.core.ai_config import GroqSettings, load_groq_settings_from_env
-from app.providers.base import BaseLLMProvider, UnsupportedProviderError
+from app.core.ai_config import (
+    GeminiSettings,
+    GroqSettings,
+    load_gemini_settings_from_env,
+    load_groq_settings_from_env,
+)
+from app.providers.base import (
+    BaseLLMProvider,
+    ProviderAuthenticationError,
+    UnsupportedProviderError,
+)
+from app.providers.gemini_provider import GeminiProvider
 from app.providers.groq_provider import GroqProvider
-from app.schemas.ai_response import ProviderMetadata, ProviderStatus
+from app.schemas.ai_response import ProviderMetadata
 
 logger = logging.getLogger("ai_service.providers.registry")
 
@@ -12,25 +22,33 @@ logger = logging.getLogger("ai_service.providers.registry")
 class ProviderRegistry:
     """
     Central registry for managing concrete AI provider implementations.
-    Guarantees strict manual selection and prevents silent fallback or routing.
+    Guarantees strict manual selection, independent configuration, and prevents silent fallback or routing.
     """
 
-    def __init__(self, groq_settings: Optional[GroqSettings] = None):
+    def __init__(
+        self,
+        groq_settings: Optional[GroqSettings] = None,
+        gemini_settings: Optional[GeminiSettings] = None
+    ):
         self._groq_settings = groq_settings or load_groq_settings_from_env()
+        self._gemini_settings = gemini_settings or load_gemini_settings_from_env()
         self._providers: Dict[str, BaseLLMProvider] = {}
         self._init_providers()
 
     def _init_providers(self) -> None:
         """Initializes supported concrete providers."""
         groq_provider = GroqProvider(self._groq_settings)
+        gemini_provider = GeminiProvider(self._gemini_settings)
         self._providers["GROQ"] = groq_provider
+        self._providers["GEMINI"] = gemini_provider
 
     def get_provider(self, provider_id: Optional[str]) -> BaseLLMProvider:
         """
         Resolves the requested provider by ID.
         Strict manual selection:
         - If provider is omitted, uses the platform default ('GROQ').
-        - If provider is unrecognized or unavailable, raises UnsupportedProviderError.
+        - If provider is unrecognized, raises UnsupportedProviderError.
+        - If provider is unconfigured, raises an informative error.
         - NEVER automatically routes or falls back between providers.
         """
         pid = (provider_id or "GROQ").strip().upper()
@@ -39,10 +57,13 @@ class ProviderRegistry:
             return self._providers["GROQ"]
 
         if pid == "GEMINI":
-            raise UnsupportedProviderError(
-                message="Provider 'GEMINI' is not currently active. Google Gemini integration is scheduled for Prompt 23.",
-                provider="GEMINI"
-            )
+            provider = self._providers["GEMINI"]
+            if not getattr(provider, "settings", None) or not provider.settings.is_configured:
+                raise UnsupportedProviderError(
+                    message="Provider 'GEMINI' is not configured on the server. Please supply a valid GEMINI_API_KEY in the environment.",
+                    provider="GEMINI"
+                )
+            return provider
 
         if pid == "OLLAMA":
             raise UnsupportedProviderError(
@@ -51,7 +72,7 @@ class ProviderRegistry:
             )
 
         raise UnsupportedProviderError(
-            message=f"Unsupported AI provider '{pid}'. Supported active providers: ['GROQ'].",
+            message=f"Unsupported AI provider '{pid}'. Supported active providers: ['GROQ', 'GEMINI'].",
             provider=pid
         )
 
@@ -60,23 +81,16 @@ class ProviderRegistry:
         Returns high-level metadata for all known providers without exposing credentials.
         """
         groq_meta = self._providers["GROQ"].get_metadata()
-
-        # Metadata for upcoming Gemini provider
-        gemini_meta = ProviderMetadata(
-            id="GEMINI",
-            name="Google Gemini",
-            available=False,
-            default=False,
-            status=ProviderStatus.NOT_CONFIGURED,
-            supported_models=["gemini-2.0-flash", "gemini-1.5-pro"],
-            default_model="gemini-2.0-flash"
-        )
-
+        gemini_meta = self._providers["GEMINI"].get_metadata()
         return [groq_meta, gemini_meta]
 
     def set_groq_provider(self, groq_provider: GroqProvider) -> None:
         """Allows injecting a custom or mocked Groq provider for testing."""
         self._providers["GROQ"] = groq_provider
+
+    def set_gemini_provider(self, gemini_provider: GeminiProvider) -> None:
+        """Allows injecting a custom or mocked Gemini provider for testing."""
+        self._providers["GEMINI"] = gemini_provider
 
 
 # Global singleton instance of ProviderRegistry

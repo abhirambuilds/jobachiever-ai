@@ -125,18 +125,67 @@ class AIServiceClientTest {
     }
 
     @Test
-    @DisplayName("getProviders returns list of configured AI providers")
+    @DisplayName("generate sends JSON payload with explicit Gemini provider selection")
+    void generateGeminiSuccess() throws Exception {
+        ai.jobachiever.ai.dto.AIGenerationRequestDto request = new ai.jobachiever.ai.dto.AIGenerationRequestDto();
+        request.setProvider("GEMINI");
+        request.setModel("gemini-2.0-flash");
+        request.setTask("TEXT_GENERATION");
+        request.setPrompt("Generate career roadmap recommendations.");
+
+        ai.jobachiever.ai.dto.AIGenerationResponseDto mockResponse = new ai.jobachiever.ai.dto.AIGenerationResponseDto();
+        mockResponse.setProvider("GEMINI");
+        mockResponse.setModel("gemini-2.0-flash");
+        mockResponse.setContent("Step 1: Deepen distributed systems fundamentals...");
+        mockResponse.setFinishReason("STOP");
+        mockResponse.setUsage(new ai.jobachiever.ai.dto.TokenUsageDto(20, 60, 80));
+        mockResponse.setProcessingTimeMs(210.0);
+
+        String responseJson = objectMapper.writeValueAsString(mockResponse);
+
+        mockServer.expect(requestTo("http://ai-service-mock:8000/api/v1/generate"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header("X-Internal-Service-Key", "test-secret-key"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
+
+        ai.jobachiever.ai.dto.AIGenerationResponseDto result = client.generate(request);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getProvider()).isEqualTo("GEMINI");
+        assertThat(result.getModel()).isEqualTo("gemini-2.0-flash");
+        assertThat(result.getContent()).contains("Step 1: Deepen distributed systems");
+        assertThat(result.getUsage().getTotalTokens()).isEqualTo(80);
+
+        mockServer.verify();
+    }
+
+    @Test
+    @DisplayName("getProviders returns list of configured AI providers including Groq and Gemini")
     void getProvidersSuccess() throws Exception {
         ai.jobachiever.ai.dto.ProviderMetadataDto groqMeta = new ai.jobachiever.ai.dto.ProviderMetadataDto();
         groqMeta.setId("GROQ");
         groqMeta.setName("Groq Cloud");
+        groqMeta.setPriority("PRIMARY");
         groqMeta.setAvailable(true);
+        groqMeta.setConfigured(true);
         groqMeta.setDefault(true);
         groqMeta.setStatus("CONFIGURED");
         groqMeta.setDefaultModel("llama-3.3-70b-versatile");
         groqMeta.setSupportedModels(List.of("llama-3.3-70b-versatile", "llama-3.1-8b-instant"));
 
-        ai.jobachiever.ai.dto.ProviderListResponseDto responseDto = new ai.jobachiever.ai.dto.ProviderListResponseDto(List.of(groqMeta));
+        ai.jobachiever.ai.dto.ProviderMetadataDto geminiMeta = new ai.jobachiever.ai.dto.ProviderMetadataDto();
+        geminiMeta.setId("GEMINI");
+        geminiMeta.setName("Google Gemini");
+        geminiMeta.setPriority("SECONDARY");
+        geminiMeta.setAvailable(true);
+        geminiMeta.setConfigured(true);
+        geminiMeta.setDefault(false);
+        geminiMeta.setStatus("CONFIGURED");
+        geminiMeta.setDefaultModel("gemini-2.0-flash");
+        geminiMeta.setSupportedModels(List.of("gemini-2.0-flash", "gemini-1.5-pro"));
+
+        ai.jobachiever.ai.dto.ProviderListResponseDto responseDto = new ai.jobachiever.ai.dto.ProviderListResponseDto(List.of(groqMeta, geminiMeta));
 
         String responseJson = objectMapper.writeValueAsString(responseDto);
 
@@ -146,10 +195,12 @@ class AIServiceClientTest {
 
         List<ai.jobachiever.ai.dto.ProviderMetadataDto> providers = client.getProviders();
 
-        assertThat(providers).hasSize(1);
+        assertThat(providers).hasSize(2);
         assertThat(providers.get(0).getId()).isEqualTo("GROQ");
-        assertThat(providers.get(0).isAvailable()).isTrue();
-        assertThat(providers.get(0).getDefaultModel()).isEqualTo("llama-3.3-70b-versatile");
+        assertThat(providers.get(0).getPriority()).isEqualTo("PRIMARY");
+        assertThat(providers.get(1).getId()).isEqualTo("GEMINI");
+        assertThat(providers.get(1).getPriority()).isEqualTo("SECONDARY");
+        assertThat(providers.get(1).getDefaultModel()).isEqualTo("gemini-2.0-flash");
 
         mockServer.verify();
     }

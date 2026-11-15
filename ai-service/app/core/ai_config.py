@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 from pydantic import BaseModel, Field
-from app.core.model_config import DEFAULT_GROQ_MODEL
+from app.core.model_config import DEFAULT_GEMINI_MODEL, DEFAULT_GROQ_MODEL
 
 
 class GroqSettings(BaseModel):
@@ -24,6 +24,27 @@ class GroqSettings(BaseModel):
             return False
         key = self.api_key.strip()
         return bool(key) and not key.startswith("gsk_your_groq_api_key") and key != "placeholder"
+
+
+class GeminiSettings(BaseModel):
+    """
+    Configuration parameters for the Google Gemini AI Provider.
+    Loaded securely from environment variables.
+    """
+    api_key: Optional[str] = Field(default=None, description="Google Gemini API Key")
+    default_model: str = Field(default=DEFAULT_GEMINI_MODEL, description="Default model for generation")
+    timeout_seconds: float = Field(default=30.0, description="Per-request timeout in seconds")
+    max_output_tokens: int = Field(default=4096, description="Upper bound for generation tokens")
+    max_concurrency: int = Field(default=10, description="Concurrency semaphore ceiling")
+    max_input_chars: int = Field(default=32000, description="Safety limit for input prompt character length")
+
+    @property
+    def is_configured(self) -> bool:
+        """Returns True if a non-placeholder API key is configured."""
+        if not self.api_key:
+            return False
+        key = self.api_key.strip()
+        return bool(key) and not key.startswith("AIzaSy_your_gemini_api_key") and key != "placeholder"
 
 
 def load_groq_settings_from_env() -> GroqSettings:
@@ -60,6 +81,38 @@ def load_groq_settings_from_env() -> GroqSettings:
         default_model=default_model,
         timeout_seconds=timeout_seconds,
         max_retries=max_retries,
+        max_output_tokens=max_output_tokens,
+        max_concurrency=max_concurrency
+    )
+
+
+def load_gemini_settings_from_env() -> GeminiSettings:
+    """Instantiates GeminiSettings from ambient environment variables."""
+    api_key = os.getenv("GEMINI_API_KEY", "").strip() or None
+    default_model = os.getenv("GEMINI_DEFAULT_MODEL", DEFAULT_GEMINI_MODEL).strip()
+
+    timeout_str = os.getenv("GEMINI_TIMEOUT_SECONDS", "30.0")
+    try:
+        timeout_seconds = float(timeout_str)
+    except ValueError:
+        timeout_seconds = 30.0
+
+    tokens_str = os.getenv("GEMINI_MAX_OUTPUT_TOKENS", "4096")
+    try:
+        max_output_tokens = int(tokens_str)
+    except ValueError:
+        max_output_tokens = 4096
+
+    concurrency_str = os.getenv("GEMINI_MAX_CONCURRENCY", "10")
+    try:
+        max_concurrency = int(concurrency_str)
+    except ValueError:
+        max_concurrency = 10
+
+    return GeminiSettings(
+        api_key=api_key,
+        default_model=default_model,
+        timeout_seconds=timeout_seconds,
         max_output_tokens=max_output_tokens,
         max_concurrency=max_concurrency
     )

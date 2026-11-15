@@ -6,7 +6,7 @@
 
 ## 1. Architectural Overview
 
-The **JobAchiever AI Microservice** (`ai-service/`) is an internal, stateless computational engine built with **FastAPI** (Python 3.11+). It is decoupled from the authoritative primary backend (**Spring Boot 3.x**) and designed specifically for document structural analysis, text extraction, rule-based normalization, and future AI reasoning (Groq, Gemini, Ollama).
+The **JobAchiever AI Microservice** (`ai-service/`) is an internal, stateless computational engine built with **FastAPI** (Python 3.11+). It is decoupled from the authoritative primary backend (**Spring Boot 3.x**) and designed specifically for document structural analysis, text extraction, rule-based normalization, and multi-provider AI reasoning (**Groq Cloud** as Primary, **Google Gemini** as Secondary).
 
 ```mermaid
 flowchart TD

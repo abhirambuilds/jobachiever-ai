@@ -11,14 +11,16 @@ class SensitiveDataFilter(logging.Filter):
     """
     EMAIL_REGEX = re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
     PHONE_REGEX = re.compile(r"(\+?\d{1,3}[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}")
-    API_KEY_REGEX = re.compile(r"(key|secret|token|password|auth|groq)=['\"]?([a-zA-Z0-9_\-]{8,})['\"]?", re.IGNORECASE)
+    API_KEY_REGEX = re.compile(r"(key|secret|token|password|auth|groq|gemini)=['\"]?([a-zA-Z0-9_\-]{8,})['\"]?", re.IGNORECASE)
     GROQ_KEY_REGEX = re.compile(r"gsk_[a-zA-Z0-9_-]{20,}")
+    GEMINI_KEY_REGEX = re.compile(r"AIza[0-9A-Za-z-_]{35}")
     BEARER_TOKEN_REGEX = re.compile(r"Bearer\s+([a-zA-Z0-9_\-\.]{15,})", re.IGNORECASE)
 
     def filter(self, record: logging.LogRecord) -> bool:
         if isinstance(record.msg, str):
             msg = record.msg
             msg = self.GROQ_KEY_REGEX.sub("[GROQ_KEY_REDACTED]", msg)
+            msg = self.GEMINI_KEY_REGEX.sub("[GEMINI_KEY_REDACTED]", msg)
             msg = self.BEARER_TOKEN_REGEX.sub("Bearer [TOKEN_REDACTED]", msg)
             msg = self.EMAIL_REGEX.sub("[EMAIL_MASKED]", msg)
             msg = self.PHONE_REGEX.sub("[PHONE_MASKED]", msg)
