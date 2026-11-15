@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Sparkles,
   Target,
@@ -11,6 +12,7 @@ import {
   ChevronUp,
   ShieldCheck,
   AlertCircle,
+  ArrowRight,
 } from 'lucide-react';
 import { useAnalyzer } from '@/hooks/useAnalyzer';
 import { useProfile } from '@/hooks/useProfile';
@@ -38,6 +40,8 @@ export function AnalysisConfigPanel() {
     analysisStepMessage,
     analysisError,
     selectedResume,
+    hasConsent,
+    selectedProvider,
   } = useAnalyzer();
 
   const { profile } = useProfile();
@@ -207,11 +211,35 @@ export function AnalysisConfigPanel() {
           )}
         </div>
 
+        {/* Consent warning notice if not yet granted */}
+        {!hasConsent && (
+          <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 flex items-start gap-3 text-xs text-amber-500">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="font-semibold text-foreground">External AI Processing Consent Disabled</p>
+              <p className="text-muted-foreground leading-relaxed">
+                AI Resume Analysis sends extracted text to your configured AI provider ({selectedProvider || 'GROQ'}).
+                To protect candidate privacy, you must explicitly enable external AI processing before running analyses.
+              </p>
+              <Link to="/settings/ai" className="inline-flex items-center gap-1 font-semibold text-primary hover:underline pt-0.5">
+                <span>Configure AI Provider Settings &amp; Grant Consent</span>
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* 4. Action Button & Progress Indicator */}
         <div className="pt-2 border-t border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
-            <span>Zero-Fabrication Guardrail: Fact-preserving critique only.</span>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
+              <span>Zero-Fabrication Guardrail Enforced.</span>
+            </span>
+            <span>•</span>
+            <span className="font-mono text-primary font-medium">
+              Provider: {selectedProvider || 'GROQ'}
+            </span>
           </div>
 
           <Button

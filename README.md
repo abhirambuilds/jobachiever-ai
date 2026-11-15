@@ -22,10 +22,12 @@ JobAchiever AI resolves these pain points by offering an integrated, privacy-foc
 
 | Feature | Description | Status |
 | :--- | :--- | :---: |
-| **Comprehensive Profile Builder** | Master career repository aggregating verified skills, work history, education, and milestones. | *Planned* |
-| **Intelligent Resume Ingestion** | Multi-format (PDF, DOCX) parser extracting structured career information. | *Planned* |
-| **Resume Weakness & Gap Diagnosis** | Actionable diagnostic reports detailing ATS compatibility, phrasing flaws, and impact metrics. | *Planned* |
-| **Multi-Career Track Management** | Manage distinct career tracks (e.g., Frontend vs. Full-Stack vs. Tech Lead) under one account. | *Planned* |
+| **Comprehensive Profile Builder** | Master career repository aggregating verified skills, work history, education, and milestones. | *Completed* |
+| **Multi-Career Track Management** | Manage distinct career tracks (e.g., Frontend vs. Full-Stack vs. Tech Lead) under one account. | *Completed* |
+| **Secure Resume Document Management** | Multi-version document library supporting PDF/DOCX uploads, validation, and storage. | *Completed* |
+| **AI Provider Settings & Consent** | Bring-your-own preference selection (Groq, Google Gemini) with privacy consent management. | *Completed* |
+| **AI-Powered Resume Analyzer** | Evidence-grounded 6-dimension scoring, ATS audit, and fact-preserving sentence rewrites. | *Completed* |
+| **Intelligent Resume Ingestion** | Multi-format (PDF, DOCX) parser extracting structured career information. | *Completed* |
 | **Tailored Resume Generator** | Generate targeted, role-specific resumes grounded strictly in verified profile achievements. | *Planned* |
 | **Job Description Deconstruction** | Granular parsing of job listings to identify core competencies, required experience, and culture markers. | *Planned* |
 | **Explainable Compatibility Engine** | Transparent, metric-driven match scores detailing alignment, transferable skills, and explicit gaps. | *Planned* |

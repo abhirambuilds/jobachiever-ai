@@ -7,6 +7,7 @@ import {
 } from '@/services/resumeAnalysisService';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useProfile } from '@/hooks/useProfile';
+import { useAiPreferences } from '@/hooks/useAiPreferences';
 import { toast } from '@/components/ui/toast';
 
 const AnalyzerContext = createContext(null);
@@ -14,6 +15,7 @@ const AnalyzerContext = createContext(null);
 export function AnalyzerProvider({ children }) {
   const { documents } = useDocuments();
   const { profile } = useProfile();
+  const { hasConsent, selectedProvider } = useAiPreferences();
 
   // Find initial primary resume or first available document
   const initialResume = useMemo(() => {
@@ -66,12 +68,32 @@ export function AnalyzerProvider({ children }) {
     }
   }, [initialResume, selectedResume, config]);
 
+  // Load history from backend when selected resume changes
+  useEffect(() => {
+    if (selectedResume?.id) {
+      resumeAnalysisService.getAnalysisHistory(selectedResume.id).then((hist) => {
+        if (Array.isArray(hist) && hist.length > 0) {
+          setHistory(hist);
+        }
+      }).catch(() => {
+        // Retain current history
+      });
+    }
+  }, [selectedResume?.id]);
+
   /**
    * Run Analysis Action
    */
   const runAnalysis = async () => {
     if (!selectedResume) {
       toast.error('Please select or upload a resume to analyze.');
+      return;
+    }
+
+    if (!hasConsent) {
+      const consentMsg = 'External AI processing consent is required. Please enable consent in AI Settings before analyzing your resume.';
+      setAnalysisError(consentMsg);
+      toast.error(consentMsg);
       return;
     }
 
@@ -91,27 +113,27 @@ export function AnalyzerProvider({ children }) {
       );
 
       setCurrentAnalysis(result);
-      setSentenceReviews(result.sentenceReviews);
+      setSentenceReviews(result.sentenceReviews || []);
       setIsAnalyzing(false);
       setAnalysisProgress(100);
 
       // Add to session history
       const newHistoryEntry = {
-        id: `ana-hist-${Date.now().toString(36)}`,
+        id: result.analysisId || `ana-hist-${Date.now().toString(36)}`,
         resumeId: selectedResume.id,
-        resumeName: selectedResume.name,
-        filename: selectedResume.originalFilename,
+        resumeName: selectedResume.name || selectedResume.title,
+        filename: selectedResume.originalFilename || selectedResume.fileName,
         analyzedAt: new Date().toISOString(),
         mode: config.mode,
         targetRole: config.targetRole,
         targetTrack: config.careerTrackName,
         overallScore: result.overallScore,
         status: 'completed',
-        summary: result.scoreSummary.slice(0, 85) + '...',
+        summary: (result.scoreSummary || '').slice(0, 85) + '...',
       };
 
-      setHistory((prev) => [newHistoryEntry, ...prev]);
-      toast.success('Resume analysis completed! Heuristic report updated.');
+      setHistory((prev) => [newHistoryEntry, ...prev.filter((h) => h.id !== newHistoryEntry.id)]);
+      toast.success('Resume analysis completed! Evidence-grounded critique report generated.');
     } catch (err) {
       setIsAnalyzing(false);
       setAnalysisError(err.message || 'Analysis encountered an error.');
@@ -185,7 +207,7 @@ export function AnalyzerProvider({ children }) {
   /**
    * Load previous analysis from history
    */
-  const loadHistoryItem = (historyItem) => {
+  const loadHistoryItem = async (historyItem) => {
     const matchingResume =
       documents.find((d) => d.id === historyItem.resumeId) || selectedResume;
 
@@ -193,16 +215,26 @@ export function AnalyzerProvider({ children }) {
       setSelectedResume(matchingResume);
     }
 
-    const reloadedResult = buildSimulatedAnalysisResult(matchingResume || selectedResume, {
-      mode: historyItem.mode,
-      targetRole: historyItem.targetRole,
-      careerTrackName: historyItem.targetTrack,
-    });
-
-    setCurrentAnalysis(reloadedResult);
-    setSentenceReviews(reloadedResult.sentenceReviews);
-    setIsHistoryModalOpen(false);
-    toast.info(`Loaded analysis session from ${new Date(historyItem.analyzedAt).toLocaleDateString()}.`);
+    try {
+      const detailed = await resumeAnalysisService.getAnalysisDetails(
+        historyItem.id,
+        matchingResume || selectedResume
+      );
+      setCurrentAnalysis(detailed);
+      setSentenceReviews(detailed.sentenceReviews || []);
+      setIsHistoryModalOpen(false);
+      toast.info(`Loaded analysis report from ${new Date(historyItem.analyzedAt).toLocaleDateString()}.`);
+    } catch {
+      const reloadedResult = buildSimulatedAnalysisResult(matchingResume || selectedResume, {
+        mode: historyItem.mode,
+        targetRole: historyItem.targetRole,
+        careerTrackName: historyItem.targetTrack,
+      });
+      setCurrentAnalysis(reloadedResult);
+      setSentenceReviews(reloadedResult.sentenceReviews);
+      setIsHistoryModalOpen(false);
+      toast.info(`Loaded cached session from ${new Date(historyItem.analyzedAt).toLocaleDateString()}.`);
+    }
   };
 
   const value = {
@@ -217,6 +249,8 @@ export function AnalyzerProvider({ children }) {
     analysisError,
     currentAnalysis,
     runAnalysis,
+    hasConsent,
+    selectedProvider,
     // Sentence actions
     sentenceReviews,
     acceptSentenceSuggestion,

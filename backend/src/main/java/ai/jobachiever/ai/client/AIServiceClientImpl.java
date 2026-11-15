@@ -175,4 +175,72 @@ public class AIServiceClientImpl implements AIServiceClient {
             throw new AIServiceException("Unable to retrieve AI providers list: " + ex.getMessage(), ex);
         }
     }
+
+    @Override
+    public String analyzeResume(byte[] fileBytes, String filename, String contentType, java.util.UUID resumeId,
+                                String provider, String model, Double temperature, Integer maxTokens, boolean userConsent) {
+        if (fileBytes == null || fileBytes.length == 0) {
+            throw new IllegalArgumentException("File content bytes cannot be null or empty");
+        }
+
+        log.info("Dispatching resume analysis request to AI service at {}/api/v1/analyze-resume for {} with provider {}",
+                properties.getUrl(), filename, provider);
+
+        ByteArrayResource fileResource = new ByteArrayResource(fileBytes) {
+            @Override
+            public String getFilename() {
+                return filename;
+            }
+        };
+
+        HttpHeaders partHeaders = new HttpHeaders();
+        if (contentType != null && !contentType.isBlank()) {
+            partHeaders.setContentType(MediaType.parseMediaType(contentType));
+        }
+
+        HttpEntity<ByteArrayResource> fileEntity = new HttpEntity<>(fileResource, partHeaders);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", fileEntity);
+        if (resumeId != null) {
+            body.add("resume_id", resumeId.toString());
+        }
+        if (provider != null) {
+            body.add("provider", provider);
+        }
+        if (model != null && !model.isBlank()) {
+            body.add("model", model);
+        }
+        if (temperature != null) {
+            body.add("temperature", temperature.toString());
+        }
+        if (maxTokens != null) {
+            body.add("max_tokens", maxTokens.toString());
+        }
+        body.add("user_consent", String.valueOf(userConsent));
+
+        try {
+            String response = restClient.post()
+                    .uri("/api/v1/analyze-resume")
+                    .header(INTERNAL_SERVICE_KEY_HEADER, properties.getInternalKey())
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(body)
+                    .retrieve()
+                    .body(String.class);
+
+            if (response == null || response.isBlank()) {
+                throw new AIServiceException("AI microservice returned an empty analysis response body.");
+            }
+
+            log.info("Successfully received resume analysis report for {}", filename);
+            return response;
+        } catch (RestClientResponseException e) {
+            log.error("AI microservice returned HTTP {} during resume analysis: {}",
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new AIServiceException("AI microservice error: " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            log.error("Failed to communicate with AI microservice during resume analysis: {}", e.getMessage(), e);
+            throw new AIServiceException("Failed to analyze resume with AI microservice: " + e.getMessage(), e);
+        }
+    }
 }

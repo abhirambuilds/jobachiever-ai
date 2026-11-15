@@ -39,4 +39,22 @@ public interface AIServiceClient {
      * @return list of provider metadata objects
      */
     java.util.List<ai.jobachiever.ai.dto.ProviderMetadataDto> getProviders();
+
+    /**
+     * Sends resume file bytes and metadata to the AI microservice for comprehensive
+     * quality evaluation and structured feedback report generation.
+     *
+     * @param fileBytes    raw document bytes (PDF or DOCX)
+     * @param filename     original filename
+     * @param contentType  document MIME type
+     * @param resumeId     optional resume entity ID
+     * @param provider     selected AI provider (e.g. GROQ, GEMINI)
+     * @param model        optional model override
+     * @param temperature  sampling temperature
+     * @param maxTokens    maximum output tokens
+     * @param userConsent  explicit user consent indicator
+     * @return raw JSON string representing the ResumeAnalysisResponse
+     */
+    String analyzeResume(byte[] fileBytes, String filename, String contentType, java.util.UUID resumeId,
+                         String provider, String model, Double temperature, Integer maxTokens, boolean userConsent);
 }

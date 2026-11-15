@@ -14,6 +14,7 @@ import ai.jobachiever.profiles.repository.ProfileEducationRepository;
 import ai.jobachiever.profiles.repository.ProfileExperienceRepository;
 import ai.jobachiever.profiles.repository.ProfileProjectRepository;
 import ai.jobachiever.profiles.repository.ProfileSkillRepository;
+import ai.jobachiever.resumes.repository.ResumeAnalysisRepository;
 import ai.jobachiever.resumes.repository.ResumeDocumentRepository;
 import ai.jobachiever.resumes.repository.ResumeVersionRepository;
 import ai.jobachiever.security.audit.SecurityAuditLogRepository;
@@ -121,6 +122,12 @@ public class TestRepositoryConfig {
     @ConditionalOnMissingBean
     public ResumeVersionRepository resumeVersionRepository() {
         return Mockito.mock(ResumeVersionRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ResumeAnalysisRepository resumeAnalysisRepository() {
+        return Mockito.mock(ResumeAnalysisRepository.class);
     }
 
     @Bean

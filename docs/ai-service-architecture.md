@@ -241,3 +241,14 @@ Implemented in Prompt 24, JobAchiever AI establishes a complete user-controlled 
 3. **Preferences Management:** Authenticated users manage settings via `GET` / `PUT` `/api/v1/users/me/ai-preferences`.
 4. **Mandatory Consent Guardrail:** Transmitting career text requires user consent; timestamps are tracked on state changes.
 5. **Zero Silent Fallback:** No automatic provider switching occurs under rate limit or failure conditions.
+
+---
+
+## 9. AI-Powered Resume Analyzer Architecture
+
+Implemented in Prompt 25, JobAchiever AI introduces evidence-grounded resume critique and multi-dimensional quality scoring:
+1. **FastAPI Microservice Endpoint:** `POST /api/v1/analyze-resume` accepts binary files, enforces magic-byte validation and anti-fabrication prompt boundaries, and yields schema-validated reports.
+2. **Spring Boot Orchestration:** `POST /api/v1/resumes/{resumeId}/analyze` verifies user ownership and explicit consent, dispatches document streams, and archives analysis history to PostgreSQL table `resume_analyses` (Flyway `V16`).
+3. **6-Dimension Rubric:** Content Completeness (20%), Skills Relevance (20%), Experience/Projects (20%), Achievements & Impact (15%), Structure & Readability (15%), ATS Readability (10%).
+4. **Anti-Fabrication & Evidence Grounding:** All suggestions preserve candidate truth with bracketed placeholders (`[actual metric]`) where details are unverified.
+5. **Full Specification:** See [docs/ai-resume-analyzer.md](ai-resume-analyzer.md).

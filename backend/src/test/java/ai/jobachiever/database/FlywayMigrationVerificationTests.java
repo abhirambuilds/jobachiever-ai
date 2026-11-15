@@ -19,10 +19,10 @@ class FlywayMigrationVerificationTests {
     private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
     @Test
-    @DisplayName("All 15 Flyway migrations exist, are ordered sequentially, and are non-empty")
+    @DisplayName("All 16 Flyway migrations exist, are ordered sequentially, and are non-empty")
     void allFlywayMigrationsExistAndAreOrdered() throws Exception {
         Resource[] resources = resolver.getResources("classpath:db/migration/V*.sql");
-        assertThat(resources).hasSize(15);
+        assertThat(resources).hasSize(16);
 
         List<String> filenames = Arrays.stream(resources)
                 .map(Resource::getFilename)
@@ -45,7 +45,8 @@ class FlywayMigrationVerificationTests {
                 "V12__add_profile_contact_fields.sql",
                 "V13__enhance_career_tracks_attributes.sql",
                 "V14__enhance_resume_documents_and_versions.sql",
-                "V15__create_user_ai_preferences_table.sql"
+                "V15__create_user_ai_preferences_table.sql",
+                "V16__create_resume_analyses_table.sql"
         );
 
         for (Resource resource : resources) {
@@ -83,7 +84,8 @@ class FlywayMigrationVerificationTests {
                 "email_verification_tokens",
                 "password_reset_tokens",
                 "security_audit_logs",
-                "user_ai_preferences");
+                "user_ai_preferences",
+                "resume_analyses");
 
         for (String table : expectedTables) {
             assertThat(allSql)
@@ -171,7 +173,8 @@ class FlywayMigrationVerificationTests {
                 Map.entry(ai.jobachiever.auth.entity.EmailVerificationToken.class, "email_verification_tokens"),
                 Map.entry(ai.jobachiever.auth.entity.PasswordResetToken.class, "password_reset_tokens"),
                 Map.entry(ai.jobachiever.security.audit.SecurityAuditLog.class, "security_audit_logs"),
-                Map.entry(ai.jobachiever.ai.entity.UserAiPreference.class, "user_ai_preferences"));
+                Map.entry(ai.jobachiever.ai.entity.UserAiPreference.class, "user_ai_preferences"),
+                Map.entry(ai.jobachiever.resumes.entity.ResumeAnalysis.class, "resume_analyses"));
 
         for (Map.Entry<Class<?>, String> entry : entityTableMap.entrySet()) {
             Class<?> entityClass = entry.getKey();

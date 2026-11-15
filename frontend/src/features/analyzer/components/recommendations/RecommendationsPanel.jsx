@@ -102,6 +102,18 @@ export function RecommendationsPanel({ onScrollToSentences }) {
                     </h4>
                   </div>
 
+                  {/* Candidate Resume Excerpt (Evidence Panel) */}
+                  {rec.originalExcerpt && (
+                    <div className="rounded-lg bg-muted/40 border border-border/50 p-2.5 text-xs text-muted-foreground space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                        Original Resume Excerpt
+                      </span>
+                      <p className="font-mono text-[11px] text-foreground/90 italic">
+                        &ldquo;{rec.originalExcerpt}&rdquo;
+                      </p>
+                    </div>
+                  )}
+
                   {/* Why it matters */}
                   <div className="rounded-lg bg-background/50 border border-border/50 p-2.5 text-xs text-muted-foreground space-y-1">
                     <strong className="text-[11px] font-semibold text-foreground block">
