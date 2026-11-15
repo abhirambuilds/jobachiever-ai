@@ -1,14 +1,13 @@
 package ai.jobachiever.auth.security;
 
 import ai.jobachiever.users.entity.AccountStatus;
+import ai.jobachiever.users.entity.Role;
 import ai.jobachiever.users.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
 
 public class UserPrincipal implements UserDetails {
 
@@ -16,28 +15,40 @@ public class UserPrincipal implements UserDetails {
     private final String email;
     private final String passwordHash;
     private final AccountStatus accountStatus;
+    private final Role role;
     private final boolean emailVerified;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public UserPrincipal(UUID id, String email, String passwordHash,
-                         AccountStatus accountStatus, boolean emailVerified,
+                         AccountStatus accountStatus, Role role, boolean emailVerified,
                          Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
         this.accountStatus = accountStatus;
+        this.role = role != null ? role : Role.USER;
         this.emailVerified = emailVerified;
         this.authorities = authorities;
     }
 
     public static UserPrincipal fromUser(User user) {
+        Role role = user.getRole() != null ? user.getRole() : Role.USER;
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        if (user.isEmailVerified()) {
+            authorities.add(new SimpleGrantedAuthority("AUTHORITY_VERIFIED_EMAIL"));
+        } else {
+            authorities.add(new SimpleGrantedAuthority("AUTHORITY_UNVERIFIED_EMAIL"));
+        }
+
         return new UserPrincipal(
                 user.getId(),
                 user.getEmail(),
                 user.getPasswordHash(),
                 user.getAccountStatus(),
+                role,
                 user.isEmailVerified(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                Collections.unmodifiableList(authorities)
         );
     }
 
@@ -51,6 +62,10 @@ public class UserPrincipal implements UserDetails {
 
     public AccountStatus getAccountStatus() {
         return accountStatus;
+    }
+
+    public Role getRole() {
+        return role;
     }
 
     public boolean isEmailVerified() {

@@ -8,9 +8,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,11 +21,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
- * Spring Security configuration establishing stateless JWT authentication.
- * Limits public routes strictly to health checks, register, and login.
+ * Hardened Spring Security configuration establishing stateless JWT authentication.
+ * Limits public routes strictly to explicit health, registration, and recovery paths.
+ * Enforces secure HTTP headers, explicit administrative boundaries, and method security.
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final CorsConfigurationSource corsConfigurationSource;
@@ -51,6 +55,12 @@ public class SecurityConfig {
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(customAccessDeniedHandler)
             )
+            .headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; frame-ancestors 'none';"))
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+                .xssProtection(HeadersConfigurer.XXssConfig::disable)
+            )
             .authorizeHttpRequests(auth -> auth
                 // Allow CORS pre-flight requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -66,6 +76,9 @@ public class SecurityConfig {
                 // Public Health and Monitoring Endpoints
                 .requestMatchers(HttpMethod.GET, "/api/v1/health").permitAll()
                 .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/info").permitAll()
+
+                // Explicit Administrative Route Protection
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                 // All other API routes require authenticated JWT bearer token
                 .anyRequest().authenticated()

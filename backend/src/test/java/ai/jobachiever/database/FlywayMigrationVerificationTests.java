@@ -19,10 +19,10 @@ class FlywayMigrationVerificationTests {
     private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
     @Test
-    @DisplayName("All 10 Flyway migrations exist, are ordered sequentially, and are non-empty")
+    @DisplayName("All 11 Flyway migrations exist, are ordered sequentially, and are non-empty")
     void allFlywayMigrationsExistAndAreOrdered() throws Exception {
         Resource[] resources = resolver.getResources("classpath:db/migration/V*.sql");
-        assertThat(resources).hasSizeGreaterThanOrEqualTo(10);
+        assertThat(resources).hasSizeGreaterThanOrEqualTo(11);
 
         List<String> filenames = Arrays.stream(resources)
                 .map(Resource::getFilename)
@@ -40,7 +40,8 @@ class FlywayMigrationVerificationTests {
                 "V7__create_jobs_and_requirements.sql",
                 "V8__create_job_applications.sql",
                 "V9__create_revoked_tokens.sql",
-                "V10__create_verification_and_reset_tokens.sql"
+                "V10__create_verification_and_reset_tokens.sql",
+                "V11__add_user_roles_and_security_audit.sql"
         );
 
         for (Resource resource : resources) {
@@ -76,7 +77,8 @@ class FlywayMigrationVerificationTests {
                 "application_activities",
                 "revoked_tokens",
                 "email_verification_tokens",
-                "password_reset_tokens"
+                "password_reset_tokens",
+                "security_audit_logs"
         );
 
         for (String table : expectedTables) {
@@ -98,6 +100,8 @@ class FlywayMigrationVerificationTests {
         assertThat(allSql).containsIgnoringCase("LOWER(email)");
         assertThat(allSql).containsIgnoringCase("chk_users_account_status");
         assertThat(allSql).containsIgnoringCase("'ACTIVE', 'PENDING_VERIFICATION', 'SUSPENDED', 'DEACTIVATED'");
+        assertThat(allSql).containsIgnoringCase("chk_users_role");
+        assertThat(allSql).containsIgnoringCase("role IN ('USER', 'ADMIN')");
     }
 
     @Test
@@ -161,7 +165,8 @@ class FlywayMigrationVerificationTests {
                 Map.entry(ai.jobachiever.applications.entity.ApplicationActivity.class, "application_activities"),
                 Map.entry(ai.jobachiever.auth.entity.RevokedToken.class, "revoked_tokens"),
                 Map.entry(ai.jobachiever.auth.entity.EmailVerificationToken.class, "email_verification_tokens"),
-                Map.entry(ai.jobachiever.auth.entity.PasswordResetToken.class, "password_reset_tokens")
+                Map.entry(ai.jobachiever.auth.entity.PasswordResetToken.class, "password_reset_tokens"),
+                Map.entry(ai.jobachiever.security.audit.SecurityAuditLog.class, "security_audit_logs")
         );
 
         for (Map.Entry<Class<?>, String> entry : entityTableMap.entrySet()) {

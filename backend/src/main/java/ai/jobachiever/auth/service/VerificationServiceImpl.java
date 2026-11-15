@@ -28,6 +28,7 @@ public class VerificationServiceImpl implements VerificationService {
     private final UserRepository userRepository;
     private final EmailVerificationTokenRepository tokenRepository;
     private final EmailService emailService;
+    private final ai.jobachiever.security.audit.SecurityAuditService auditService;
 
     private final int otpExpirationMinutes;
     private final int resendCooldownSeconds;
@@ -37,12 +38,14 @@ public class VerificationServiceImpl implements VerificationService {
             UserRepository userRepository,
             EmailVerificationTokenRepository tokenRepository,
             EmailService emailService,
+            ai.jobachiever.security.audit.SecurityAuditService auditService,
             @Value("${app.mail.otp-expiration-minutes:15}") int otpExpirationMinutes,
             @Value("${app.mail.resend-cooldown-seconds:60}") int resendCooldownSeconds,
             @Value("${app.mail.max-otp-attempts:5}") int maxOtpAttempts) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
+        this.auditService = auditService;
         this.otpExpirationMinutes = otpExpirationMinutes;
         this.resendCooldownSeconds = resendCooldownSeconds;
         this.maxOtpAttempts = maxOtpAttempts;
@@ -135,6 +138,13 @@ public class VerificationServiceImpl implements VerificationService {
             user.setAccountStatus(AccountStatus.ACTIVE);
         }
         userRepository.save(user);
+
+        auditService.recordSuccess(
+                ai.jobachiever.security.audit.SecurityAuditEventType.EMAIL_VERIFIED,
+                user.getId(),
+                user.getEmail(),
+                "Email address successfully verified via OTP"
+        );
 
         log.info("Email successfully verified for user {}. Account status is now ACTIVE.", user.getId());
     }

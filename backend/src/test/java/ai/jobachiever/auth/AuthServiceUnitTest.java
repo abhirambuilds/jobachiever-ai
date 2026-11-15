@@ -57,6 +57,9 @@ class AuthServiceUnitTest {
     @Mock
     private VerificationService verificationService;
 
+    @Mock
+    private ai.jobachiever.security.audit.SecurityAuditService auditService;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
@@ -99,12 +102,22 @@ class AuthServiceUnitTest {
         assertThat(persistedUser.getPasswordHash()).isEqualTo("$2a$12$eX4mpL3H4sh3dStr1ng");
         assertThat(persistedUser.getPasswordHash()).doesNotContain("PlaintextSecret123!");
         assertThat(persistedUser.getEmail()).isEqualTo("dev@jobachiever.ai");
+        assertThat(persistedUser.getRole()).isEqualTo(ai.jobachiever.users.entity.Role.USER);
+        assertThat(response.role()).isEqualTo("USER");
 
         // Verify master career profile is created in same transaction
         verify(careerProfileRepository, times(1)).save(any(CareerProfile.class));
 
         // Verify verification OTP is dispatched
         verify(verificationService, times(1)).sendVerificationOtp(persistedUser);
+
+        // Verify security audit log recorded
+        verify(auditService, times(1)).recordSuccess(
+                eq(ai.jobachiever.security.audit.SecurityAuditEventType.ACCOUNT_REGISTERED),
+                any(UUID.class),
+                eq("dev@jobachiever.ai"),
+                anyString()
+        );
     }
 
     @Test

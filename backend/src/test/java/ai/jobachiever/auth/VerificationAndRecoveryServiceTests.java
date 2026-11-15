@@ -56,6 +56,9 @@ class VerificationAndRecoveryServiceTests {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private ai.jobachiever.security.audit.SecurityAuditService auditService;
+
     private VerificationServiceImpl verificationService;
     private PasswordResetServiceImpl passwordResetService;
 
@@ -67,6 +70,7 @@ class VerificationAndRecoveryServiceTests {
                 userRepository,
                 emailTokenRepository,
                 emailService,
+                auditService,
                 15, // 15 min expiry
                 60, // 60 sec cooldown
                 5   // 5 max attempts
@@ -77,6 +81,7 @@ class VerificationAndRecoveryServiceTests {
                 resetTokenRepository,
                 emailService,
                 passwordEncoder,
+                auditService,
                 30 // 30 min expiry
         );
 

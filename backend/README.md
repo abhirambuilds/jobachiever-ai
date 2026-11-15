@@ -341,7 +341,18 @@ The platform provides a provider-independent notification architecture in packag
 
 ---
 
-## 10. Flyway Schema Migrations
+## 10. Centralized Authorization & Ownership Architecture
+
+JobAchiever AI enforces server-authoritative tenant isolation and resource ownership:
+- **`CurrentUserService`:** Resolves user identity, account status, email verification state, and granted authorities directly from the validated `SecurityContext` / live PostgreSQL state. Client-supplied IDs are never trusted for authorization.
+- **`ResourceOwnershipService`:** Verifies access boundaries for private career profiles, tracks, resume documents, versions, applications, and activities. Inaccessible private resources return `HTTP 404 Not Found` to prevent resource ID enumeration.
+- **Role Model:** Minimal two-tier hierarchy (`USER` vs `ADMIN`). Public registration strictly assigns `USER`. Elevation is restricted to administrative endpoints protected by `@PreAuthorize("hasRole('ADMIN')")`.
+- **Account State Guardrails:** Unverified accounts are prevented from accessing private verified resources (`403 Forbidden`). Suspended and deactivated accounts are blocked during authentication (`401/403`).
+- **Security Audit Logging:** All security-critical events (logins, failures, password resets, verification, status changes, token revocations) are recorded transactionally in `security_audit_logs`.
+
+---
+
+## 11. Flyway Schema Migrations
 
 Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL generation (`ddl-auto: create` or `update`) is strictly forbidden. Schema validation (`hibernate.ddl-auto: validate`) verifies JPA entity alignment against the migrated schema.
 
@@ -362,6 +373,7 @@ Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL
 | **V8** | `V8__create_job_applications.sql` | Creates `job_applications` tracker and `application_activities` audit log |
 | **V9** | `V9__create_revoked_tokens.sql` | Creates `revoked_tokens` table for logout and token invalidation |
 | **V10** | `V10__create_verification_and_reset_tokens.sql` | Creates `email_verification_tokens` and `password_reset_tokens` tables |
+| **V11** | `V11__add_user_roles_and_security_audit.sql` | Adds `role` column to `users` and creates `security_audit_logs` table |
 
 ### 9.2 Migration Execution
 Migrations execute automatically when the Spring Boot backend starts with an active database connection:

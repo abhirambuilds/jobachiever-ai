@@ -33,19 +33,22 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final TokenRevocationService tokenRevocationService;
     private final VerificationService verificationService;
+    private final ai.jobachiever.security.audit.SecurityAuditService auditService;
 
     public AuthServiceImpl(UserRepository userRepository,
                            CareerProfileRepository careerProfileRepository,
                            PasswordEncoder passwordEncoder,
                            JwtService jwtService,
                            TokenRevocationService tokenRevocationService,
-                           VerificationService verificationService) {
+                           VerificationService verificationService,
+                           ai.jobachiever.security.audit.SecurityAuditService auditService) {
         this.userRepository = userRepository;
         this.careerProfileRepository = careerProfileRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.tokenRevocationService = tokenRevocationService;
         this.verificationService = verificationService;
+        this.auditService = auditService;
     }
 
     @Override
@@ -68,6 +71,7 @@ public class AuthServiceImpl implements AuthService {
                 request.lastName().trim()
         );
         user.setAccountStatus(AccountStatus.PENDING_VERIFICATION);
+        user.setRole(ai.jobachiever.users.entity.Role.USER);
         user.setEmailVerified(false);
 
         User savedUser = userRepository.save(user);
@@ -79,7 +83,15 @@ public class AuthServiceImpl implements AuthService {
         // Dispatch initial account verification OTP email
         verificationService.sendVerificationOtp(savedUser);
 
-        log.info("Registered new user with id: {} (status: PENDING_VERIFICATION)", savedUser.getId());
+        // Record security audit event
+        auditService.recordSuccess(
+                ai.jobachiever.security.audit.SecurityAuditEventType.ACCOUNT_REGISTERED,
+                savedUser.getId(),
+                savedUser.getEmail(),
+                "New user registered with default USER role"
+        );
+
+        log.info("Registered new user with id: {} (status: PENDING_VERIFICATION, role: USER)", savedUser.getId());
         return UserResponse.fromEntity(savedUser);
     }
 
@@ -91,21 +103,45 @@ public class AuthServiceImpl implements AuthService {
         // Retrieve user or fail with generic error to avoid account enumeration
         User user = userRepository.findByEmailIgnoreCase(normalizedEmail)
                 .orElseThrow(() -> {
+                    auditService.recordFailure(
+                            ai.jobachiever.security.audit.SecurityAuditEventType.LOGIN_FAILURE,
+                            null,
+                            normalizedEmail,
+                            "User not found"
+                    );
                     log.warn("Authentication failed: user with email {} not found", normalizedEmail);
                     return new BadCredentialsException("Invalid email or password");
                 });
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            auditService.recordFailure(
+                    ai.jobachiever.security.audit.SecurityAuditEventType.LOGIN_FAILURE,
+                    user.getId(),
+                    normalizedEmail,
+                    "Invalid password"
+            );
             log.warn("Authentication failed: invalid password for user {}", user.getId());
             throw new BadCredentialsException("Invalid email or password");
         }
 
         // Account status guardrails
         if (user.getAccountStatus() == AccountStatus.SUSPENDED) {
+            auditService.recordFailure(
+                    ai.jobachiever.security.audit.SecurityAuditEventType.LOGIN_FAILURE,
+                    user.getId(),
+                    normalizedEmail,
+                    "Account is SUSPENDED"
+            );
             log.warn("Authentication rejected: account {} is SUSPENDED", user.getId());
             throw new AccountRestrictedException("Account has been suspended. Please contact support.");
         }
         if (user.getAccountStatus() == AccountStatus.DEACTIVATED) {
+            auditService.recordFailure(
+                    ai.jobachiever.security.audit.SecurityAuditEventType.LOGIN_FAILURE,
+                    user.getId(),
+                    normalizedEmail,
+                    "Account is DEACTIVATED"
+            );
             log.warn("Authentication rejected: account {} is DEACTIVATED", user.getId());
             throw new AccountRestrictedException("Account has been deactivated. Please contact support.");
         }
@@ -113,6 +149,13 @@ public class AuthServiceImpl implements AuthService {
         // Update last login timestamp
         user.setLastLoginAt(Instant.now());
         userRepository.save(user);
+
+        auditService.recordSuccess(
+                ai.jobachiever.security.audit.SecurityAuditEventType.LOGIN_SUCCESS,
+                user.getId(),
+                user.getEmail(),
+                "User authentication successful"
+        );
 
         String token = jwtService.generateToken(user.getId(), user.getEmail());
         log.info("Successful login for user {}", user.getId());
@@ -132,6 +175,12 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void logout(String rawToken, UUID userId) {
         tokenRevocationService.revokeToken(rawToken, userId);
+        auditService.recordSuccess(
+                ai.jobachiever.security.audit.SecurityAuditEventType.TOKEN_REVOKED,
+                userId,
+                null,
+                "Token successfully revoked on logout"
+        );
         log.info("User {} successfully logged out", userId);
     }
 }

@@ -11,6 +11,7 @@ public record UserResponse(
         String firstName,
         String lastName,
         String accountStatus,
+        String role,
         boolean emailVerified,
         Instant createdAt,
         Instant lastLoginAt
@@ -22,6 +23,7 @@ public record UserResponse(
                 user.getFirstName(),
                 user.getLastName(),
                 user.getAccountStatus() != null ? user.getAccountStatus().name() : null,
+                user.getRole() != null ? user.getRole().name() : "USER",
                 user.isEmailVerified(),
                 user.getCreatedAt(),
                 user.getLastLoginAt()

@@ -12,5 +12,9 @@ public interface CareerProfileRepository extends JpaRepository<CareerProfile, UU
 
     Optional<CareerProfile> findByUserId(UUID userId);
 
+    Optional<CareerProfile> findByIdAndUserId(UUID id, UUID userId);
+
     boolean existsByUserId(UUID userId);
+
+    boolean existsByIdAndUserId(UUID id, UUID userId);
 }

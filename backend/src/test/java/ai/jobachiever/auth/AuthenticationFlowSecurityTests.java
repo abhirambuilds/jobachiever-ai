@@ -69,6 +69,7 @@ class AuthenticationFlowSecurityTests {
                 "Alex",
                 "Turner",
                 "PENDING_VERIFICATION",
+                "USER",
                 false,
                 Instant.now(),
                 null

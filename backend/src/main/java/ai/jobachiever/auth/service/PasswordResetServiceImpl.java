@@ -28,6 +28,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private final PasswordResetTokenRepository resetTokenRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final ai.jobachiever.security.audit.SecurityAuditService auditService;
     private final int resetTokenExpirationMinutes;
 
     public PasswordResetServiceImpl(
@@ -35,11 +36,13 @@ public class PasswordResetServiceImpl implements PasswordResetService {
             PasswordResetTokenRepository resetTokenRepository,
             EmailService emailService,
             PasswordEncoder passwordEncoder,
+            ai.jobachiever.security.audit.SecurityAuditService auditService,
             @Value("${app.mail.reset-token-expiration-minutes:30}") int resetTokenExpirationMinutes) {
         this.userRepository = userRepository;
         this.resetTokenRepository = resetTokenRepository;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
+        this.auditService = auditService;
         this.resetTokenExpirationMinutes = resetTokenExpirationMinutes;
     }
 
@@ -76,6 +79,13 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         // Security rule: Never log the plain reset token in application logs
         log.info("Dispatched password reset instructions for user {}", user.getId());
 
+        auditService.recordSuccess(
+                ai.jobachiever.security.audit.SecurityAuditEventType.PASSWORD_RESET_REQUESTED,
+                user.getId(),
+                user.getEmail(),
+                "Password reset token generated and email dispatched"
+        );
+
         emailService.sendPasswordReset(user.getEmail(), user.getFirstName(), plainToken, resetTokenExpirationMinutes);
     }
 
@@ -111,6 +121,13 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         // Consume the reset token (single-use guarantee)
         resetToken.consume();
         resetTokenRepository.save(resetToken);
+
+        auditService.recordSuccess(
+                ai.jobachiever.security.audit.SecurityAuditEventType.PASSWORD_RESET_COMPLETED,
+                user.getId(),
+                user.getEmail(),
+                "Password successfully updated via verified reset token"
+        );
 
         log.info("Password successfully reset for user {}. Token consumed.", user.getId());
     }

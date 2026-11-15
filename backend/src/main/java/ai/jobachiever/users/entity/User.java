@@ -29,6 +29,10 @@ public class User {
     @Column(name = "account_status", nullable = false, length = 32)
     private AccountStatus accountStatus = AccountStatus.PENDING_VERIFICATION;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 32)
+    private Role role = Role.USER;
+
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified = false;
 
@@ -117,6 +121,14 @@ public class User {
 
     public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role != null ? role : Role.USER;
     }
 
     public boolean isEmailVerified() {

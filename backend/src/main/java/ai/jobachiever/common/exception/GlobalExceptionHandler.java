@@ -5,6 +5,7 @@ import ai.jobachiever.auth.exception.EmailAlreadyExistsException;
 import ai.jobachiever.auth.exception.InvalidTokenException;
 import ai.jobachiever.auth.exception.OtpVerificationException;
 import ai.jobachiever.auth.exception.RateLimitException;
+import ai.jobachiever.auth.exception.UnverifiedAccountException;
 import ai.jobachiever.common.response.ErrorResponse;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -210,6 +211,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccountRestrictedException.class)
     public ResponseEntity<ErrorResponse> handleAccountRestricted(
             AccountRestrictedException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    /**
+     * 12. Unverified Account accessing restricted resource (403 Forbidden)
+     */
+    @ExceptionHandler(UnverifiedAccountException.class)
+    public ResponseEntity<ErrorResponse> handleUnverifiedAccount(
+            UnverifiedAccountException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.FORBIDDEN.value(),
                 HttpStatus.FORBIDDEN.getReasonPhrase(),
