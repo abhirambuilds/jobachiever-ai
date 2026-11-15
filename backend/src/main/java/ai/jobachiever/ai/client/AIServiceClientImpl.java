@@ -243,4 +243,65 @@ public class AIServiceClientImpl implements AIServiceClient {
             throw new AIServiceException("Failed to analyze resume with AI microservice: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public String analyzeJobDescription(String jobDescription, java.util.UUID jobId, String jobTitle,
+                                       String companyName, String provider, String model,
+                                       Double temperature, Integer maxTokens, boolean userConsent) {
+        if (jobDescription == null || jobDescription.trim().length() < 50) {
+            throw new IllegalArgumentException("Job description must contain at least 50 meaningful characters");
+        }
+
+        log.info("Dispatching job description analysis request to AI service at {}/api/v1/analyze/job-description (chars={})",
+                properties.getUrl(), jobDescription.length());
+
+        java.util.Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("job_description", jobDescription);
+        if (jobId != null) {
+            payload.put("job_id", jobId.toString());
+        }
+        if (jobTitle != null && !jobTitle.isBlank()) {
+            payload.put("job_title", jobTitle);
+        }
+        if (companyName != null && !companyName.isBlank()) {
+            payload.put("company_name", companyName);
+        }
+        if (provider != null && !provider.isBlank()) {
+            payload.put("provider", provider);
+        }
+        if (model != null && !model.isBlank()) {
+            payload.put("model", model);
+        }
+        if (temperature != null) {
+            payload.put("temperature", temperature);
+        }
+        if (maxTokens != null) {
+            payload.put("max_tokens", maxTokens);
+        }
+        payload.put("user_consent", userConsent);
+
+        try {
+            String response = restClient.post()
+                    .uri("/api/v1/analyze/job-description")
+                    .header(INTERNAL_SERVICE_KEY_HEADER, properties.getInternalKey())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(String.class);
+
+            if (response == null || response.isBlank()) {
+                throw new AIServiceException("AI microservice returned an empty job analysis response body.");
+            }
+
+            log.info("Successfully received job description analysis report");
+            return response;
+        } catch (RestClientResponseException e) {
+            log.error("AI microservice returned HTTP {} during job analysis: {}",
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new AIServiceException("AI microservice error: " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            log.error("Failed to communicate with AI microservice during job analysis: {}", e.getMessage(), e);
+            throw new AIServiceException("Failed to analyze job description with AI microservice: " + e.getMessage(), e);
+        }
+    }
 }

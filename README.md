@@ -28,8 +28,8 @@ JobAchiever AI resolves these pain points by offering an integrated, privacy-foc
 | **AI Provider Settings & Consent** | Bring-your-own preference selection (Groq, Google Gemini) with privacy consent management. | *Completed* |
 | **AI-Powered Resume Analyzer** | Evidence-grounded 6-dimension scoring, ATS audit, and fact-preserving sentence rewrites. | *Completed* |
 | **Intelligent Resume Ingestion** | Multi-format (PDF, DOCX) parser extracting structured career information. | *Completed* |
+| **Job Description Deconstruction** | Granular AI parsing of job listings to identify required skills, qualifications, responsibilities, and ambiguities. | *Completed* |
 | **Tailored Resume Generator** | Generate targeted, role-specific resumes grounded strictly in verified profile achievements. | *Planned* |
-| **Job Description Deconstruction** | Granular parsing of job listings to identify core competencies, required experience, and culture markers. | *Planned* |
 | **Explainable Compatibility Engine** | Transparent, metric-driven match scores detailing alignment, transferable skills, and explicit gaps. | *Planned* |
 | **Job Discovery & Pipeline Tracking** | Kanban-style application management from bookmark to offer negotiation. | *Planned* |
 | **Tailored Cover Letter Builder** | Context-driven cover letters highlighting relevant milestones for targeted job listings. | *Planned* |

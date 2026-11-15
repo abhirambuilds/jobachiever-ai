@@ -252,3 +252,14 @@ Implemented in Prompt 25, JobAchiever AI introduces evidence-grounded resume cri
 3. **6-Dimension Rubric:** Content Completeness (20%), Skills Relevance (20%), Experience/Projects (20%), Achievements & Impact (15%), Structure & Readability (15%), ATS Readability (10%).
 4. **Anti-Fabrication & Evidence Grounding:** All suggestions preserve candidate truth with bracketed placeholders (`[actual metric]`) where details are unverified.
 5. **Full Specification:** See [docs/ai-resume-analyzer.md](ai-resume-analyzer.md).
+
+---
+
+## 10. AI-Powered Job Description Analyzer Architecture
+
+Implemented in Prompt 26, JobAchiever AI introduces structured job description decomposition and requirements extraction:
+1. **FastAPI Microservice Endpoint:** `POST /api/v1/analyze/job-description` (and alias `/api/v1/analyze-job-description`) accepts raw posting text, isolates untrusted content within `<untrusted_job_description>` XML boundaries, and produces Pydantic-validated JSON.
+2. **Spring Boot Orchestration:** `POST /api/v1/jobs/analyze-description` and `POST /api/v1/jobs/{jobId}/analyze` verify candidate AI consent, enforce length bounds (50–50,000 chars), calculate SHA-256 idempotency hashes, and persist reports into PostgreSQL table `job_analyses` (Flyway `V17`).
+3. **Structured Decomposition:** Deconstructs roles into Job Overview (title, company, seniority, employment type, location, experience range), Technical Skills (required, preferred, mentioned), Soft Skills, Responsibilities, Qualifications (education, certifications), Categorized Keywords, and Atomic Requirements with verbatim quotes (`evidenceExcerpt`).
+4. **Advisory & Ambiguity Detection:** Identifies unstated compensation, vague expectations, and potential red flags with neutral candidate guidance tags (`CLARIFICATION_NEEDED`, `POTENTIAL_AMBIGUITY`, `INCOMPLETE_INFORMATION`).
+5. **Full Specification:** See [docs/ai-job-description-analyzer.md](ai-job-description-analyzer.md).

@@ -26,6 +26,7 @@ import { ResumeLibraryPage } from '@/pages/ResumeLibraryPage';
 import { ResumeAnalyzerPage } from '@/pages/ResumeAnalyzerPage';
 import ResumeStudioPage from '@/pages/ResumeStudioPage';
 import { JobMatcherPage } from '@/pages/JobMatcherPage';
+import { JobDescriptionAnalyzerPage } from '@/pages/JobDescriptionAnalyzerPage';
 import { AiSettingsPage } from '@/features/settings/AiSettingsPage';
 import { FeaturePlaceholderPage } from '@/pages/FeaturePlaceholderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -78,6 +79,8 @@ export function AppRoutes() {
             />
           }
         />
+        <Route path="/jd-analyzer" element={<JobDescriptionAnalyzerPage />} />
+        <Route path="/jobs/analyze" element={<JobDescriptionAnalyzerPage />} />
         <Route path="/job-match" element={<JobMatcherPage />} />
         <Route path="/job-matcher" element={<JobMatcherPage />} />
         <Route

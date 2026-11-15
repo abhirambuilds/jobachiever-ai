@@ -54,6 +54,7 @@ const navItems = [
   { label: 'Resume Library', path: '/resumes', icon: FileText },
   { label: 'Resume Studio', path: '/resume-studio', icon: Sparkles },
   { label: 'Resume Analyzer', path: '/resume-analyzer', icon: FileSearch },
+  { label: 'JD Analyzer', path: '/jd-analyzer', icon: FileSearch },
   { label: 'Job Discovery', path: '/jobs', icon: Compass, upcoming: true },
   { label: 'Job Matching', path: '/job-matcher', icon: Target },
   { label: 'Applications', path: '/applications', icon: Kanban, upcoming: true },
@@ -114,7 +115,10 @@ export function DashboardLayout() {
 
   // Determine current section breadcrumb
   const currentNavItem = navItems.find(
-    (item) => item.path === location.pathname || (item.path === '/job-matcher' && location.pathname === '/job-match')
+    (item) =>
+      item.path === location.pathname ||
+      (item.path === '/job-matcher' && location.pathname === '/job-match') ||
+      (item.path === '/jd-analyzer' && location.pathname === '/jobs/analyze')
   );
   const breadcrumbTitle = currentNavItem?.label || 'Command Center';
 
@@ -177,7 +181,8 @@ export function DashboardLayout() {
               const Icon = item.icon;
               const isActive =
                 location.pathname === item.path ||
-                (item.path === '/job-matcher' && location.pathname === '/job-match');
+                (item.path === '/job-matcher' && location.pathname === '/job-match') ||
+                (item.path === '/jd-analyzer' && location.pathname === '/jobs/analyze');
 
               const linkContent = (
                 <Link
@@ -460,7 +465,8 @@ export function DashboardLayout() {
                   const Icon = item.icon;
                   const isActive =
                 location.pathname === item.path ||
-                (item.path === '/job-matcher' && location.pathname === '/job-match');
+                (item.path === '/job-matcher' && location.pathname === '/job-match') ||
+                (item.path === '/jd-analyzer' && location.pathname === '/jobs/analyze');
                   return (
                     <Link
                       key={item.path}

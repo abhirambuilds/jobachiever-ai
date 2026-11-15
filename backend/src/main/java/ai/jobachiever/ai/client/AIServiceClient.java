@@ -57,4 +57,23 @@ public interface AIServiceClient {
      */
     String analyzeResume(byte[] fileBytes, String filename, String contentType, java.util.UUID resumeId,
                          String provider, String model, Double temperature, Integer maxTokens, boolean userConsent);
+
+    /**
+     * Sends a raw job description or job posting text to the AI microservice
+     * for deep architectural decomposition, requirement extraction, and gap analysis.
+     *
+     * @param jobDescription raw job description text (50-50,000 characters)
+     * @param jobId          optional job entity ID
+     * @param jobTitle       optional job title hint
+     * @param companyName    optional company name hint
+     * @param provider       selected AI provider (e.g. GROQ, GEMINI)
+     * @param model          optional model override
+     * @param temperature    sampling temperature
+     * @param maxTokens      maximum output tokens
+     * @param userConsent    explicit user consent indicator
+     * @return raw JSON string representing the JobAnalysisResponse
+     */
+    String analyzeJobDescription(String jobDescription, java.util.UUID jobId, String jobTitle,
+                                String companyName, String provider, String model,
+                                Double temperature, Integer maxTokens, boolean userConsent);
 }
