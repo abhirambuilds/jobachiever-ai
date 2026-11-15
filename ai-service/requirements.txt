@@ -1,0 +1,31 @@
+# ==============================================================================
+# JobAchiever AI — AI Microservice Dependencies (Python 3.11+)
+# ==============================================================================
+
+# FastAPI & ASGI Server
+fastapi==0.163.1
+uvicorn[standard]==0.54.0
+python-multipart==0.0.33
+starlette==1.10.0
+
+# Data Validation & Configuration
+pydantic==2.14.3
+pydantic-settings==2.16.3
+pydantic_core==2.50.4
+python-dotenv==1.2.4
+
+# Document Extraction
+pdfplumber==0.11.10
+pdfminer.six==20260107
+pypdfium2==5.15.2
+python-docx==1.2.0
+lxml==6.1.3
+pillow==13.0.0
+
+# HTTP Client
+httpx==0.28.1
+httpcore==1.0.9
+
+# Testing Framework
+pytest==9.2.0
+pytest-asyncio==1.5.0

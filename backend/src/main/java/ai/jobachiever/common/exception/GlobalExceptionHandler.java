@@ -336,7 +336,23 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 18. Unhandled Internal Server Errors (sanitized to avoid leaking implementation details)
+     * 18. AI Microservice Failures (503 Service Unavailable)
+     */
+    @ExceptionHandler(ai.jobachiever.ai.exception.AIServiceException.class)
+    public ResponseEntity<ErrorResponse> handleAIServiceException(
+            ai.jobachiever.ai.exception.AIServiceException ex, HttpServletRequest request) {
+        log.error("AI service failure at {}: {}", request.getRequestURI(), ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),
+                "AI computation service is currently unavailable. Please try again later.",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+    }
+
+    /**
+     * 19. Unhandled Internal Server Errors (sanitized to avoid leaking implementation details)
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
