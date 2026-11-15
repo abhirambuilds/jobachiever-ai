@@ -38,7 +38,8 @@ class FlywayMigrationVerificationTests {
                 "V5__create_career_tracks.sql",
                 "V6__create_resume_documents.sql",
                 "V7__create_jobs_and_requirements.sql",
-                "V8__create_job_applications.sql"
+                "V8__create_job_applications.sql",
+                "V9__create_revoked_tokens.sql"
         );
 
         for (Resource resource : resources) {
@@ -52,7 +53,7 @@ class FlywayMigrationVerificationTests {
     }
 
     @Test
-    @DisplayName("Flyway migrations create all 15 core platform tables with UUID primary keys")
+    @DisplayName("Flyway migrations create all 16 core platform tables with UUID primary keys")
     void migrationsCreateAllCorePlatformTables() throws Exception {
         String allSql = loadCombinedMigrations();
 
@@ -71,7 +72,8 @@ class FlywayMigrationVerificationTests {
                 "jobs",
                 "job_requirements",
                 "job_applications",
-                "application_activities"
+                "application_activities",
+                "revoked_tokens"
         );
 
         for (String table : expectedTables) {
@@ -153,7 +155,8 @@ class FlywayMigrationVerificationTests {
                 Map.entry(ai.jobachiever.jobs.entity.Job.class, "jobs"),
                 Map.entry(ai.jobachiever.jobs.entity.JobRequirement.class, "job_requirements"),
                 Map.entry(ai.jobachiever.applications.entity.JobApplication.class, "job_applications"),
-                Map.entry(ai.jobachiever.applications.entity.ApplicationActivity.class, "application_activities")
+                Map.entry(ai.jobachiever.applications.entity.ApplicationActivity.class, "application_activities"),
+                Map.entry(ai.jobachiever.auth.entity.RevokedToken.class, "revoked_tokens")
         );
 
         for (Map.Entry<Class<?>, String> entry : entityTableMap.entrySet()) {

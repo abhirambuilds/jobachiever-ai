@@ -27,6 +27,10 @@ public record ErrorResponse(
         this(Instant.now(), status, error, message, path, null);
     }
 
+    public static ErrorResponse of(int status, String error, String message, String path) {
+        return new ErrorResponse(status, error, message, path);
+    }
+
     public ErrorResponse(int status, String error, String message, String path, List<ValidationError> validationErrors) {
         this(Instant.now(), status, error, message, path, validationErrors);
     }

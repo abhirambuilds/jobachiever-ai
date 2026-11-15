@@ -157,9 +157,10 @@ jobachiever-ai/
 | **Milestone 8** | Java Spring Boot Backend Foundation (Prompt 12) | **Completed** |
 | **Milestone 9** | PostgreSQL Database Infrastructure & Flyway Setup (Prompt 13) | **Completed** |
 | **Milestone 10** | Core PostgreSQL Database Schema & JPA Entities (Prompt 14) | **Completed** |
-| **Milestone 11+** | Authentication, Profile Persistence, AI Microservice & Integrations | *Upcoming* |
+| **Milestone 11** | Secure Registration, Login and JWT Authentication (Prompt 15) | **Completed** |
+| **Milestone 12+** | Email OTP Verification, Password Reset, AI Microservice & Integrations | *Upcoming* |
 
-> *Current State:* Frontend client application, Spring Boot backend foundation, and core PostgreSQL relational schema (15 tables, Flyway migrations V1–V8, JPA entities, ER diagram) established with automated test suites. REST endpoints, authentication, and AI integration will be introduced in subsequent milestones.
+> *Current State:* Frontend client application, Spring Boot backend foundation, PostgreSQL schema (16 tables, Flyway migrations V1–V9, JPA entities), and secure authentication subsystem (BCrypt, stateless JWT, token revocation, Spring Security 6.x) established with automated test suites. Profile persistence and AI integration will be introduced in subsequent milestones.
 
 ---
 

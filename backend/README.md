@@ -164,10 +164,105 @@ The backend binds database connection properties through environment variables w
 | `spring.jpa.hibernate.ddl-auto` | — | `validate` | Validates schema without automatic DDL alters |
 | `spring.flyway.enabled` | — | `true` | Automated Flyway migrations on startup |
 | `app.cors.allowed-origins` | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,http://localhost:3000` | Allowed cross-origin client URLs |
+| `app.jwt.secret` | `JWT_SECRET` | *(development fallback)* | HMAC-SHA256 signing secret (min 32 bytes; required in prod) |
+| `app.jwt.expiration-seconds` | `JWT_EXPIRATION_SECONDS` | `86400` (24h) | Access token validity duration in seconds |
+| `app.jwt.issuer` | `JWT_ISSUER` | `jobachiever-ai` | Issuer claim verification string |
 
 ---
 
-## 8. Flyway Schema Migrations
+## 8. Authentication & Authorization API (`/api/v1/auth`)
+
+Stateless JWT bearer authentication with BCrypt hashing and server-side token revocation. See [`docs/authentication-architecture.md`](file:///c:/Projects/JobAchieverAI/docs/authentication-architecture.md) for full design specification.
+
+### 8.1 Register (`POST /api/v1/auth/register`)
+- **Public endpoint.**
+- **Request Body:**
+  ```json
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "password": "StrongPassword123!"
+  }
+  ```
+- **Response (`201 Created`):**
+  ```json
+  {
+    "data": {
+      "id": "7b579178-5776-47a3-a75e-3c58bbf9df01",
+      "email": "john@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "accountStatus": "PENDING_VERIFICATION",
+      "emailVerified": false,
+      "createdAt": "2026-11-15T10:45:00Z",
+      "lastLoginAt": null
+    },
+    "message": "User registered successfully"
+  }
+  ```
+- **Errors:** `400 Bad Request` (validation failure), `409 Conflict` (duplicate email).
+
+### 8.2 Login (`POST /api/v1/auth/login`)
+- **Public endpoint.**
+- **Request Body:**
+  ```json
+  {
+    "email": "john@example.com",
+    "password": "StrongPassword123!"
+  }
+  ```
+- **Response (`200 OK`):**
+  ```json
+  {
+    "data": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "tokenType": "Bearer",
+      "expiresIn": 86400,
+      "user": {
+        "id": "7b579178-5776-47a3-a75e-3c58bbf9df01",
+        "email": "john@example.com",
+        "firstName": "John",
+        "lastName": "Doe",
+        "accountStatus": "PENDING_VERIFICATION",
+        "emailVerified": false,
+        "createdAt": "2026-11-15T10:45:00Z",
+        "lastLoginAt": "2026-11-15T10:46:00Z"
+      }
+    },
+    "message": "Login successful"
+  }
+  ```
+- **Errors:** `401 Unauthorized` (generic "Invalid email or password" to prevent enumeration), `403 Forbidden` (suspended/deactivated).
+
+### 8.3 Get Current User (`GET /api/v1/auth/me`)
+- **Protected endpoint** (Requires `Authorization: Bearer <token>`).
+- **Response (`200 OK`):**
+  ```json
+  {
+    "data": {
+      "id": "7b579178-5776-47a3-a75e-3c58bbf9df01",
+      "email": "john@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "accountStatus": "PENDING_VERIFICATION",
+      "emailVerified": false,
+      "createdAt": "2026-11-15T10:45:00Z",
+      "lastLoginAt": "2026-11-15T10:46:00Z"
+    },
+    "message": "Current user retrieved successfully"
+  }
+  ```
+- **Errors:** `401 Unauthorized` (missing, invalid, expired, or revoked token).
+
+### 8.4 Logout (`POST /api/v1/auth/logout`)
+- **Protected endpoint** (Requires `Authorization: Bearer <token>`).
+- **Action:** Adds token cryptographic identifier (`jti` or SHA-256 digest) to `revoked_tokens` table.
+- **Response:** `204 No Content`. Subsequent attempts to use this token yield `401 Unauthorized`.
+
+---
+
+## 9. Flyway Schema Migrations
 
 Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL generation (`ddl-auto: create` or `update`) is strictly forbidden. Schema validation (`hibernate.ddl-auto: validate`) verifies JPA entity alignment against the migrated schema.
 
@@ -175,7 +270,7 @@ Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL
 - **Naming Pattern:** `V{Version}__{Descriptive_Title}.sql`
 - **Detailed Schema Specification & ER Diagram:** See [`docs/database-schema.md`](file:///c:/Projects/JobAchieverAI/docs/database-schema.md)
 
-### 8.1 Migration Catalog
+### 9.1 Migration Catalog
 | Version | Migration Script | Description |
 | :--- | :--- | :--- |
 | **V1** | `V1__create_database_extensions.sql` | Enables `uuid-ossp`, `pgcrypto`, and conditionally initializes `vector` (pgvector) |
@@ -186,8 +281,9 @@ Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL
 | **V6** | `V6__create_resume_documents.sql` | Creates `resume_documents` and `resume_versions` tables with secure storage paths |
 | **V7** | `V7__create_jobs_and_requirements.sql` | Creates shared `jobs` catalog and decomposed `job_requirements` |
 | **V8** | `V8__create_job_applications.sql` | Creates `job_applications` tracker and `application_activities` audit log |
+| **V9** | `V9__create_revoked_tokens.sql` | Creates `revoked_tokens` table for logout and token invalidation |
 
-### 8.2 Migration Execution
+### 9.2 Migration Execution
 Migrations execute automatically when the Spring Boot backend starts with an active database connection:
 ```powershell
 # Migrations run automatically at startup against local PostgreSQL
