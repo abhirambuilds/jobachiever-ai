@@ -3,33 +3,13 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Header, HTTPException, UploadFile, File, status
 
 from app.core.config import get_settings, Settings
+from app.core.security import verify_internal_service_key
 from app.schemas.resume import ParsedResumeResponse
 from app.services.parsing.resume_parser import parse_resume_document
 from app.utils.file_validation import validate_uploaded_document
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["Resume Parsing"])
-
-
-def verify_internal_service_key(
-    x_internal_service_key: Optional[str] = Header(None, alias="X-Internal-Service-Key"),
-    settings: Settings = Depends(get_settings)
-) -> None:
-    """
-    Verifies service-to-service authentication header.
-    Only requests dispatched by trusted internal services (Spring Boot) carrying
-    the valid shared secret are permitted to invoke the parsing engine.
-    """
-    # Allow missing key only in development if not configured or empty
-    if not settings.internal_service_key:
-        return
-
-    if not x_internal_service_key or x_internal_service_key != settings.internal_service_key:
-        logger.warning("Rejected unauthorized internal service request to /parse")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or missing internal service credentials."
-        )
 
 
 @router.post(

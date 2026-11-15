@@ -110,4 +110,69 @@ public class AIServiceClientImpl implements AIServiceClient {
             return false;
         }
     }
+
+    @Override
+    public ai.jobachiever.ai.dto.AIGenerationResponseDto generate(ai.jobachiever.ai.dto.AIGenerationRequestDto request) {
+        if (request == null) {
+            throw new IllegalArgumentException("AI generation request payload cannot be null");
+        }
+
+        log.info("Dispatching AI generation request to AI service at {}/api/v1/generate (provider: {}, task: {})",
+                properties.getUrl(), request.getProvider(), request.getTask());
+
+        try {
+            ai.jobachiever.ai.dto.AIGenerationResponseDto response = restClient.post()
+                    .uri("/api/v1/generate")
+                    .header(INTERNAL_SERVICE_KEY_HEADER, properties.getInternalKey())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(ai.jobachiever.ai.dto.AIGenerationResponseDto.class);
+
+            if (response == null) {
+                throw new AIServiceException("AI microservice returned an empty response body.");
+            }
+
+            log.info("Successfully received AI generation response from provider {} (tokens: in={}, out={})",
+                    response.getProvider(),
+                    response.getUsage() != null ? response.getUsage().getInputTokens() : 0,
+                    response.getUsage() != null ? response.getUsage().getOutputTokens() : 0);
+            return response;
+
+        } catch (RestClientResponseException ex) {
+            log.error("AI microservice returned HTTP error status {}: {}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            int code = ex.getStatusCode().value();
+            if (code == 429) {
+                throw new AIServiceException("AI provider rate limit reached. Please retry in a few moments.", ex);
+            } else if (code == 502) {
+                throw new AIServiceException("AI provider authentication failure. Please verify server configuration.", ex);
+            } else if (code == 504) {
+                throw new AIServiceException("AI generation request timed out.", ex);
+            }
+            throw new AIServiceException("AI microservice error (" + code + "): " + ex.getStatusText(), ex);
+        } catch (Exception ex) {
+            log.error("Failed to communicate with AI microservice at {}: {}", properties.getUrl(), ex.getMessage());
+            throw new AIServiceException("Unable to communicate with AI generation service: " + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public java.util.List<ai.jobachiever.ai.dto.ProviderMetadataDto> getProviders() {
+        log.info("Fetching available AI providers from {}/api/v1/providers", properties.getUrl());
+        try {
+            ai.jobachiever.ai.dto.ProviderListResponseDto response = restClient.get()
+                    .uri("/api/v1/providers")
+                    .retrieve()
+                    .body(ai.jobachiever.ai.dto.ProviderListResponseDto.class);
+
+            if (response == null || response.getProviders() == null) {
+                return java.util.Collections.emptyList();
+            }
+            return response.getProviders();
+
+        } catch (Exception ex) {
+            log.error("Failed to fetch AI providers list: {}", ex.getMessage());
+            throw new AIServiceException("Unable to retrieve AI providers list: " + ex.getMessage(), ex);
+        }
+    }
 }

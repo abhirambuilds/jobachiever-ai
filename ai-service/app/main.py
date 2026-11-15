@@ -4,7 +4,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routes import health, resume_parser
+from app.api.routes import generation, health, providers, resume_parser
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 
@@ -59,6 +59,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     """Uniform handler for domain and HTTP exceptions."""
     return JSONResponse(
         status_code=exc.status_code,
+        headers=exc.headers,
         content={
             "status": exc.status_code,
             "error": "HTTP Error",
@@ -85,6 +86,8 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
 # Mount versioned API routes under /api/v1
 app.include_router(health.router, prefix="/api/v1")
+app.include_router(providers.router, prefix="/api/v1")
+app.include_router(generation.router, prefix="/api/v1")
 app.include_router(resume_parser.router, prefix="/api/v1")
 
 

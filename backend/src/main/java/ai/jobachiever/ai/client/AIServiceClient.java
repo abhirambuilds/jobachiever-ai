@@ -24,4 +24,19 @@ public interface AIServiceClient {
      * @return true if service reports status UP, false otherwise
      */
     boolean checkHealth();
+
+    /**
+     * Dispatches text or structured generation request to the selected AI provider.
+     *
+     * @param request configuration and prompt payload
+     * @return normalized generation response with content and token metrics
+     */
+    ai.jobachiever.ai.dto.AIGenerationResponseDto generate(ai.jobachiever.ai.dto.AIGenerationRequestDto request);
+
+    /**
+     * Retrieves available AI providers and their supported models.
+     *
+     * @return list of provider metadata objects
+     */
+    java.util.List<ai.jobachiever.ai.dto.ProviderMetadataDto> getProviders();
 }

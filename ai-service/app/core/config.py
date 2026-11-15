@@ -1,6 +1,6 @@
 import os
 from functools import lru_cache
-from typing import List, Union
+from typing import List, Optional, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -36,6 +36,14 @@ class Settings(BaseSettings):
 
     # CORS Configuration
     cors_allowed_origins: Union[str, List[str]] = ["http://localhost:8080", "http://127.0.0.1:8080"]
+
+    # Groq AI Provider Configuration
+    groq_api_key: Optional[str] = None
+    groq_default_model: str = "llama-3.3-70b-versatile"
+    groq_timeout_seconds: float = 30.0
+    groq_max_retries: int = 2
+    groq_max_output_tokens: int = 4096
+    groq_max_concurrency: int = 10
 
     @field_validator("cors_allowed_origins", mode="before")
     @classmethod
