@@ -19,10 +19,10 @@ class FlywayMigrationVerificationTests {
     private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
     @Test
-    @DisplayName("All 11 Flyway migrations exist, are ordered sequentially, and are non-empty")
+    @DisplayName("All 14 Flyway migrations exist, are ordered sequentially, and are non-empty")
     void allFlywayMigrationsExistAndAreOrdered() throws Exception {
         Resource[] resources = resolver.getResources("classpath:db/migration/V*.sql");
-        assertThat(resources).hasSizeGreaterThanOrEqualTo(11);
+        assertThat(resources).hasSize(14);
 
         List<String> filenames = Arrays.stream(resources)
                 .map(Resource::getFilename)
