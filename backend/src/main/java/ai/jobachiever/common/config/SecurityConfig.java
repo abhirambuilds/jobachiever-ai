@@ -58,6 +58,10 @@ public class SecurityConfig {
                 // Public Authentication Endpoints
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/verify-email", "/api/v1/auth/verify-otp").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/resend-verification", "/api/v1/auth/resend-otp").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/forgot-password").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/reset-password").permitAll()
 
                 // Public Health and Monitoring Endpoints
                 .requestMatchers(HttpMethod.GET, "/api/v1/health").permitAll()

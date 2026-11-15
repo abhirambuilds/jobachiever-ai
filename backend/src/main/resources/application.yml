@@ -60,6 +60,15 @@ app:
     allowed-headers: "*"
     allow-credentials: true
     max-age: 3600
+  mail:
+    enabled: ${MAIL_ENABLED:false}
+    from: ${MAIL_FROM:noreply@jobachiever.ai}
+    from-name: ${MAIL_FROM_NAME:JobAchiever AI}
+    reset-base-url: ${RESET_BASE_URL:http://localhost:5173/reset-password}
+    otp-expiration-minutes: ${OTP_EXPIRATION_MINUTES:15}
+    reset-token-expiration-minutes: ${RESET_TOKEN_EXPIRATION_MINUTES:30}
+    resend-cooldown-seconds: ${RESEND_COOLDOWN_SECONDS:60}
+    max-otp-attempts: ${MAX_OTP_ATTEMPTS:5}
 
 management:
   endpoints:

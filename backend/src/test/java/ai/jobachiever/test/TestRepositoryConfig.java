@@ -1,5 +1,7 @@
 package ai.jobachiever.test;
 
+import ai.jobachiever.auth.repository.EmailVerificationTokenRepository;
+import ai.jobachiever.auth.repository.PasswordResetTokenRepository;
 import ai.jobachiever.auth.repository.RevokedTokenRepository;
 import ai.jobachiever.profiles.repository.CareerProfileRepository;
 import ai.jobachiever.users.repository.UserRepository;
@@ -34,5 +36,17 @@ public class TestRepositoryConfig {
     @ConditionalOnMissingBean
     public RevokedTokenRepository revokedTokenRepository() {
         return Mockito.mock(RevokedTokenRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public EmailVerificationTokenRepository emailVerificationTokenRepository() {
+        return Mockito.mock(EmailVerificationTokenRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PasswordResetTokenRepository passwordResetTokenRepository() {
+        return Mockito.mock(PasswordResetTokenRepository.class);
     }
 }

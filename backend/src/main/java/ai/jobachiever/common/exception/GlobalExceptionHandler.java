@@ -3,6 +3,8 @@ package ai.jobachiever.common.exception;
 import ai.jobachiever.auth.exception.AccountRestrictedException;
 import ai.jobachiever.auth.exception.EmailAlreadyExistsException;
 import ai.jobachiever.auth.exception.InvalidTokenException;
+import ai.jobachiever.auth.exception.OtpVerificationException;
+import ai.jobachiever.auth.exception.RateLimitException;
 import ai.jobachiever.common.response.ErrorResponse;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -233,7 +235,37 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 13. Unhandled Internal Server Errors (sanitized to avoid leaking implementation details)
+     * 13. OTP Verification Failures (400 Bad Request)
+     */
+    @ExceptionHandler(OtpVerificationException.class)
+    public ResponseEntity<ErrorResponse> handleOtpVerification(
+            OtpVerificationException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * 14. Rate Limiting / Cooldown Violations (429 Too Many Requests)
+     */
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimit(
+            RateLimitException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.TOO_MANY_REQUESTS.value(),
+                HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(errorResponse);
+    }
+
+    /**
+     * 15. Unhandled Internal Server Errors (sanitized to avoid leaking implementation details)
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(

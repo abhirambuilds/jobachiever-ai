@@ -32,17 +32,20 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final TokenRevocationService tokenRevocationService;
+    private final VerificationService verificationService;
 
     public AuthServiceImpl(UserRepository userRepository,
                            CareerProfileRepository careerProfileRepository,
                            PasswordEncoder passwordEncoder,
                            JwtService jwtService,
-                           TokenRevocationService tokenRevocationService) {
+                           TokenRevocationService tokenRevocationService,
+                           VerificationService verificationService) {
         this.userRepository = userRepository;
         this.careerProfileRepository = careerProfileRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.tokenRevocationService = tokenRevocationService;
+        this.verificationService = verificationService;
     }
 
     @Override
@@ -72,6 +75,9 @@ public class AuthServiceImpl implements AuthService {
         // Transactionally initialize master career profile (1-to-1 relationship)
         CareerProfile profile = new CareerProfile(savedUser);
         careerProfileRepository.save(profile);
+
+        // Dispatch initial account verification OTP email
+        verificationService.sendVerificationOtp(savedUser);
 
         log.info("Registered new user with id: {} (status: PENDING_VERIFICATION)", savedUser.getId());
         return UserResponse.fromEntity(savedUser);

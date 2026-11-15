@@ -9,6 +9,7 @@ import ai.jobachiever.auth.exception.EmailAlreadyExistsException;
 import ai.jobachiever.auth.service.AuthServiceImpl;
 import ai.jobachiever.auth.service.JwtService;
 import ai.jobachiever.auth.service.TokenRevocationService;
+import ai.jobachiever.auth.service.VerificationService;
 import ai.jobachiever.profiles.entity.CareerProfile;
 import ai.jobachiever.profiles.repository.CareerProfileRepository;
 import ai.jobachiever.users.entity.AccountStatus;
@@ -52,6 +53,9 @@ class AuthServiceUnitTest {
 
     @Mock
     private TokenRevocationService tokenRevocationService;
+
+    @Mock
+    private VerificationService verificationService;
 
     @InjectMocks
     private AuthServiceImpl authService;
@@ -98,6 +102,9 @@ class AuthServiceUnitTest {
 
         // Verify master career profile is created in same transaction
         verify(careerProfileRepository, times(1)).save(any(CareerProfile.class));
+
+        // Verify verification OTP is dispatched
+        verify(verificationService, times(1)).sendVerificationOtp(persistedUser);
     }
 
     @Test

@@ -260,9 +260,88 @@ Stateless JWT bearer authentication with BCrypt hashing and server-side token re
 - **Action:** Adds token cryptographic identifier (`jti` or SHA-256 digest) to `revoked_tokens` table.
 - **Response:** `204 No Content`. Subsequent attempts to use this token yield `401 Unauthorized`.
 
+### 8.5 Verify Email OTP (`POST /api/v1/auth/verify-email` & alias `/verify-otp`)
+- **Public endpoint.**
+- **Request Body:**
+  ```json
+  {
+    "email": "candidate@example.com",
+    "otp": "482910"
+  }
+  ```
+- **Response (`200 OK`):**
+  ```json
+  {
+    "success": true,
+    "message": "Email successfully verified. Your account is now active."
+  }
+  ```
+- **Security:** Evaluated via constant-time SHA-256 verification (`MessageDigest.isEqual`), max 5 attempts enforced, single-use token consumption.
+
+### 8.6 Resend Verification OTP (`POST /api/v1/auth/resend-verification` & alias `/resend-otp`)
+- **Public endpoint.**
+- **Request Body:**
+  ```json
+  {
+    "email": "candidate@example.com"
+  }
+  ```
+- **Response (`200 OK`):**
+  ```json
+  {
+    "success": true,
+    "message": "If an account exists with this email address, a new verification code has been dispatched."
+  }
+  ```
+- **Security:** Zero account enumeration (identical generic message if unregistered). Rate-limited with a 60-second cooldown (`429 Too Many Requests`).
+
+### 8.7 Request Password Reset (`POST /api/v1/auth/forgot-password`)
+- **Public endpoint.**
+- **Request Body:**
+  ```json
+  {
+    "email": "candidate@example.com"
+  }
+  ```
+- **Response (`200 OK`):**
+  ```json
+  {
+    "success": true,
+    "message": "If an account exists with this email address, password reset instructions have been dispatched."
+  }
+  ```
+- **Security:** Zero account enumeration. Generates a 32-byte cryptographic token (SHA-256 stored) valid for 30 minutes.
+
+### 8.8 Complete Password Reset (`POST /api/v1/auth/reset-password`)
+- **Public endpoint.**
+- **Request Body:**
+  ```json
+  {
+    "token": "3a7b9c1d5e2f4a6b8c0d1e3f5a7b9c1d3a7b9c1d5e2f4a6b8c0d1e3f5a7b9c1d",
+    "newPassword": "NewStr0ngP@ssw0rd2026!"
+  }
+  ```
+- **Response (`200 OK`):**
+  ```json
+  {
+    "success": true,
+    "message": "Password successfully reset. You may now log in with your new credentials."
+  }
+  ```
+- **Security:** Single-use token consumption, BCrypt hashing of new password, `email_verified` status preserved without modification.
+
 ---
 
-## 9. Flyway Schema Migrations
+## 9. Email Notification System
+
+The platform provides a provider-independent notification architecture in package `ai.jobachiever.notifications`:
+- **`EmailProvider`:** Abstract interface with implementations `SmtpEmailProvider` (Spring JavaMailSender) and `SimulatedEmailProvider` (safe metadata logging).
+- **Zero Configuration Fallback:** If SMTP host is not configured (`app.mail.enabled: false`), the backend defaults automatically to `SimulatedEmailProvider`, guaranteeing zero runtime failures in local or offline developer environments.
+- **`EmailTemplateService`:** Assembles responsive HTML and plain-text multipart emails with modern SaaS styling.
+
+---
+
+## 10. Flyway Schema Migrations
 
 Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL generation (`ddl-auto: create` or `update`) is strictly forbidden. Schema validation (`hibernate.ddl-auto: validate`) verifies JPA entity alignment against the migrated schema.
 
@@ -282,6 +361,7 @@ Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL
 | **V7** | `V7__create_jobs_and_requirements.sql` | Creates shared `jobs` catalog and decomposed `job_requirements` |
 | **V8** | `V8__create_job_applications.sql` | Creates `job_applications` tracker and `application_activities` audit log |
 | **V9** | `V9__create_revoked_tokens.sql` | Creates `revoked_tokens` table for logout and token invalidation |
+| **V10** | `V10__create_verification_and_reset_tokens.sql` | Creates `email_verification_tokens` and `password_reset_tokens` tables |
 
 ### 9.2 Migration Execution
 Migrations execute automatically when the Spring Boot backend starts with an active database connection:

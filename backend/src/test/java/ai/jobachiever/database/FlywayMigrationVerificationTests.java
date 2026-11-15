@@ -19,10 +19,10 @@ class FlywayMigrationVerificationTests {
     private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
     @Test
-    @DisplayName("All 8 Flyway migrations exist, are ordered sequentially, and are non-empty")
+    @DisplayName("All 10 Flyway migrations exist, are ordered sequentially, and are non-empty")
     void allFlywayMigrationsExistAndAreOrdered() throws Exception {
         Resource[] resources = resolver.getResources("classpath:db/migration/V*.sql");
-        assertThat(resources).hasSizeGreaterThanOrEqualTo(8);
+        assertThat(resources).hasSizeGreaterThanOrEqualTo(10);
 
         List<String> filenames = Arrays.stream(resources)
                 .map(Resource::getFilename)
@@ -39,7 +39,8 @@ class FlywayMigrationVerificationTests {
                 "V6__create_resume_documents.sql",
                 "V7__create_jobs_and_requirements.sql",
                 "V8__create_job_applications.sql",
-                "V9__create_revoked_tokens.sql"
+                "V9__create_revoked_tokens.sql",
+                "V10__create_verification_and_reset_tokens.sql"
         );
 
         for (Resource resource : resources) {
@@ -73,7 +74,9 @@ class FlywayMigrationVerificationTests {
                 "job_requirements",
                 "job_applications",
                 "application_activities",
-                "revoked_tokens"
+                "revoked_tokens",
+                "email_verification_tokens",
+                "password_reset_tokens"
         );
 
         for (String table : expectedTables) {
@@ -156,7 +159,9 @@ class FlywayMigrationVerificationTests {
                 Map.entry(ai.jobachiever.jobs.entity.JobRequirement.class, "job_requirements"),
                 Map.entry(ai.jobachiever.applications.entity.JobApplication.class, "job_applications"),
                 Map.entry(ai.jobachiever.applications.entity.ApplicationActivity.class, "application_activities"),
-                Map.entry(ai.jobachiever.auth.entity.RevokedToken.class, "revoked_tokens")
+                Map.entry(ai.jobachiever.auth.entity.RevokedToken.class, "revoked_tokens"),
+                Map.entry(ai.jobachiever.auth.entity.EmailVerificationToken.class, "email_verification_tokens"),
+                Map.entry(ai.jobachiever.auth.entity.PasswordResetToken.class, "password_reset_tokens")
         );
 
         for (Map.Entry<Class<?>, String> entry : entityTableMap.entrySet()) {

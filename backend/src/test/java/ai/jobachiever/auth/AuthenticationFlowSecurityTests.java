@@ -1,12 +1,14 @@
 package ai.jobachiever.auth;
 
-import ai.jobachiever.auth.dto.AuthResponse;
-import ai.jobachiever.auth.dto.LoginRequest;
-import ai.jobachiever.auth.dto.RegisterRequest;
-import ai.jobachiever.auth.dto.UserResponse;
+import ai.jobachiever.auth.dto.*;
 import ai.jobachiever.auth.exception.AccountRestrictedException;
 import ai.jobachiever.auth.exception.EmailAlreadyExistsException;
+import ai.jobachiever.auth.exception.InvalidTokenException;
+import ai.jobachiever.auth.exception.OtpVerificationException;
+import ai.jobachiever.auth.exception.RateLimitException;
 import ai.jobachiever.auth.service.AuthService;
+import ai.jobachiever.auth.service.PasswordResetService;
+import ai.jobachiever.auth.service.VerificationService;
 import ai.jobachiever.common.exception.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +50,12 @@ class AuthenticationFlowSecurityTests {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private VerificationService verificationService;
+
+    @MockBean
+    private PasswordResetService passwordResetService;
 
     private UUID sampleUserId;
     private UserResponse sampleUserResponse;
@@ -204,5 +212,158 @@ class AuthenticationFlowSecurityTests {
         mockMvc.perform(post("/api/v1/auth/logout")
                         .header("Authorization", "Bearer sample.revoked.token"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("POST /verify-email with valid 6-digit OTP returns 200 OK")
+    void verifyEmail_withValidOtp_returnsOk() throws Exception {
+        VerifyEmailRequest request = new VerifyEmailRequest("alex.turner@jobachiever.ai", "123456");
+        doNothing().when(verificationService).verifyEmail("alex.turner@jobachiever.ai", "123456");
+
+        mockMvc.perform(post("/api/v1/auth/verify-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value(containsString("Email successfully verified")));
+    }
+
+    @Test
+    @DisplayName("POST /verify-otp alias endpoint with valid OTP returns 200 OK")
+    void verifyOtp_aliasEndpoint_returnsOk() throws Exception {
+        VerifyEmailRequest request = new VerifyEmailRequest("alex.turner@jobachiever.ai", "654321");
+        doNothing().when(verificationService).verifyEmail("alex.turner@jobachiever.ai", "654321");
+
+        mockMvc.perform(post("/api/v1/auth/verify-otp")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value(containsString("Email successfully verified")));
+    }
+
+    @Test
+    @DisplayName("POST /verify-email with invalid OTP format fails validation with 400 Bad Request")
+    void verifyEmail_withInvalidOtpFormat_failsValidation() throws Exception {
+        VerifyEmailRequest request = new VerifyEmailRequest("alex.turner@jobachiever.ai", "123");
+
+        mockMvc.perform(post("/api/v1/auth/verify-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    @DisplayName("POST /verify-email with failed OTP verification returns 400 Bad Request")
+    void verifyEmail_withIncorrectOtp_returnsBadRequest() throws Exception {
+        VerifyEmailRequest request = new VerifyEmailRequest("alex.turner@jobachiever.ai", "999999");
+        org.mockito.Mockito.doThrow(new OtpVerificationException("Invalid verification code. 4 attempts remaining."))
+                .when(verificationService).verifyEmail("alex.turner@jobachiever.ai", "999999");
+
+        mockMvc.perform(post("/api/v1/auth/verify-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value(containsString("Invalid verification code")));
+    }
+
+    @Test
+    @DisplayName("POST /resend-verification returns 200 OK")
+    void resendVerification_returnsOk() throws Exception {
+        ResendVerificationRequest request = new ResendVerificationRequest("alex.turner@jobachiever.ai");
+        doNothing().when(verificationService).resendVerificationOtp("alex.turner@jobachiever.ai");
+
+        mockMvc.perform(post("/api/v1/auth/resend-verification")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value(containsString("verification code has been dispatched")));
+    }
+
+    @Test
+    @DisplayName("POST /resend-otp alias endpoint returns 200 OK")
+    void resendOtp_aliasEndpoint_returnsOk() throws Exception {
+        ResendVerificationRequest request = new ResendVerificationRequest("alex.turner@jobachiever.ai");
+        doNothing().when(verificationService).resendVerificationOtp("alex.turner@jobachiever.ai");
+
+        mockMvc.perform(post("/api/v1/auth/resend-otp")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value(containsString("verification code has been dispatched")));
+    }
+
+    @Test
+    @DisplayName("POST /resend-verification throttled by cooldown returns 429 Too Many Requests")
+    void resendVerification_throttled_returnsTooManyRequests() throws Exception {
+        ResendVerificationRequest request = new ResendVerificationRequest("alex.turner@jobachiever.ai");
+        org.mockito.Mockito.doThrow(new RateLimitException("Please wait 45 seconds before requesting a new verification code."))
+                .when(verificationService).resendVerificationOtp("alex.turner@jobachiever.ai");
+
+        mockMvc.perform(post("/api/v1/auth/resend-verification")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.status").value(429))
+                .andExpect(jsonPath("$.message").value(containsString("wait 45 seconds")));
+    }
+
+    @Test
+    @DisplayName("POST /forgot-password returns 200 OK with zero email enumeration")
+    void forgotPassword_returnsOk() throws Exception {
+        ForgotPasswordRequest request = new ForgotPasswordRequest("alex.turner@jobachiever.ai");
+        doNothing().when(passwordResetService).requestPasswordReset("alex.turner@jobachiever.ai");
+
+        mockMvc.perform(post("/api/v1/auth/forgot-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value(containsString("password reset instructions have been dispatched")));
+    }
+
+    @Test
+    @DisplayName("POST /reset-password with valid token and strong password returns 200 OK")
+    void resetPassword_withValidTokenAndStrongPassword_returnsOk() throws Exception {
+        ResetPasswordRequest request = new ResetPasswordRequest("valid-hex-token-32-bytes", "NewStr0ngP@ssw0rd2026!");
+        doNothing().when(passwordResetService).resetPassword("valid-hex-token-32-bytes", "NewStr0ngP@ssw0rd2026!");
+
+        mockMvc.perform(post("/api/v1/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value(containsString("Password successfully reset")));
+    }
+
+    @Test
+    @DisplayName("POST /reset-password with weak password fails validation with 400 Bad Request")
+    void resetPassword_withWeakPassword_failsValidation() throws Exception {
+        ResetPasswordRequest request = new ResetPasswordRequest("valid-hex-token-32-bytes", "weak");
+
+        mockMvc.perform(post("/api/v1/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    @DisplayName("POST /reset-password with expired/invalid token returns 401 Unauthorized")
+    void resetPassword_withInvalidToken_returnsUnauthorized() throws Exception {
+        ResetPasswordRequest request = new ResetPasswordRequest("expired-token", "NewStr0ngP@ssw0rd2026!");
+        org.mockito.Mockito.doThrow(new InvalidTokenException("Invalid or expired password reset token."))
+                .when(passwordResetService).resetPassword("expired-token", "NewStr0ngP@ssw0rd2026!");
+
+        mockMvc.perform(post("/api/v1/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.message").value(containsString("Invalid or expired")));
     }
 }

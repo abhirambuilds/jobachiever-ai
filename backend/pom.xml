@@ -90,6 +90,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- Spring Boot Mail Starter (Jakarta Mail / SMTP Delivery) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- Spring Boot Test Starter (JUnit 5, Mockito, AssertJ, MockMvc) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
