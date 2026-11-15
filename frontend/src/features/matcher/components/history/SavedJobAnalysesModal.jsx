@@ -5,6 +5,7 @@ import {
   Layers,
   ShieldCheck,
   Building2,
+  Trash2,
 } from 'lucide-react';
 import { useJobMatcher } from '@/hooks/useJobMatcher';
 import {
@@ -19,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 export function SavedJobAnalysesModal({ isOpen, onClose }) {
-  const { savedAnalyses, loadSavedAnalysis } = useJobMatcher();
+  const { savedAnalyses, loadSavedAnalysis, deleteSavedAnalysis } = useJobMatcher();
 
   const formatDate = (isoString) => {
     if (!isoString) return 'Unknown';
@@ -56,8 +57,8 @@ export function SavedJobAnalysesModal({ isOpen, onClose }) {
           <div className="rounded-xl border border-border/60 bg-muted/20 p-3 flex items-start gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
             <p>
-              <strong className="text-foreground font-semibold">Development Workspace: </strong>
-              Saved opportunities are currently preserved in session memory and development baselines. Spring Boot Data JPA will manage persistence in future backend milestones.
+              <strong className="text-foreground font-semibold">Persisted Match History: </strong>
+              Compatibility reports and granular gap assessments are securely stored in your personal profile. Reopening a report retrieves the full dimension breakdown and recommendations.
             </p>
           </div>
 
@@ -97,7 +98,7 @@ export function SavedJobAnalysesModal({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                <div className="shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/40">
+                <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/40">
                   <Button
                     type="button"
                     variant="outline"
@@ -107,6 +108,16 @@ export function SavedJobAnalysesModal({ isOpen, onClose }) {
                   >
                     <RotateCcw className="h-3.5 w-3.5 text-cyan-400" />
                     <span>Reopen Report</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteSavedAnalysis?.(item.id)}
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                    aria-label="Delete match report"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </div>

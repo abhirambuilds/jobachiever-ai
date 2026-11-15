@@ -182,12 +182,26 @@ export function JobMatcherProvider({ children }) {
   /**
    * Reload a saved analysis
    */
-  const loadSavedAnalysis = (savedItem) => {
+  const loadSavedAnalysis = async (savedItem) => {
     setJobDetails((prev) => ({
       ...prev,
       company: savedItem.company,
       title: savedItem.title,
     }));
+
+    if (savedItem.id && savedItem.id.length === 36 && savedItem.id.includes('-')) {
+      try {
+        const fullMatch = await jobMatchingService.getMatchDetails(savedItem.id);
+        if (fullMatch) {
+          setCurrentMatch(fullMatch);
+          setIsHistoryModalOpen(false);
+          toast.info(`Reloaded analysis for ${savedItem.company} (${savedItem.title}).`);
+          return;
+        }
+      } catch (err) {
+        console.warn('Could not load backend match details, falling back:', err);
+      }
+    }
 
     const matchingResume =
       documents.find((d) => d.name === savedItem.resumeName) || selectedResume;
@@ -200,6 +214,21 @@ export function JobMatcherProvider({ children }) {
     setCurrentMatch(reloaded);
     setIsHistoryModalOpen(false);
     toast.info(`Reloaded analysis for ${savedItem.company} (${savedItem.title}).`);
+  };
+
+  /**
+   * Delete a saved analysis
+   */
+  const deleteSavedAnalysis = async (savedId) => {
+    if (savedId && savedId.length === 36 && savedId.includes('-')) {
+      try {
+        await jobMatchingService.deleteMatch(savedId);
+      } catch (err) {
+        console.warn('Backend delete error:', err);
+      }
+    }
+    setSavedAnalyses((prev) => prev.filter((item) => item.id !== savedId));
+    toast.success('Match record removed.');
   };
 
   const value = {
@@ -238,6 +267,7 @@ export function JobMatcherProvider({ children }) {
     setIsHistoryModalOpen,
     saveCurrentAnalysis,
     loadSavedAnalysis,
+    deleteSavedAnalysis,
   };
 
   return <JobMatcherContext.Provider value={value}>{children}</JobMatcherContext.Provider>;

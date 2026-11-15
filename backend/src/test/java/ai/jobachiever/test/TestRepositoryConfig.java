@@ -9,6 +9,7 @@ import ai.jobachiever.auth.repository.RevokedTokenRepository;
 import ai.jobachiever.careertracks.repository.CareerTrackRepository;
 import ai.jobachiever.jobs.repository.JobAnalysisRepository;
 import ai.jobachiever.jobs.repository.JobRepository;
+import ai.jobachiever.matching.repository.JobMatchRepository;
 import ai.jobachiever.profiles.repository.CareerProfileRepository;
 import ai.jobachiever.profiles.repository.ProfileAchievementRepository;
 import ai.jobachiever.profiles.repository.ProfileCertificationRepository;
@@ -160,5 +161,11 @@ public class TestRepositoryConfig {
     @ConditionalOnMissingBean
     public JobAnalysisRepository jobAnalysisRepository() {
         return Mockito.mock(JobAnalysisRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JobMatchRepository jobMatchRepository() {
+        return Mockito.mock(JobMatchRepository.class);
     }
 }

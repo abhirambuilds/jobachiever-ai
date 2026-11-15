@@ -76,4 +76,33 @@ public interface AIServiceClient {
     String analyzeJobDescription(String jobDescription, java.util.UUID jobId, String jobTitle,
                                 String companyName, String provider, String model,
                                 Double temperature, Integer maxTokens, boolean userConsent);
+
+    /**
+     * Dispatches structured candidate resume evidence and job requirement definitions
+     * to the internal Python FastAPI matching microservice.
+     *
+     * @param resumeData    structured resume fields or parsed resume map
+     * @param jobData       structured job fields or analyzed job map
+     * @param resumeId      optional resume UUID
+     * @param versionId     optional resume version UUID
+     * @param jobId         optional job UUID
+     * @param jobAnalysisId optional job analysis UUID
+     * @param provider      selected AI provider (GROQ / GEMINI)
+     * @param model         optional model override
+     * @param temperature   sampling temperature
+     * @param maxTokens     max tokens
+     * @param userConsent   explicit candidate AI consent
+     * @return raw JSON string representing MatchingResponse
+     */
+    String matchResumeToJob(java.util.Map<String, Object> resumeData,
+                            java.util.Map<String, Object> jobData,
+                            java.util.UUID resumeId,
+                            java.util.UUID versionId,
+                            java.util.UUID jobId,
+                            java.util.UUID jobAnalysisId,
+                            String provider,
+                            String model,
+                            Double temperature,
+                            Integer maxTokens,
+                            boolean userConsent);
 }

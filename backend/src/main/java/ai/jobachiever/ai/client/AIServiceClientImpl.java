@@ -304,4 +304,80 @@ public class AIServiceClientImpl implements AIServiceClient {
             throw new AIServiceException("Failed to analyze job description with AI microservice: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public String matchResumeToJob(java.util.Map<String, Object> resumeData,
+                                   java.util.Map<String, Object> jobData,
+                                   java.util.UUID resumeId,
+                                   java.util.UUID versionId,
+                                   java.util.UUID jobId,
+                                   java.util.UUID jobAnalysisId,
+                                   String provider,
+                                   String model,
+                                   Double temperature,
+                                   Integer maxTokens,
+                                   boolean userConsent) {
+        if (resumeData == null || resumeData.isEmpty()) {
+            throw new IllegalArgumentException("Resume data must not be empty for matching");
+        }
+        if (jobData == null || jobData.isEmpty()) {
+            throw new IllegalArgumentException("Job requirement data must not be empty for matching");
+        }
+
+        log.info("Dispatching resume-job match request to AI service at {}/api/v1/matching/analyze (resumeId={}, jobId={})",
+                properties.getUrl(), resumeId, jobId);
+
+        java.util.Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("resume_data", resumeData);
+        payload.put("job_data", jobData);
+        if (resumeId != null) {
+            payload.put("resume_id", resumeId.toString());
+        }
+        if (versionId != null) {
+            payload.put("resume_version_id", versionId.toString());
+        }
+        if (jobId != null) {
+            payload.put("job_id", jobId.toString());
+        }
+        if (jobAnalysisId != null) {
+            payload.put("job_analysis_id", jobAnalysisId.toString());
+        }
+        if (provider != null && !provider.isBlank()) {
+            payload.put("provider", provider);
+        }
+        if (model != null && !model.isBlank()) {
+            payload.put("model", model);
+        }
+        if (temperature != null) {
+            payload.put("temperature", temperature);
+        }
+        if (maxTokens != null) {
+            payload.put("max_tokens", maxTokens);
+        }
+        payload.put("user_consent", userConsent);
+
+        try {
+            String response = restClient.post()
+                    .uri("/api/v1/matching/analyze")
+                    .header(INTERNAL_SERVICE_KEY_HEADER, properties.getInternalKey())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(String.class);
+
+            if (response == null || response.isBlank()) {
+                throw new AIServiceException("AI microservice returned an empty matching response body.");
+            }
+
+            log.info("Successfully received resume-job match report");
+            return response;
+        } catch (RestClientResponseException e) {
+            log.error("AI microservice returned HTTP {} during matching: {}",
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new AIServiceException("AI microservice error: " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            log.error("Failed to communicate with AI microservice during matching: {}", e.getMessage(), e);
+            throw new AIServiceException("Failed to execute resume-job matching: " + e.getMessage(), e);
+        }
+    }
 }

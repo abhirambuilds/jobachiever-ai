@@ -222,9 +222,9 @@ In alignment with **AGENTS.md Core Principles**:
 ### 7.1 Automated Testing Metrics
 | Test Suite | Framework | Scope | Tests Run | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **FastAPI Microservice** | `pytest` + `pytest-asyncio` | API routes, extractors, Groq/Gemini providers | 95 | **95 Passed** (0.61s) |
-| **Spring Boot Backend** | JUnit 5 + Mockito + MockMvc | AI client, provider settings, controllers, security | 215 | **214 Passed** (1 skipped) |
-| **React Frontend** | Vitest + RTL | AI settings, provider context, UI navigation | 92 | **92 Passed** (7.73s) |
+| **FastAPI Microservice** | `pytest` + `pytest-asyncio` | API routes, parsers, Groq/Gemini, matching engine | 128 | **128 Passed** (0.78s) |
+| **Spring Boot Backend** | JUnit 5 + Mockito + MockMvc | AI client, matching engine, repositories, security | 264 | **263 Passed** (1 skipped) |
+| **React Frontend** | Vitest + RTL | AI settings, matching context, scorecards, tables | 106 | **106 Passed** (8.25s) |
 
 ### 7.2 Performance Characteristics
 - Typical parsing latency for a standard 2-page PDF: **~120ms to 250ms**.
@@ -263,3 +263,16 @@ Implemented in Prompt 26, JobAchiever AI introduces structured job description d
 3. **Structured Decomposition:** Deconstructs roles into Job Overview (title, company, seniority, employment type, location, experience range), Technical Skills (required, preferred, mentioned), Soft Skills, Responsibilities, Qualifications (education, certifications), Categorized Keywords, and Atomic Requirements with verbatim quotes (`evidenceExcerpt`).
 4. **Advisory & Ambiguity Detection:** Identifies unstated compensation, vague expectations, and potential red flags with neutral candidate guidance tags (`CLARIFICATION_NEEDED`, `POTENTIAL_AMBIGUITY`, `INCOMPLETE_INFORMATION`).
 5. **Full Specification:** See [docs/ai-job-description-analyzer.md](ai-job-description-analyzer.md).
+
+---
+
+## 11. Explainable Resume–Job Matching Engine Architecture
+
+Implemented in Prompt 27, JobAchiever AI establishes a deterministic compatibility matching engine comparing candidate resumes against job descriptions:
+1. **FastAPI Microservice Engine:** `POST /api/v1/matching/analyze` (and alias `/api/v1/matching/match`) executes deterministic multi-dimensional matching across normalized candidate evidence and stated requirements.
+2. **Spring Boot Orchestration:** `POST /api/v1/matches` validates candidate ownership of the resume, checks mandatory AI processing consent, resolves candidate and job data, dispatches matching, and persists reports into PostgreSQL table `job_matches` (Flyway `V18`).
+3. **Deterministic Scoring (0–100):** Fixed base weights: Required Skills (35%), Work Experience (20%), Responsibilities (15%), Education & Qualifications (10%), Preferred Skills (10%), Domain/Tools (10%). Re-normalizes weights dynamically when specific dimensions are unstated in the job description.
+4. **Multi-Tier Skill Alignment:** Progressive four-tier matching (Exact $\rightarrow$ Canonical Alias Dictionary $\rightarrow$ Closely Related Graph $\rightarrow$ Not Demonstrated).
+5. **Non-Overlapping Experience Tenure:** Parses dates and merges overlapping employment intervals to compute accurate professional years without double-counting.
+6. **Strict Non-Guarantee Disclaimer:** All scores are presented as heuristic alignment estimates, accompanied by transparent gaps and grounded recommendations.
+7. **Full Specification:** See [docs/resume-job-matching.md](resume-job-matching.md).

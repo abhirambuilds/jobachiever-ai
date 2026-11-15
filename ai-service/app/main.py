@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.routes import analysis, generation, health, job_analysis, providers, resume_parser
+from app.matching import router as matching_router
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 
@@ -91,6 +92,7 @@ app.include_router(generation.router, prefix="/api/v1")
 app.include_router(resume_parser.router, prefix="/api/v1")
 app.include_router(analysis.router, prefix="/api/v1")
 app.include_router(job_analysis.router, prefix="/api/v1")
+app.include_router(matching_router, prefix="/api/v1")
 
 
 if __name__ == "__main__":

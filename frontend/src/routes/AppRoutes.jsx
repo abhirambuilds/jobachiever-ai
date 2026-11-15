@@ -83,6 +83,7 @@ export function AppRoutes() {
         <Route path="/jobs/analyze" element={<JobDescriptionAnalyzerPage />} />
         <Route path="/job-match" element={<JobMatcherPage />} />
         <Route path="/job-matcher" element={<JobMatcherPage />} />
+        <Route path="/matching" element={<JobMatcherPage />} />
         <Route
           path="/applications"
           element={
