@@ -292,3 +292,20 @@ Implemented in Prompt 28, JobAchiever AI integrates an evidence-grounded interac
    - Evaluates and returns explainable confidence levels (`HIGH`, `MEDIUM`, `LOW`).
 6. **Draft-Only Editor State:** Suggestions update the active client draft state only and never overwrite saved resumes without explicit user confirmation.
 7. **Full Specification:** See [docs/resume-studio-ai.md](resume-studio-ai.md).
+
+---
+
+## 13. AI Skill Gap Analysis & Career Recommendations Architecture
+
+Implemented in Prompt 29, JobAchiever AI introduces evidence-grounded Skill Gap Analysis, Priority Weighting, and Phased Learning Roadmaps:
+1. **FastAPI Microservice Endpoints:**
+   - `POST /api/v1/career/skill-gaps`: Evaluates candidate facts against role benchmarks with canonical aliasing and formula prioritization.
+   - `POST /api/v1/career/recommendations`: Synthesizes prioritized strategic advice across 5 categories (`SKILL_DEVELOPMENT`, `PRACTICAL_PROJECT`, `PORTFOLIO_ENHANCEMENT`, `CERTIFICATION`, `CONCEPT_MASTERY`).
+   - `POST /api/v1/career/roadmaps/generate`: Generates dependency-ordered, phased curriculum with demonstrable milestones, tasks, and completion criteria.
+   - `POST /api/v1/career/projects/recommend`: Synthesizes multi-skill portfolio project blueprints eliminating 2–4 missing skills simultaneously.
+2. **Deterministic Prioritization Formula:**
+   $$\text{Priority Score} = 0.35 \times R + 0.20 \times F + 0.20 \times T + 0.15 \times D + 0.10 \times G$$
+   Classifies competencies into `CRITICAL` ($\ge 90$), `HIGH` ($70-89$), `MEDIUM` ($50-69$), and `LOW` ($< 50$).
+3. **Four-Tier Evidence Evaluation:** `STRONG` (demonstrated mastery), `DEVELOPING` (partial evidence), `MISSING_EVIDENCE` (unproven competence), `NEEDS_REVIEW` (aliased/ambiguous).
+4. **Spring Boot Orchestration (`/api/v1/career/**`):** Enforces mandatory explicit user AI consent, verifies career track ownership, manages persistence in `career_skill_gaps`, `career_roadmaps`, `career_milestones`, and `career_recommendations` (Flyway `V19`), and updates dashboard summaries.
+5. **Full Specification:** See [docs/career-intelligence.md](career-intelligence.md).

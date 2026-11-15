@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Bot, Sparkles, ArrowRight, Lightbulb } from 'lucide-react';
 import { dashboardService } from '@/services/dashboardService';
+import { careerIntelligenceService } from '@/services/careerIntelligenceService';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,17 +14,53 @@ export function CareerInsightsPanel() {
 
   useEffect(() => {
     let mounted = true;
-    dashboardService
-      .getAiInsights()
-      .then((data) => {
-        if (mounted) {
-          setInsights(data);
-          setLoading(false);
+    Promise.allSettled([
+      dashboardService.getAiInsights(),
+      careerIntelligenceService.getDashboardSummary(),
+    ]).then(([insightsRes, summaryRes]) => {
+      if (!mounted) return;
+      const baseInsights = insightsRes.status === 'fulfilled' ? insightsRes.value : [];
+      const summary = summaryRes.status === 'fulfilled' ? summaryRes.value : null;
+
+      if (summary) {
+        const enriched = [...baseInsights];
+
+        if (summary.topCriticalGaps && summary.topCriticalGaps.length > 0) {
+          const topGapNames = summary.topCriticalGaps.map(g => g.canonicalName).slice(0, 3).join(', ');
+          enriched.unshift({
+            id: 'intel-gaps',
+            category: 'Skill Gap Strategy',
+            title: `Critical Gaps for ${summary.targetRole || 'Target Role'}: ${topGapNames}`,
+            description: `Address ${summary.criticalGapsCount} critical missing qualifications to maximize hiring match scores.`,
+            actionLabel: 'View Skill Gap Strategy',
+            actionRoute: '/career-assistant',
+            badge: `${summary.criticalGapsCount} Gaps`,
+            badgeVariant: 'warning',
+          });
         }
-      })
-      .catch(() => {
-        if (mounted) setLoading(false);
-      });
+
+        if (summary.hasActiveRoadmap) {
+          enriched.splice(1, 0, {
+            id: 'intel-roadmap',
+            category: 'Learning Roadmap',
+            title: `Target Roadmap Progress: ${summary.roadmapProgressPercentage}% Complete`,
+            description: `${summary.completedMilestones} of ${summary.totalMilestones} milestones completed. Next: ${summary.upcomingMilestones?.[0]?.title || 'Continue Milestone'}`,
+            actionLabel: 'Open Learning Roadmap',
+            actionRoute: '/career-assistant',
+            badge: `${summary.roadmapProgressPercentage}% Complete`,
+            badgeVariant: 'ai',
+          });
+        }
+
+        setInsights(enriched.slice(0, 3));
+      } else {
+        setInsights(baseInsights);
+      }
+      setLoading(false);
+    }).catch(() => {
+      if (mounted) setLoading(false);
+    });
+
     return () => {
       mounted = false;
     };

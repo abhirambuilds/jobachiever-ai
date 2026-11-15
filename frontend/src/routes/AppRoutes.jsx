@@ -6,7 +6,6 @@ import {
   FileSignature,
   Globe,
   GraduationCap,
-  Bot,
 } from 'lucide-react';
 
 import { AppLayout } from '@/layouts/AppLayout';
@@ -28,6 +27,7 @@ import ResumeStudioPage from '@/pages/ResumeStudioPage';
 import { JobMatcherPage } from '@/pages/JobMatcherPage';
 import { JobDescriptionAnalyzerPage } from '@/pages/JobDescriptionAnalyzerPage';
 import { AiSettingsPage } from '@/features/settings/AiSettingsPage';
+import CareerIntelligencePage from '@/features/career/CareerIntelligencePage';
 import { FeaturePlaceholderPage } from '@/pages/FeaturePlaceholderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -128,17 +128,8 @@ export function AppRoutes() {
             />
           }
         />
-        <Route
-          path="/career-assistant"
-          element={
-            <FeaturePlaceholderPage
-              title="AI Career Strategist &amp; Copilot"
-              description="Personalized career roadmaps, skill acquisition suggestions, and market alignment recommendations."
-              milestone="Milestone 10"
-              icon={Bot}
-            />
-          }
-        />
+        <Route path="/career/intelligence" element={<CareerIntelligencePage />} />
+        <Route path="/career-assistant" element={<CareerIntelligencePage />} />
         <Route path="/settings" element={<AiSettingsPage />} />
         <Route path="/settings/ai" element={<AiSettingsPage />} />
       </Route>

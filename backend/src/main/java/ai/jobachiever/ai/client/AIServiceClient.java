@@ -132,4 +132,37 @@ public interface AIServiceClient {
                                        Integer maxTokens,
                                        Integer numAlternatives,
                                        boolean userConsent);
+
+    /**
+     * Dispatches candidate profile facts and target career track requirements
+     * to the internal Python FastAPI skill gap analysis engine.
+     *
+     * @param payload map containing candidate facts, target role, and model parameters
+     * @return raw JSON string representing SkillGapAnalysisResponse
+     */
+    String analyzeCareerSkillGaps(java.util.Map<String, Object> payload);
+
+    /**
+     * Dispatches skill gap items and candidate facts to the AI recommendations engine.
+     *
+     * @param payload map containing skill gaps, target role, and model parameters
+     * @return raw JSON string representing CareerRecommendationsResponse
+     */
+    String generateCareerRecommendations(java.util.Map<String, Object> payload);
+
+    /**
+     * Dispatches candidate profile facts and skill gaps to the phased learning roadmap generator.
+     *
+     * @param payload map containing candidate facts, skill gaps, and model parameters
+     * @return raw JSON string representing RoadmapGenerateResponse
+     */
+    String generateCareerRoadmap(java.util.Map<String, Object> payload);
+
+    /**
+     * Dispatches candidate profile facts and missing skills to the portfolio project recommender.
+     *
+     * @param payload map containing missing skills, target role, and model parameters
+     * @return raw JSON string representing ProjectRecommendationsResponse
+     */
+    String recommendCareerProjects(java.util.Map<String, Object> payload);
 }

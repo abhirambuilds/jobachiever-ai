@@ -7,6 +7,10 @@ import ai.jobachiever.auth.repository.EmailVerificationTokenRepository;
 import ai.jobachiever.auth.repository.PasswordResetTokenRepository;
 import ai.jobachiever.auth.repository.RevokedTokenRepository;
 import ai.jobachiever.careertracks.repository.CareerTrackRepository;
+import ai.jobachiever.career.repository.CareerMilestoneRepository;
+import ai.jobachiever.career.repository.CareerRecommendationRepository;
+import ai.jobachiever.career.repository.CareerRoadmapRepository;
+import ai.jobachiever.career.repository.CareerSkillGapRepository;
 import ai.jobachiever.jobs.repository.JobAnalysisRepository;
 import ai.jobachiever.jobs.repository.JobRepository;
 import ai.jobachiever.matching.repository.JobMatchRepository;
@@ -167,5 +171,29 @@ public class TestRepositoryConfig {
     @ConditionalOnMissingBean
     public JobMatchRepository jobMatchRepository() {
         return Mockito.mock(JobMatchRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CareerSkillGapRepository careerSkillGapRepository() {
+        return Mockito.mock(CareerSkillGapRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CareerRecommendationRepository careerRecommendationRepository() {
+        return Mockito.mock(CareerRecommendationRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CareerRoadmapRepository careerRoadmapRepository() {
+        return Mockito.mock(CareerRoadmapRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CareerMilestoneRepository careerMilestoneRepository() {
+        return Mockito.mock(CareerMilestoneRepository.class);
     }
 }

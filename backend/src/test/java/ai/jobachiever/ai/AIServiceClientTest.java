@@ -252,4 +252,40 @@ class AIServiceClientTest {
         assertThat(result).contains("Engineered systems");
         mockServer.verify();
     }
+
+    @Test
+    @DisplayName("analyzeCareerSkillGaps dispatches payload with internal key and returns response string")
+    void analyzeCareerSkillGapsSuccess() {
+        String mockResponse = "{\"target_role\":\"Backend Engineer\",\"demonstrated_skills\":[],\"missing_evidence_skills\":[]}";
+
+        mockServer.expect(requestTo("http://ai-service-mock:8000/api/v1/career/skill-gaps"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header("X-Internal-Service-Key", "test-secret-key"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+
+        String result = client.analyzeCareerSkillGaps(java.util.Map.of("target_role", "Backend Engineer"));
+
+        assertThat(result).isNotNull();
+        assertThat(result).contains("Backend Engineer");
+        mockServer.verify();
+    }
+
+    @Test
+    @DisplayName("generateCareerRoadmap dispatches payload with internal key and returns response string")
+    void generateCareerRoadmapSuccess() {
+        String mockResponse = "{\"title\":\"Roadmap\",\"phases\":[]}";
+
+        mockServer.expect(requestTo("http://ai-service-mock:8000/api/v1/career/roadmaps/generate"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header("X-Internal-Service-Key", "test-secret-key"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+
+        String result = client.generateCareerRoadmap(java.util.Map.of("target_role", "Backend Engineer"));
+
+        assertThat(result).isNotNull();
+        assertThat(result).contains("Roadmap");
+        mockServer.verify();
+    }
 }

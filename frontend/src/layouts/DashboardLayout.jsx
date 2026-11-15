@@ -61,7 +61,7 @@ const navItems = [
   { label: 'Cover Letters', path: '/cover-letters', icon: FileSignature, upcoming: true },
   { label: 'Portfolio', path: '/portfolio', icon: Globe, upcoming: true },
   { label: 'Interview Prep', path: '/interviews', icon: GraduationCap, upcoming: true },
-  { label: 'AI Assistant', path: '/career-assistant', icon: Bot, upcoming: true },
+  { label: 'Career Intelligence', path: '/career-assistant', icon: Bot },
   { label: 'Settings', path: '/settings/ai', icon: Settings },
 ];
 

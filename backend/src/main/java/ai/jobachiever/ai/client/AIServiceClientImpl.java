@@ -452,4 +452,140 @@ public class AIServiceClientImpl implements AIServiceClient {
             throw new AIServiceException("Failed to generate Resume Studio enhancement: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public String analyzeCareerSkillGaps(java.util.Map<String, Object> payload) {
+        if (payload == null || payload.isEmpty()) {
+            throw new IllegalArgumentException("Skill gap payload must not be empty");
+        }
+
+        log.info("Dispatching career skill gap analysis request to AI service at {}/api/v1/career/skill-gaps",
+                properties.getUrl());
+
+        try {
+            String response = restClient.post()
+                    .uri("/api/v1/career/skill-gaps")
+                    .header(INTERNAL_SERVICE_KEY_HEADER, properties.getInternalKey())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(String.class);
+
+            if (response == null || response.isBlank()) {
+                throw new AIServiceException("AI microservice returned an empty skill gap response body.");
+            }
+
+            log.info("Successfully received skill gap analysis response");
+            return response;
+        } catch (RestClientResponseException e) {
+            log.error("AI microservice returned HTTP {} during skill gap analysis: {}",
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new AIServiceException("AI microservice error: " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            log.error("Failed to communicate with AI microservice during skill gap analysis: {}", e.getMessage(), e);
+            throw new AIServiceException("Failed to analyze skill gaps: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String generateCareerRecommendations(java.util.Map<String, Object> payload) {
+        if (payload == null || payload.isEmpty()) {
+            throw new IllegalArgumentException("Career recommendations payload must not be empty");
+        }
+
+        log.info("Dispatching career recommendations request to AI service at {}/api/v1/career/recommendations",
+                properties.getUrl());
+
+        try {
+            String response = restClient.post()
+                    .uri("/api/v1/career/recommendations")
+                    .header(INTERNAL_SERVICE_KEY_HEADER, properties.getInternalKey())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(String.class);
+
+            if (response == null || response.isBlank()) {
+                throw new AIServiceException("AI microservice returned an empty career recommendations response body.");
+            }
+
+            log.info("Successfully received career recommendations response");
+            return response;
+        } catch (RestClientResponseException e) {
+            log.error("AI microservice returned HTTP {} during recommendations generation: {}",
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new AIServiceException("AI microservice error: " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            log.error("Failed to communicate with AI microservice during recommendations generation: {}", e.getMessage(), e);
+            throw new AIServiceException("Failed to generate career recommendations: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String generateCareerRoadmap(java.util.Map<String, Object> payload) {
+        if (payload == null || payload.isEmpty()) {
+            throw new IllegalArgumentException("Roadmap payload must not be empty");
+        }
+
+        log.info("Dispatching career roadmap generation request to AI service at {}/api/v1/career/roadmaps/generate",
+                properties.getUrl());
+
+        try {
+            String response = restClient.post()
+                    .uri("/api/v1/career/roadmaps/generate")
+                    .header(INTERNAL_SERVICE_KEY_HEADER, properties.getInternalKey())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(String.class);
+
+            if (response == null || response.isBlank()) {
+                throw new AIServiceException("AI microservice returned an empty roadmap response body.");
+            }
+
+            log.info("Successfully received career roadmap generation response");
+            return response;
+        } catch (RestClientResponseException e) {
+            log.error("AI microservice returned HTTP {} during roadmap generation: {}",
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new AIServiceException("AI microservice error: " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            log.error("Failed to communicate with AI microservice during roadmap generation: {}", e.getMessage(), e);
+            throw new AIServiceException("Failed to generate career roadmap: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String recommendCareerProjects(java.util.Map<String, Object> payload) {
+        if (payload == null || payload.isEmpty()) {
+            throw new IllegalArgumentException("Project recommendations payload must not be empty");
+        }
+
+        log.info("Dispatching project recommendations request to AI service at {}/api/v1/career/projects/recommend",
+                properties.getUrl());
+
+        try {
+            String response = restClient.post()
+                    .uri("/api/v1/career/projects/recommend")
+                    .header(INTERNAL_SERVICE_KEY_HEADER, properties.getInternalKey())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(String.class);
+
+            if (response == null || response.isBlank()) {
+                throw new AIServiceException("AI microservice returned an empty project recommendations response body.");
+            }
+
+            log.info("Successfully received project recommendations response");
+            return response;
+        } catch (RestClientResponseException e) {
+            log.error("AI microservice returned HTTP {} during project recommendations: {}",
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new AIServiceException("AI microservice error: " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            log.error("Failed to communicate with AI microservice during project recommendations: {}", e.getMessage(), e);
+            throw new AIServiceException("Failed to recommend portfolio projects: " + e.getMessage(), e);
+        }
+    }
 }

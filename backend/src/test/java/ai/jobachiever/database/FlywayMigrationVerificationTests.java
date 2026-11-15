@@ -19,10 +19,10 @@ class FlywayMigrationVerificationTests {
     private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
     @Test
-    @DisplayName("All 18 Flyway migrations exist, are ordered sequentially, and are non-empty")
+    @DisplayName("All 19 Flyway migrations exist, are ordered sequentially, and are non-empty")
     void allFlywayMigrationsExistAndAreOrdered() throws Exception {
         Resource[] resources = resolver.getResources("classpath:db/migration/V*.sql");
-        assertThat(resources).hasSize(18);
+        assertThat(resources).hasSize(19);
 
         List<String> filenames = Arrays.stream(resources)
                 .map(Resource::getFilename)
@@ -48,7 +48,8 @@ class FlywayMigrationVerificationTests {
                 "V15__create_user_ai_preferences_table.sql",
                 "V16__create_resume_analyses_table.sql",
                 "V17__create_job_analyses_table.sql",
-                "V18__create_job_matches_table.sql"
+                "V18__create_job_matches_table.sql",
+                "V19__create_career_intelligence_tables.sql"
         );
 
         for (Resource resource : resources) {
@@ -89,7 +90,11 @@ class FlywayMigrationVerificationTests {
                 "user_ai_preferences",
                 "resume_analyses",
                 "job_analyses",
-                "job_matches");
+                "job_matches",
+                "career_skill_gaps",
+                "career_recommendations",
+                "career_roadmaps",
+                "career_milestones");
 
         for (String table : expectedTables) {
             assertThat(allSql)
@@ -180,7 +185,11 @@ class FlywayMigrationVerificationTests {
                 Map.entry(ai.jobachiever.ai.entity.UserAiPreference.class, "user_ai_preferences"),
                 Map.entry(ai.jobachiever.resumes.entity.ResumeAnalysis.class, "resume_analyses"),
                 Map.entry(ai.jobachiever.jobs.entity.JobAnalysis.class, "job_analyses"),
-                Map.entry(ai.jobachiever.matching.entity.JobMatch.class, "job_matches"));
+                Map.entry(ai.jobachiever.matching.entity.JobMatch.class, "job_matches"),
+                Map.entry(ai.jobachiever.career.entity.CareerSkillGap.class, "career_skill_gaps"),
+                Map.entry(ai.jobachiever.career.entity.CareerRecommendation.class, "career_recommendations"),
+                Map.entry(ai.jobachiever.career.entity.CareerRoadmap.class, "career_roadmaps"),
+                Map.entry(ai.jobachiever.career.entity.CareerMilestone.class, "career_milestones"));
 
         for (Map.Entry<Class<?>, String> entry : entityTableMap.entrySet()) {
             Class<?> entityClass = entry.getKey();
