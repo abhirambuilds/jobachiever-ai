@@ -7,7 +7,6 @@ import {
   Globe,
   GraduationCap,
   Bot,
-  Settings,
 } from 'lucide-react';
 
 import { AppLayout } from '@/layouts/AppLayout';
@@ -27,6 +26,7 @@ import { ResumeLibraryPage } from '@/pages/ResumeLibraryPage';
 import { ResumeAnalyzerPage } from '@/pages/ResumeAnalyzerPage';
 import ResumeStudioPage from '@/pages/ResumeStudioPage';
 import { JobMatcherPage } from '@/pages/JobMatcherPage';
+import { AiSettingsPage } from '@/features/settings/AiSettingsPage';
 import { FeaturePlaceholderPage } from '@/pages/FeaturePlaceholderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -135,17 +135,8 @@ export function AppRoutes() {
             />
           }
         />
-        <Route
-          path="/settings"
-          element={
-            <FeaturePlaceholderPage
-              title="Settings &amp; AI Provider Configuration"
-              description="Configure Bring-Your-Own-Key (BYOK) for Groq, Google Gemini, and Ollama with AES-256 local encryption."
-              milestone="Milestone 10"
-              icon={Settings}
-            />
-          }
-        />
+        <Route path="/settings" element={<AiSettingsPage />} />
+        <Route path="/settings/ai" element={<AiSettingsPage />} />
       </Route>
 
       {/* General & Public Views Wrapped in Standard AppLayout */}

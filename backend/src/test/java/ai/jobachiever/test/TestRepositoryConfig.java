@@ -1,5 +1,6 @@
 package ai.jobachiever.test;
 
+import ai.jobachiever.ai.repository.UserAiPreferenceRepository;
 import ai.jobachiever.applications.repository.ApplicationActivityRepository;
 import ai.jobachiever.applications.repository.JobApplicationRepository;
 import ai.jobachiever.auth.repository.EmailVerificationTokenRepository;
@@ -132,5 +133,11 @@ public class TestRepositoryConfig {
     @ConditionalOnMissingBean
     public ApplicationActivityRepository applicationActivityRepository() {
         return Mockito.mock(ApplicationActivityRepository.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public UserAiPreferenceRepository userAiPreferenceRepository() {
+        return Mockito.mock(UserAiPreferenceRepository.class);
     }
 }

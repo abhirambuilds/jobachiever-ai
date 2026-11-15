@@ -222,11 +222,22 @@ In alignment with **AGENTS.md Core Principles**:
 ### 7.1 Automated Testing Metrics
 | Test Suite | Framework | Scope | Tests Run | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **FastAPI Microservice** | `pytest` + `pytest-asyncio` | API routes, extractors, normalizers, file validation | 43 | **43 Passed** (0.35s) |
-| **Spring Boot Backend** | JUnit 5 + Mockito + MockMvc | AI client, parsing service, controller, security | 190 | **190 Passed** (1 skipped) |
-| **React Frontend** | Vitest + RTL | UI navigation, validation, context, studio | 82 | **82 Passed** (7.08s) |
+| **FastAPI Microservice** | `pytest` + `pytest-asyncio` | API routes, extractors, Groq/Gemini providers | 95 | **95 Passed** (0.61s) |
+| **Spring Boot Backend** | JUnit 5 + Mockito + MockMvc | AI client, provider settings, controllers, security | 215 | **214 Passed** (1 skipped) |
+| **React Frontend** | Vitest + RTL | AI settings, provider context, UI navigation | 92 | **92 Passed** (7.73s) |
 
 ### 7.2 Performance Characteristics
 - Typical parsing latency for a standard 2-page PDF: **~120ms to 250ms**.
 - DOCX parsing latency: **~40ms to 100ms**.
 - Memory footprint: In-memory streaming keeps peak memory under 50MB per concurrent request.
+
+---
+
+## 8. AI Provider Settings & User Preferences Architecture
+
+Implemented in Prompt 24, JobAchiever AI establishes a complete user-controlled AI configuration layer:
+1. **Source of Truth:** Spring Boot manages persistence via PostgreSQL table `user_ai_preferences` (Flyway `V15`).
+2. **Provider Discovery:** Spring Boot `/api/v1/ai/providers` exposes active providers (`GROQ` Primary, `GEMINI` Secondary).
+3. **Preferences Management:** Authenticated users manage settings via `GET` / `PUT` `/api/v1/users/me/ai-preferences`.
+4. **Mandatory Consent Guardrail:** Transmitting career text requires user consent; timestamps are tracked on state changes.
+5. **Zero Silent Fallback:** No automatic provider switching occurs under rate limit or failure conditions.

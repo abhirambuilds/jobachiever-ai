@@ -24,10 +24,10 @@ import {
   Check,
   LogOut,
   Zap,
-  Cpu,
 } from 'lucide-react';
 
 import { useProfile } from '@/hooks/useProfile';
+import { useAiPreferences } from '@/hooks/useAiPreferences';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -61,19 +61,19 @@ const navItems = [
   { label: 'Portfolio', path: '/portfolio', icon: Globe, upcoming: true },
   { label: 'Interview Prep', path: '/interviews', icon: GraduationCap, upcoming: true },
   { label: 'AI Assistant', path: '/career-assistant', icon: Bot, upcoming: true },
-  { label: 'Settings', path: '/settings', icon: Settings, upcoming: true },
+  { label: 'Settings', path: '/settings/ai', icon: Settings },
 ];
 
 const AI_PROVIDERS = [
-  { id: 'groq', name: 'Groq Cloud', model: 'Llama 3.3', icon: Zap },
-  { id: 'gemini', name: 'Google Gemini', model: 'Gemini 2.0 Flash', icon: Sparkles },
-  { id: 'ollama', name: 'Ollama (Local)', model: 'Llama 3 Local', icon: Cpu },
+  { id: 'GROQ', name: 'Groq', model: 'Llama 3.3 70B', icon: Zap },
+  { id: 'GEMINI', name: 'Google Gemini', model: 'Gemini 2.0 Flash', icon: Sparkles },
 ];
 
 export function DashboardLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState(AI_PROVIDERS[0]);
+  const { selectedProvider: activeProvId, updatePreferences: updateAiPrefs } = useAiPreferences();
+  const selectedProvider = AI_PROVIDERS.find((p) => p.id === activeProvId) || AI_PROVIDERS[0];
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -103,7 +103,7 @@ export function DashboardLayout() {
     .toUpperCase();
 
   const handleProviderSelect = (provider) => {
-    setSelectedProvider(provider);
+    updateAiPrefs({ selectedProvider: provider.id });
     toast.success(`AI provider switched to ${provider.name} (${provider.model})`);
   };
 
@@ -289,9 +289,9 @@ export function DashboardLayout() {
                   <Sparkles className="mr-2 h-4 w-4 text-cyan-400" />
                   <span>Onboarding Wizard</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/settings')}>
+                <DropdownMenuItem onClick={() => navigate('/settings/ai')}>
                   <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <span>Settings &amp; Keys</span>
+                  <span>AI Provider Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate('/login')} className="text-destructive">
@@ -386,6 +386,10 @@ export function DashboardLayout() {
                     );
                   })}
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/settings/ai')} className="text-xs text-primary cursor-pointer">
+                    <Settings className="mr-2 h-3.5 w-3.5" />
+                    <span>AI Provider Settings</span>
+                  </DropdownMenuItem>
                   <div className="p-2 text-[10px] text-muted-foreground">
                     100% User-Selected. No automatic silent routing.
                   </div>

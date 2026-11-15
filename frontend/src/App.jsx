@@ -2,6 +2,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ProfileProvider } from '@/features/profile/context/ProfileContext';
+import { AiPreferenceProvider } from '@/context/AiPreferenceContext';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { AppRoutes } from '@/routes/AppRoutes';
 
@@ -21,9 +22,11 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="dark" storageKey="jobachiever-theme">
           <ProfileProvider>
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
+            <AiPreferenceProvider>
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </AiPreferenceProvider>
           </ProfileProvider>
         </ThemeProvider>
       </QueryClientProvider>
