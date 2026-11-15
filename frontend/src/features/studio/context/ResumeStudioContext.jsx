@@ -8,7 +8,7 @@ import {
 const STUDIO_STORAGE_KEY = 'jobachiever_studio_resume_draft';
 const STUDIO_VERSIONS_KEY = 'jobachiever_studio_resume_versions';
 
-const ResumeStudioContext = createContext(null);
+export const ResumeStudioContext = createContext(null);
 
 export function ResumeStudioProvider({ children }) {
   const { profile, tracks, activeTrackId } = useProfile();

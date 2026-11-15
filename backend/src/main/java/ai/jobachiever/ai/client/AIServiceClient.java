@@ -105,4 +105,31 @@ public interface AIServiceClient {
                             Double temperature,
                             Integer maxTokens,
                             boolean userConsent);
+
+    /**
+     * Dispatches text enhancement, rewriting, and tailoring requests to the internal
+     * Python FastAPI Resume Studio microservice.
+     *
+     * @param action          enhancement action (e.g. IMPROVE_BULLET, IMPROVE_SUMMARY, TAILOR_TO_JOB)
+     * @param sourceText      original sentence, bullet, or summary text
+     * @param context         optional contextual information map (section, role, company, target JD)
+     * @param writingMode     stylistic writing mode (e.g. PROFESSIONAL, CONCISE, TECHNICAL)
+     * @param provider        selected AI provider (e.g. GROQ, GEMINI)
+     * @param model           optional model override
+     * @param temperature     sampling temperature
+     * @param maxTokens       max tokens
+     * @param numAlternatives number of variations to generate
+     * @param userConsent     explicit candidate AI consent
+     * @return raw JSON string representing ResumeStudioResponse
+     */
+    String generateResumeStudioContent(String action,
+                                       String sourceText,
+                                       java.util.Map<String, Object> context,
+                                       String writingMode,
+                                       String provider,
+                                       String model,
+                                       Double temperature,
+                                       Integer maxTokens,
+                                       Integer numAlternatives,
+                                       boolean userConsent);
 }

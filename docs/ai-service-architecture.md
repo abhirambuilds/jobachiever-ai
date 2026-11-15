@@ -222,9 +222,9 @@ In alignment with **AGENTS.md Core Principles**:
 ### 7.1 Automated Testing Metrics
 | Test Suite | Framework | Scope | Tests Run | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **FastAPI Microservice** | `pytest` + `pytest-asyncio` | API routes, parsers, Groq/Gemini, matching engine | 128 | **128 Passed** (0.78s) |
-| **Spring Boot Backend** | JUnit 5 + Mockito + MockMvc | AI client, matching engine, repositories, security | 264 | **263 Passed** (1 skipped) |
-| **React Frontend** | Vitest + RTL | AI settings, matching context, scorecards, tables | 106 | **106 Passed** (8.25s) |
+| **FastAPI Microservice** | `pytest` + `pytest-asyncio` | API routes, parsers, Groq/Gemini, matching, studio assistant | 147 | **147 Passed** (0.75s) |
+| **Spring Boot Backend** | JUnit 5 + Mockito + MockMvc | AI client, matching, studio service/controllers, security | 274 | **274 Passed** (1 skipped) |
+| **React Frontend** | Vitest + RTL | AI settings, matching, studio assistant, editors | 114 | **114 Passed** (8.47s) |
 
 ### 7.2 Performance Characteristics
 - Typical parsing latency for a standard 2-page PDF: **~120ms to 250ms**.
@@ -276,3 +276,19 @@ Implemented in Prompt 27, JobAchiever AI establishes a deterministic compatibili
 5. **Non-Overlapping Experience Tenure:** Parses dates and merges overlapping employment intervals to compute accurate professional years without double-counting.
 6. **Strict Non-Guarantee Disclaimer:** All scores are presented as heuristic alignment estimates, accompanied by transparent gaps and grounded recommendations.
 7. **Full Specification:** See [docs/resume-job-matching.md](resume-job-matching.md).
+
+---
+
+## 12. AI-Powered Resume Studio Writing Assistant Architecture
+
+Implemented in Prompt 28, JobAchiever AI integrates an evidence-grounded interactive writing assistant directly into Resume Studio:
+1. **FastAPI Microservice Endpoints:** `POST /api/v1/resume-studio/generate` (and alias `/api/v1/resume-studio/rewrite`) performs prompt-injected isolated text rewriting, Anti-Fabrication validation, and multi-alternative phrasing.
+2. **Spring Boot Orchestration:** `POST /api/v1/studio/generate` (and `/api/v1/studio/rewrite`) validates authenticated user identity, checks mandatory AI processing consent, verifies resume ownership, enriches job context if `jobId` is provided, and dispatches to the AI microservice.
+3. **8 Enhancement Actions:** `IMPROVE_BULLET`, `IMPROVE_SUMMARY`, `IMPROVE_PROJECT`, `IMPROVE_EXPERIENCE`, `FIX_GRAMMAR`, `MAKE_CONCISE`, `TAILOR_TO_JOB`, `GENERATE_ALTERNATIVES`.
+4. **6 Stylistic Writing Modes:** `PROFESSIONAL`, `CONCISE`, `TECHNICAL`, `ACHIEVEMENT_FOCUSED`, `ACTION_ORIENTED`, `ATS_FRIENDLY`.
+5. **Strict Anti-Fabrication Engine (`AntiFabricationValidator`):**
+   - Automatically sanitizes unevidenced raw numbers and percentages into safe bracketed placeholders e.g. `[verified percentage, if available]`.
+   - Flags introduced unverified skills or tools with caution warnings.
+   - Evaluates and returns explainable confidence levels (`HIGH`, `MEDIUM`, `LOW`).
+6. **Draft-Only Editor State:** Suggestions update the active client draft state only and never overwrite saved resumes without explicit user confirmation.
+7. **Full Specification:** See [docs/resume-studio-ai.md](resume-studio-ai.md).

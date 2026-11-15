@@ -29,8 +29,9 @@ JobAchiever AI resolves these pain points by offering an integrated, privacy-foc
 | **AI-Powered Resume Analyzer** | Evidence-grounded 6-dimension scoring, ATS audit, and fact-preserving sentence rewrites. | *Completed* |
 | **Intelligent Resume Ingestion** | Multi-format (PDF, DOCX) parser extracting structured career information. | *Completed* |
 | **Job Description Deconstruction** | Granular AI parsing of job listings to identify required skills, qualifications, responsibilities, and ambiguities. | *Completed* |
+| **Explainable Compatibility Engine** | Transparent, metric-driven match scores detailing alignment, transferable skills, and explicit gaps. | *Completed* |
+| **AI Resume Studio Writing Assistant** | Interactive fact-preserving writing enhancement with 8 actions, 6 stylistic modes, and anti-fabrication engine. | *Completed* |
 | **Tailored Resume Generator** | Generate targeted, role-specific resumes grounded strictly in verified profile achievements. | *Planned* |
-| **Explainable Compatibility Engine** | Transparent, metric-driven match scores detailing alignment, transferable skills, and explicit gaps. | *Planned* |
 | **Job Discovery & Pipeline Tracking** | Kanban-style application management from bookmark to offer negotiation. | *Planned* |
 | **Tailored Cover Letter Builder** | Context-driven cover letters highlighting relevant milestones for targeted job listings. | *Planned* |
 | **Professional Web Portfolios** | Generate and publish clean, modern personal career websites showcasing projects and credentials. | *Planned* |

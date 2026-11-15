@@ -223,4 +223,33 @@ class AIServiceClientTest {
 
         mockServer.verify();
     }
+
+    @Test
+    @DisplayName("generateResumeStudioContent dispatches payload with internal key and returns response string")
+    void generateResumeStudioContentSuccess() {
+        String mockResponse = "{\"suggestions\":[{\"id\":\"sug-1\",\"original_text\":\"did work\",\"suggested_text\":\"Engineered systems\"}],\"action\":\"IMPROVE_BULLET\"}";
+
+        mockServer.expect(requestTo("http://ai-service-mock:8000/api/v1/resume-studio/generate"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header("X-Internal-Service-Key", "test-secret-key"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+
+        String result = client.generateResumeStudioContent(
+                "IMPROVE_BULLET",
+                "did work",
+                java.util.Map.of("section", "experience"),
+                "PROFESSIONAL",
+                "GROQ",
+                "llama-3.3-70b-versatile",
+                0.3,
+                1024,
+                null,
+                true
+        );
+
+        assertThat(result).isNotNull();
+        assertThat(result).contains("Engineered systems");
+        mockServer.verify();
+    }
 }

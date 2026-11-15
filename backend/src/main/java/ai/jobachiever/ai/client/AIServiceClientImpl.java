@@ -380,4 +380,76 @@ public class AIServiceClientImpl implements AIServiceClient {
             throw new AIServiceException("Failed to execute resume-job matching: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public String generateResumeStudioContent(String action,
+                                              String sourceText,
+                                              java.util.Map<String, Object> context,
+                                              String writingMode,
+                                              String provider,
+                                              String model,
+                                              Double temperature,
+                                              Integer maxTokens,
+                                              Integer numAlternatives,
+                                              boolean userConsent) {
+        if (action == null || action.isBlank()) {
+            throw new IllegalArgumentException("Action must not be empty for Resume Studio enhancement");
+        }
+        if (sourceText == null || sourceText.isBlank()) {
+            throw new IllegalArgumentException("Source text must not be empty for Resume Studio enhancement");
+        }
+
+        log.info("Dispatching Resume Studio enhancement to AI microservice at {}/api/v1/resume-studio/generate (action={}, writingMode={})",
+                properties.getUrl(), action, writingMode);
+
+        java.util.Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("action", action);
+        payload.put("source_text", sourceText);
+        if (context != null && !context.isEmpty()) {
+            payload.put("context", context);
+        }
+        if (writingMode != null && !writingMode.isBlank()) {
+            payload.put("writing_mode", writingMode);
+        }
+        if (provider != null && !provider.isBlank()) {
+            payload.put("provider", provider);
+        }
+        if (model != null && !model.isBlank()) {
+            payload.put("model", model);
+        }
+        if (temperature != null) {
+            payload.put("temperature", temperature);
+        }
+        if (maxTokens != null) {
+            payload.put("max_tokens", maxTokens);
+        }
+        if (numAlternatives != null) {
+            payload.put("num_alternatives", numAlternatives);
+        }
+        payload.put("user_consent", userConsent);
+
+        try {
+            String response = restClient.post()
+                    .uri("/api/v1/resume-studio/generate")
+                    .header(INTERNAL_SERVICE_KEY_HEADER, properties.getInternalKey())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(String.class);
+
+            if (response == null || response.isBlank()) {
+                throw new AIServiceException("AI microservice returned an empty Resume Studio response body.");
+            }
+
+            log.info("Successfully received Resume Studio rewrite suggestions");
+            return response;
+        } catch (RestClientResponseException e) {
+            log.error("AI microservice returned HTTP {} during Resume Studio generation: {}",
+                    e.getStatusCode(), e.getResponseBodyAsString());
+            throw new AIServiceException("AI microservice error: " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            log.error("Failed to communicate with AI microservice during Resume Studio generation: {}", e.getMessage(), e);
+            throw new AIServiceException("Failed to generate Resume Studio enhancement: " + e.getMessage(), e);
+        }
+    }
 }
