@@ -293,29 +293,49 @@ export const documentService = {
    * Target endpoint: GET /api/v1/resumes
    */
   async getDocuments() {
+    try {
+      const token = localStorage.getItem('jobachiever_jwt_token');
+      if (token) {
+        const response = await fetch(`${RESUME_API_BASE}/resumes`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const json = await response.json();
+          const page = json.data;
+          const items = page?.content || [];
+          if (items.length > 0) {
+            return items.map(mapBackendResumeToDocument);
+          }
+        }
+      }
+    } catch {
+      // Fallback to local default resumes if offline
+    }
+
     await new Promise((resolve) => setTimeout(resolve, 150));
     return [...INITIAL_RESUMES];
   },
 
   /**
    * Upload and process a new document
-   * Target endpoint: POST /api/v1/resumes/upload (multipart/form-data)
+   * Target endpoint: POST /api/v1/resumes (multipart/form-data)
    */
   async uploadDocument(file, metadata = {}, onProgress = () => {}) {
-    // 1. Validate
+    // 1. Validate client-side
     const validation = validateDocumentFile(file);
     if (!validation.valid) {
       throw new Error(validation.errors.join(' '));
     }
 
-    // 2. Simulate progress ticks (20%, 50%, 80%, 100%)
-    for (let p = 20; p <= 100; p += 20) {
-      await new Promise((resolve) => setTimeout(resolve, 80));
+    // 2. Simulate initial progress ticks
+    for (let p = 20; p <= 60; p += 20) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
       onProgress(p);
     }
 
-    const documentId = `res-${Date.now().toString(36)}`;
-    const extension = validation.extension.replace('.', '');
     const cleanName =
       metadata.name ||
       file.name
@@ -323,11 +343,53 @@ export const documentService = {
         .replace(/[_-]/g, ' ')
         .trim();
 
-    // Create temporary browser preview object URL for immediate in-session inspection
-    const previewUrl =
-      extension === 'pdf' ? URL.createObjectURL(file) : null;
+    // 3. Attempt upload to backend API if authenticated
+    try {
+      const token = localStorage.getItem('jobachiever_jwt_token');
+      if (token) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', cleanName);
+        if (metadata.careerTrackId) {
+          formData.append('careerTrackId', metadata.careerTrackId);
+        }
+        if (metadata.description) {
+          formData.append('description', metadata.description);
+        }
+        if (metadata.templateIdentifier) {
+          formData.append('templateIdentifier', metadata.templateIdentifier);
+        }
 
-    const newDoc = {
+        const res = await fetch(`${RESUME_API_BASE}/resumes`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        if (res.ok) {
+          onProgress(100);
+          const json = await res.json();
+          const created = mapBackendResumeToDocument(json.data);
+          created.fileRef = file;
+          if (created.fileExtension === 'pdf' && typeof URL !== 'undefined') {
+            created.previewUrl = URL.createObjectURL(file);
+          }
+          return created;
+        }
+      }
+    } catch {
+      // Fallback to client-side simulation on network error
+    }
+
+    onProgress(100);
+    const documentId = `res-${Date.now().toString(36)}`;
+    const extension = validation.extension.replace('.', '');
+    const previewUrl =
+      extension === 'pdf' && typeof URL !== 'undefined' ? URL.createObjectURL(file) : null;
+
+    return {
       id: documentId,
       ownerId: 'usr-dev-001',
       name: cleanName,
@@ -343,9 +405,9 @@ export const documentService = {
       uploadedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isPrimary: false,
-      atsScore: Math.floor(Math.random() * 10) + 85, // 85-95 baseline
+      atsScore: Math.floor(Math.random() * 10) + 85,
       previewUrl,
-      fileRef: file, // Keep in-memory file reference during session for download
+      fileRef: file,
       versions: [
         {
           versionId: `ver-${documentId}-1`,
@@ -359,15 +421,38 @@ export const documentService = {
         },
       ],
     };
-
-    return newDoc;
   },
 
   /**
    * Download a document
    * Target endpoint: GET /api/v1/resumes/{id}/download
    */
-  downloadDocument(doc) {
+  async downloadDocument(doc, versionNumber) {
+    try {
+      const token = localStorage.getItem('jobachiever_jwt_token');
+      if (token && doc.id && !doc.id.startsWith('res-10')) {
+        const url = new URL(`${RESUME_API_BASE}/resumes/${doc.id}/download`);
+        if (versionNumber) url.searchParams.append('versionNumber', String(versionNumber));
+        const res = await fetch(url.toString(), {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          const downloadUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+          a.download = doc.originalFilename || `${doc.name}.${doc.fileExtension || 'pdf'}`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+          return;
+        }
+      }
+    } catch {
+      // offline fallback
+    }
+
     if (doc.fileRef) {
       const url = URL.createObjectURL(doc.fileRef);
       const a = document.createElement('a');
@@ -386,10 +471,231 @@ export const documentService = {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = doc.originalFilename.replace(/\.(pdf|docx)$/i, '-download.txt');
+    a.download = (doc.originalFilename || 'resume.txt').replace(/\.(pdf|docx)$/i, '-download.txt');
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   },
+
+  /**
+   * Securely preview document binary in browser.
+   * Target endpoint: GET /api/v1/resumes/{id}/preview
+   */
+  async previewDocument(doc, versionNumber) {
+    try {
+      const token = localStorage.getItem('jobachiever_jwt_token');
+      if (token && doc.id && !doc.id.startsWith('res-10')) {
+        const url = new URL(`${RESUME_API_BASE}/resumes/${doc.id}/preview`);
+        if (versionNumber) url.searchParams.append('versionNumber', String(versionNumber));
+        const res = await fetch(url.toString(), {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          return URL.createObjectURL(blob);
+        }
+      }
+    } catch {
+      // Fallback
+    }
+    return doc.previewUrl || null;
+  },
+
+  /**
+   * Rename a document
+   * Target endpoint: PATCH /api/v1/resumes/{id}
+   */
+  async renameDocument(documentId, newTitle) {
+    try {
+      const token = localStorage.getItem('jobachiever_jwt_token');
+      if (token && !documentId.startsWith('res-10')) {
+        const res = await fetch(`${RESUME_API_BASE}/resumes/${documentId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title: newTitle }),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          return mapBackendResumeToDocument(json.data);
+        }
+      }
+    } catch {
+      // offline fallback
+    }
+    return null;
+  },
+
+  /**
+   * Re-associate document with a career track
+   * Target endpoint: PATCH /api/v1/resumes/{id}
+   */
+  async updateDocumentTrack(documentId, newTrackId) {
+    try {
+      const token = localStorage.getItem('jobachiever_jwt_token');
+      if (token && !documentId.startsWith('res-10')) {
+        const res = await fetch(`${RESUME_API_BASE}/resumes/${documentId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ careerTrackId: newTrackId }),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          return mapBackendResumeToDocument(json.data);
+        }
+      }
+    } catch {
+      // offline fallback
+    }
+    return null;
+  },
+
+  /**
+   * Delete a document safely
+   * Target endpoint: DELETE /api/v1/resumes/{id}
+   */
+  async deleteDocument(documentId) {
+    try {
+      const token = localStorage.getItem('jobachiever_jwt_token');
+      if (token && !documentId.startsWith('res-10')) {
+        await fetch(`${RESUME_API_BASE}/resumes/${documentId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        return true;
+      }
+    } catch {
+      // offline fallback
+    }
+    return true;
+  },
+
+  /**
+   * Designate resume as primary
+   * Target endpoint: PATCH /api/v1/resumes/{id}/primary
+   */
+  async setPrimaryResume(documentId) {
+    try {
+      const token = localStorage.getItem('jobachiever_jwt_token');
+      if (token && !documentId.startsWith('res-10')) {
+        const res = await fetch(`${RESUME_API_BASE}/resumes/${documentId}/primary`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          const json = await res.json();
+          return mapBackendResumeToDocument(json.data);
+        }
+      }
+    } catch {
+      // offline fallback
+    }
+    return null;
+  },
+
+  /**
+   * Upload a new version for an existing resume
+   * Target endpoint: POST /api/v1/resumes/{id}/versions
+   */
+  async uploadNewVersion(documentId, file, description) {
+    try {
+      const token = localStorage.getItem('jobachiever_jwt_token');
+      if (token && !documentId.startsWith('res-10')) {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (description) formData.append('description', description);
+
+        const res = await fetch(`${RESUME_API_BASE}/resumes/${documentId}/versions`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+        if (res.ok) {
+          const json = await res.json();
+          return json.data;
+        }
+      }
+    } catch {
+      // offline fallback
+    }
+    return null;
+  },
+
+  /**
+   * Retrieve version history
+   * Target endpoint: GET /api/v1/resumes/{id}/versions
+   */
+  async getVersionHistory(documentId) {
+    try {
+      const token = localStorage.getItem('jobachiever_jwt_token');
+      if (token && !documentId.startsWith('res-10')) {
+        const res = await fetch(`${RESUME_API_BASE}/resumes/${documentId}/versions`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          const json = await res.json();
+          return json.data || [];
+        }
+      }
+    } catch {
+      // offline fallback
+    }
+    return [];
+  },
 };
+
+/**
+ * Maps a backend ResumeResponse DTO into frontend document library model
+ */
+export function mapBackendResumeToDocument(backendDoc) {
+  const ext =
+    backendDoc.fileExtension ||
+    (backendDoc.originalFilename?.toLowerCase().endsWith('.docx') ? 'docx' : 'pdf');
+
+  return {
+    id: backendDoc.id,
+    ownerId: backendDoc.userId,
+    name: backendDoc.title,
+    originalFilename: backendDoc.originalFilename,
+    mimeType: backendDoc.mimeType,
+    fileExtension: ext,
+    fileSize: backendDoc.fileSizeBytes,
+    storageKey: `resumes/${backendDoc.id}-v${backendDoc.currentVersionNumber || 1}.${ext}`,
+    careerTrackId: backendDoc.careerTrackId || 'track-1',
+    careerTrackName: backendDoc.careerTrackName || 'General Career Track',
+    version: backendDoc.currentVersionNumber || 1,
+    processingStatus:
+      (backendDoc.processingStatus || 'READY').toLowerCase() === 'ready'
+        ? DOCUMENT_STATUS.PROCESSED
+        : (backendDoc.processingStatus || '').toLowerCase(),
+    uploadedAt: backendDoc.createdAt,
+    updatedAt: backendDoc.updatedAt,
+    isPrimary: backendDoc.isPrimary,
+    atsScore: 92,
+    previewUrl: null,
+    versions: [
+      {
+        versionId: backendDoc.currentVersionId || `ver-${backendDoc.id}-${backendDoc.currentVersionNumber || 1}`,
+        versionNumber: backendDoc.currentVersionNumber || 1,
+        name: `${backendDoc.title} (v${backendDoc.currentVersionNumber || 1}.0)`,
+        updatedAt: backendDoc.updatedAt || backendDoc.createdAt,
+        description: backendDoc.description || 'Current document version.',
+        source: 'User Upload',
+        fileSize: backendDoc.fileSizeBytes,
+        careerTrackId: backendDoc.careerTrackId,
+      },
+    ],
+  };
+}

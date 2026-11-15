@@ -23,6 +23,9 @@ public class ResumeVersion {
     @Column(name = "storage_path", nullable = false, length = 1000)
     private String storagePath;
 
+    @Column(name = "storage_key", length = 255)
+    private String storageKey;
+
     @Column(name = "file_name", nullable = false, length = 255)
     private String fileName;
 
@@ -37,7 +40,7 @@ public class ResumeVersion {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "processing_status", nullable = false, length = 32)
-    private ProcessingStatus processingStatus = ProcessingStatus.PENDING;
+    private ProcessingStatus processingStatus = ProcessingStatus.READY;
 
     @Column(name = "template_identifier", length = 100)
     private String templateIdentifier;
@@ -55,6 +58,9 @@ public class ResumeVersion {
     protected void onCreate() {
         if (createdAt == null) {
             createdAt = Instant.now();
+        }
+        if (storageKey == null && storagePath != null) {
+            storageKey = storagePath;
         }
     }
 
@@ -90,6 +96,17 @@ public class ResumeVersion {
 
     public void setStoragePath(String storagePath) {
         this.storagePath = storagePath;
+        if (this.storageKey == null) {
+            this.storageKey = storagePath;
+        }
+    }
+
+    public String getStorageKey() {
+        return storageKey != null ? storageKey : storagePath;
+    }
+
+    public void setStorageKey(String storageKey) {
+        this.storageKey = storageKey;
     }
 
     public String getFileName() {

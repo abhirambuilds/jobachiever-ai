@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { validateDocumentFile } from '@/services/documentService';
+import { validateDocumentFile, mapBackendResumeToDocument } from '@/services/documentService';
 import { Dropzone } from '../components/upload/Dropzone';
 
 describe('Document Upload Validation & Dropzone', () => {
@@ -60,6 +60,41 @@ describe('Document Upload Validation & Dropzone', () => {
       const result = validateDocumentFile(emptyFile);
       expect(result.valid).toBe(false);
       expect(result.errors.some((err) => err.includes('0 bytes'))).toBe(true);
+    });
+  });
+
+  describe('Backend DTO Mapping', () => {
+    it('correctly maps backend ResumeResponse into frontend document model', () => {
+      const backendDto = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        userId: '223e4567-e89b-12d3-a456-426614174000',
+        careerTrackId: '323e4567-e89b-12d3-a456-426614174000',
+        careerTrackName: 'Full-Stack Engineer',
+        title: 'Master Architect Resume',
+        description: 'Primary CV for distributed systems',
+        documentType: 'UPLOADED',
+        isPrimary: true,
+        currentVersionNumber: 2,
+        currentVersionId: '423e4567-e89b-12d3-a456-426614174000',
+        originalFilename: 'Architect_Resume.pdf',
+        mimeType: 'application/pdf',
+        fileExtension: 'pdf',
+        fileSizeBytes: 204800,
+        sha256Checksum: 'abcdef1234567890',
+        processingStatus: 'READY',
+        createdAt: '2026-11-15T10:00:00Z',
+        updatedAt: '2026-11-15T12:00:00Z',
+      };
+
+      const mapped = mapBackendResumeToDocument(backendDto);
+      expect(mapped.id).toBe(backendDto.id);
+      expect(mapped.name).toBe('Master Architect Resume');
+      expect(mapped.isPrimary).toBe(true);
+      expect(mapped.version).toBe(2);
+      expect(mapped.fileExtension).toBe('pdf');
+      expect(mapped.processingStatus).toBe('processed');
+      expect(mapped.versions).toHaveLength(1);
+      expect(mapped.versions[0].versionNumber).toBe(2);
     });
   });
 

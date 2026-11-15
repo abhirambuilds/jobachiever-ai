@@ -43,7 +43,8 @@ class FlywayMigrationVerificationTests {
                 "V10__create_verification_and_reset_tokens.sql",
                 "V11__add_user_roles_and_security_audit.sql",
                 "V12__add_profile_contact_fields.sql",
-                "V13__enhance_career_tracks_attributes.sql"
+                "V13__enhance_career_tracks_attributes.sql",
+                "V14__enhance_resume_documents_and_versions.sql"
         );
 
         for (Resource resource : resources) {

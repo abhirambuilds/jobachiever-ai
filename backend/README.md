@@ -407,7 +407,35 @@ Detailed architecture, DTO schemas, and matching engine specifications are docum
 
 ---
 
-## 13. Flyway Schema Migrations
+## 13. Secure Resume Document Management & Storage APIs (`/api/v1/resumes`)
+
+The Resume Document subsystem provides secure binary persistence, deep file validation (magic bytes & Zip Slip defense), revision tracking, in-browser previews, and career track association.
+
+Detailed architecture, validation algorithms, and configuration guides are documented in [`docs/resume-document-management.md`](file:///c:/Projects/JobAchieverAI/docs/resume-document-management.md).
+
+### 13.1 Endpoints Summary
+| Method | Path | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/resumes` | Upload resume with multipart file and optional track association | `USER` |
+| `GET` | `/api/v1/resumes` | List user resumes with search, filtering, and pagination | `USER` |
+| `GET` | `/api/v1/resumes/{resumeId}` | Retrieve document metadata | `USER` |
+| `GET` | `/api/v1/resumes/{resumeId}/download` | Secure binary download with safe attachment headers | `USER` |
+| `GET` | `/api/v1/resumes/{resumeId}/preview` | In-browser preview with nosniff and CSP headers | `USER` |
+| `PATCH` | `/api/v1/resumes/{resumeId}` | Update editable metadata (title, description, track) | `USER` |
+| `DELETE` | `/api/v1/resumes/{resumeId}` | Safe deletion with storage purge and primary promotion | `USER` |
+| `POST` | `/api/v1/resumes/{resumeId}/versions` | Upload new version of an existing resume | `USER` |
+| `GET` | `/api/v1/resumes/{resumeId}/versions` | Retrieve version history ordered descending | `USER` |
+| `PATCH` | `/api/v1/resumes/{resumeId}/primary` | Designate resume as user's primary master resume | `USER` |
+
+### 13.2 Storage Configuration Environment Variables
+| Variable | Property | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `RESUMES_STORAGE_DIR` | `app.storage.resumes-dir` | `./data/resumes` | Directory path for protected binary file persistence |
+| `MAX_RESUME_FILE_SIZE_BYTES` | `app.storage.max-file-size-bytes` | `10485760` (10 MB) | Maximum permitted file upload size |
+
+---
+
+## 14. Flyway Schema Migrations
 
 Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL generation (`ddl-auto: create` or `update`) is strictly forbidden. Schema validation (`hibernate.ddl-auto: validate`) verifies JPA entity alignment against the migrated schema.
 
@@ -415,7 +443,7 @@ Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL
 - **Naming Pattern:** `V{Version}__{Descriptive_Title}.sql`
 - **Detailed Schema Specification & ER Diagram:** See [`docs/database-schema.md`](file:///c:/Projects/JobAchieverAI/docs/database-schema.md)
 
-### 13.1 Migration Catalog
+### 14.1 Migration Catalog
 | Version | Migration Script | Description |
 | :--- | :--- | :--- |
 | **V1** | `V1__create_database_extensions.sql` | Enables `uuid-ossp`, `pgcrypto`, and conditionally initializes `vector` (pgvector) |
@@ -431,8 +459,9 @@ Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL
 | **V11** | `V11__add_user_roles_and_security_audit.sql` | Adds `role` column to `users` and creates `security_audit_logs` table |
 | **V12** | `V12__add_profile_contact_fields.sql` | Adds `phone_number` and `country` columns to `career_profiles` |
 | **V13** | `V13__enhance_career_tracks_attributes.sql` | Adds `target_seniority`, `industries`, `preferred_skills`, `career_goals`, `priority`, `is_primary`, and priority index |
+| **V14** | `V14__enhance_resume_documents_and_versions.sql` | Adds `description`, `is_primary`, `current_version_id`, `storage_key`, and lifecycle status check constraint |
 
-### 13.2 Migration Execution
+### 14.2 Migration Execution
 Migrations execute automatically when the Spring Boot backend starts with an active database connection:
 ```powershell
 # Migrations run automatically at startup against local PostgreSQL
@@ -444,27 +473,27 @@ To run tests without requiring a live database:
 ./mvnw clean test
 ```
 
-### 13.3 Migration Rules:
+### 14.3 Migration Rules:
 1. Migrations are strictly **append-only**. Never edit a migration once committed and merged.
 2. Destructive operations (`DROP TABLE`, `DROP DATABASE`, `TRUNCATE`) are prohibited in migrations.
 3. Every table must include standard audit fields (`created_at TIMESTAMPTZ`, `updated_at TIMESTAMPTZ`).
 
 ---
 
-## 14. Safe Database Development & Backup
+## 15. Safe Database Development & Backup
 
-### 14.1 Data Persistence
+### 15.1 Data Persistence
 - Data is stored in the Docker named volume `jobachiever_postgres_data`, mapped to `/var/lib/postgresql/data`.
 - This ensures data survives container updates, restarts, and local machine reboots.
 
-### 14.2 Database Backup (pg_dump)
+### 15.2 Database Backup (pg_dump)
 To take a snapshot of the local database:
 ```bash
 docker exec -t jobachiever-postgres pg_dump -U jobachiever -d jobachiever -F c -b -v -f /tmp/jobachiever_backup.dump
 docker cp jobachiever-postgres:/tmp/jobachiever_backup.dump ./jobachiever_backup.dump
 ```
 
-### 14.3 Database Restore (pg_restore)
+### 15.3 Database Restore (pg_restore)
 To restore a snapshot:
 ```bash
 docker cp ./jobachiever_backup.dump jobachiever-postgres:/tmp/jobachiever_backup.dump
@@ -473,7 +502,7 @@ docker exec -t jobachiever-postgres pg_restore -U jobachiever -d jobachiever -v 
 
 ---
 
-## 15. Troubleshooting Connection Issues
+## 16. Troubleshooting Connection Issues
 
 | Issue | Cause | Solution |
 | :--- | :--- | :--- |
@@ -484,7 +513,7 @@ docker exec -t jobachiever-postgres pg_restore -U jobachiever -d jobachiever -v 
 
 ---
 
-## 16. Build & Test Commands
+## 17. Build & Test Commands
 
 Run from the `backend/` directory using Maven Wrapper:
 

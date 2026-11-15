@@ -157,11 +157,11 @@ htmlcov/
 # ------------------------------------------------------------------------------
 # Local Storage, Uploads & Temporary Files
 # ------------------------------------------------------------------------------
-uploads/
-storage/
-media/
-temp/
-tmp/
+/uploads/
+/storage/
+/media/
+/temp/
+/tmp/
 *.tmp
 *.temp
 /data/

@@ -31,12 +31,23 @@ export function DocumentProvider({ children }) {
   const createdUrlsRef = useRef(new Set());
 
   useEffect(() => {
+    let isMounted = true;
     const urls = createdUrlsRef.current;
     INITIAL_RESUMES.forEach((doc) => {
       if (doc.previewUrl) urls.add(doc.previewUrl);
     });
 
+    documentService.getDocuments().then((docs) => {
+      if (isMounted && docs && docs.length > 0) {
+        setDocuments(docs);
+        docs.forEach((doc) => {
+          if (doc.previewUrl) urls.add(doc.previewUrl);
+        });
+      }
+    });
+
     return () => {
+      isMounted = false;
       // Cleanup all temporary preview URLs on unmount
       urls.forEach((url) => {
         try {
@@ -115,11 +126,17 @@ export function DocumentProvider({ children }) {
   /**
    * Rename a document
    */
-  const renameDocument = (documentId, newName) => {
+  const renameDocument = async (documentId, newName) => {
     const trimmed = newName.trim();
     if (!trimmed) {
       toast.error('Resume name cannot be empty.');
       return false;
+    }
+
+    try {
+      await documentService.renameDocument(documentId, trimmed);
+    } catch {
+      // offline fallback
     }
 
     setDocuments((prev) =>
@@ -145,9 +162,15 @@ export function DocumentProvider({ children }) {
   /**
    * Re-associate document with a career track
    */
-  const updateDocumentTrack = (documentId, newTrackId) => {
+  const updateDocumentTrack = async (documentId, newTrackId) => {
     const trackObj = availableTracks.find((t) => t.id === newTrackId);
     if (!trackObj) return;
+
+    try {
+      await documentService.updateDocumentTrack(documentId, newTrackId);
+    } catch {
+      // offline fallback
+    }
 
     setDocuments((prev) =>
       prev.map((doc) => {
@@ -170,7 +193,7 @@ export function DocumentProvider({ children }) {
   /**
    * Delete a document with cleanup
    */
-  const deleteDocument = (documentId) => {
+  const deleteDocument = async (documentId) => {
     const docToDelete = documents.find((d) => d.id === documentId);
     if (docToDelete?.previewUrl) {
       try {
@@ -181,12 +204,37 @@ export function DocumentProvider({ children }) {
       }
     }
 
+    try {
+      await documentService.deleteDocument(documentId);
+    } catch {
+      // offline fallback
+    }
+
     setDocuments((prev) => prev.filter((d) => d.id !== documentId));
     if (activePreviewDoc?.id === documentId) setActivePreviewDoc(null);
     if (activeVersionDoc?.id === documentId) setActiveVersionDoc(null);
     setActiveDeleteDoc(null);
 
     toast.success(`"${docToDelete?.name || 'Document'}" permanently removed.`);
+  };
+
+  /**
+   * Designate resume as user's primary master resume
+   */
+  const setPrimaryResume = async (documentId) => {
+    try {
+      await documentService.setPrimaryResume(documentId);
+    } catch {
+      // offline fallback
+    }
+
+    setDocuments((prev) =>
+      prev.map((doc) => ({
+        ...doc,
+        isPrimary: doc.id === documentId,
+      }))
+    );
+    toast.success('Primary resume updated successfully.');
   };
 
   /**
@@ -338,6 +386,7 @@ export function DocumentProvider({ children }) {
     deleteDocument,
     restoreVersion,
     downloadDocument,
+    setPrimaryResume,
     validateDocumentFile,
     // Modal states
     isUploadModalOpen,

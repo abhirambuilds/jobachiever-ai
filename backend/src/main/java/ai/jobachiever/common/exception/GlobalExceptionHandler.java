@@ -297,7 +297,46 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 16. Unhandled Internal Server Errors (sanitized to avoid leaking implementation details)
+     * 16. File Validation Exceptions & Max Size Exceeded (400 Bad Request)
+     */
+    @ExceptionHandler({
+            ai.jobachiever.resumes.exception.FileValidationException.class,
+            org.springframework.web.multipart.MaxUploadSizeExceededException.class
+    })
+    public ResponseEntity<ErrorResponse> handleFileValidation(
+            Exception ex, HttpServletRequest request) {
+        log.warn("File validation failure at {}: {}", request.getRequestURI(), ex.getMessage());
+        String message = ex instanceof org.springframework.web.multipart.MaxUploadSizeExceededException
+                ? "File exceeds the maximum permitted upload limit of 10 MB"
+                : ex.getMessage();
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                message,
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * 17. File Storage Exceptions (500 Internal Server Error)
+     */
+    @ExceptionHandler(ai.jobachiever.resumes.exception.FileStorageException.class)
+    public ResponseEntity<ErrorResponse> handleFileStorage(
+            ai.jobachiever.resumes.exception.FileStorageException ex, HttpServletRequest request) {
+        log.error("File storage failure at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "File storage operation failed: " + ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    /**
+     * 18. Unhandled Internal Server Errors (sanitized to avoid leaking implementation details)
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(

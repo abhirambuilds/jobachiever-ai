@@ -36,6 +36,7 @@ export function ResumeListItem({ doc }) {
     setActiveDeleteDoc,
     downloadDocument,
     updateDocumentTrack,
+    setPrimaryResume,
     availableTracks,
   } = useDocuments();
 
@@ -216,6 +217,13 @@ export function ResumeListItem({ doc }) {
                   ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+
+              {!doc.isPrimary && (
+                <DropdownMenuItem onClick={() => setPrimaryResume(doc.id)}>
+                  <Sparkles className="mr-2 h-4 w-4 text-amber-400" />
+                  <span>Set as Primary</span>
+                </DropdownMenuItem>
+              )}
 
               <DropdownMenuSeparator />
               <DropdownMenuItem

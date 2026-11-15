@@ -26,12 +26,22 @@ public class ResumeDocument {
     @Column(name = "title", nullable = false, length = 255)
     private String title;
 
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "document_type", nullable = false, length = 32)
     private DocumentType documentType = DocumentType.UPLOADED;
 
     @Column(name = "is_master", nullable = false)
     private boolean master = false;
+
+    @Column(name = "is_primary", nullable = false)
+    private boolean primary = false;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_version_id")
+    private ResumeVersion currentVersion;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -98,6 +108,14 @@ public class ResumeDocument {
         this.title = title;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public DocumentType getDocumentType() {
         return documentType;
     }
@@ -112,6 +130,24 @@ public class ResumeDocument {
 
     public void setMaster(boolean master) {
         this.master = master;
+        this.primary = master;
+    }
+
+    public boolean isPrimary() {
+        return primary;
+    }
+
+    public void setPrimary(boolean primary) {
+        this.primary = primary;
+        this.master = primary;
+    }
+
+    public ResumeVersion getCurrentVersion() {
+        return currentVersion;
+    }
+
+    public void setCurrentVersion(ResumeVersion currentVersion) {
+        this.currentVersion = currentVersion;
     }
 
     public Instant getCreatedAt() {
