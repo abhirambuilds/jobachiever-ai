@@ -169,15 +169,37 @@ The backend binds database connection properties through environment variables w
 
 ## 8. Flyway Schema Migrations
 
-Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL generation (`ddl-auto: create` or `update`) is strictly forbidden.
+Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL generation (`ddl-auto: create` or `update`) is strictly forbidden. Schema validation (`hibernate.ddl-auto: validate`) verifies JPA entity alignment against the migrated schema.
 
 - **Migration Scripts Directory:** `backend/src/main/resources/db/migration/`
 - **Naming Pattern:** `V{Version}__{Descriptive_Title}.sql`
-- **Current Baseline Migration:** `V1__create_database_extensions.sql`
-  - Enables `uuid-ossp` and `pgcrypto` for UUID primary keys.
-  - Queries `pg_available_extensions` for `vector` and enables pgvector safely with graceful warnings if absent.
+- **Detailed Schema Specification & ER Diagram:** See [`docs/database-schema.md`](file:///c:/Projects/JobAchieverAI/docs/database-schema.md)
 
-### Migration Rules:
+### 8.1 Migration Catalog
+| Version | Migration Script | Description |
+| :--- | :--- | :--- |
+| **V1** | `V1__create_database_extensions.sql` | Enables `uuid-ossp`, `pgcrypto`, and conditionally initializes `vector` (pgvector) |
+| **V2** | `V2__create_user_accounts.sql` | Creates `users` table with case-insensitive unique email and account status constraints |
+| **V3** | `V3__create_career_profiles.sql` | Creates `career_profiles` table (1-to-1 master career profile per user) |
+| **V4** | `V4__create_profile_details.sql` | Creates structured child entities: educations, skills, experiences, projects, certifications, achievements |
+| **V5** | `V5__create_career_tracks.sql` | Creates `career_tracks` table for multi-track persona management |
+| **V6** | `V6__create_resume_documents.sql` | Creates `resume_documents` and `resume_versions` tables with secure storage paths |
+| **V7** | `V7__create_jobs_and_requirements.sql` | Creates shared `jobs` catalog and decomposed `job_requirements` |
+| **V8** | `V8__create_job_applications.sql` | Creates `job_applications` tracker and `application_activities` audit log |
+
+### 8.2 Migration Execution
+Migrations execute automatically when the Spring Boot backend starts with an active database connection:
+```powershell
+# Migrations run automatically at startup against local PostgreSQL
+./mvnw spring-boot:run
+```
+To run tests without requiring a live database:
+```powershell
+# Uses test profile; DataSource and Flyway autoconfigurations are excluded
+./mvnw clean test
+```
+
+### 8.3 Migration Rules:
 1. Migrations are strictly **append-only**. Never edit a migration once committed and merged.
 2. Destructive operations (`DROP TABLE`, `DROP DATABASE`, `TRUNCATE`) are prohibited in migrations.
 3. Every table must include standard audit fields (`created_at TIMESTAMPTZ`, `updated_at TIMESTAMPTZ`).
