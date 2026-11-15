@@ -161,9 +161,10 @@ jobachiever-ai/
 | **Milestone 12** | Email OTP Verification, Resend & Password Recovery (Prompt 16) | **Completed** |
 | **Milestone 13** | Centralized Authorization, User Ownership & Security Hardening (Prompt 17) | **Completed** |
 | **Milestone 14** | Master Career Profile APIs & Profile Management (Prompt 18) | **Completed** |
-| **Milestone 15+** | AI Microservice (FastAPI), Parsing & Integrations | *Upcoming* |
+| **Milestone 15** | Multiple Career Tracks Management APIs (Prompt 19) | **Completed** |
+| **Milestone 16+** | Resume Upload & Multi-Format Parsing, AI Microservice, Matching | *Upcoming* |
 
-> *Current State:* Frontend client application, Spring Boot backend foundation, PostgreSQL schema (19 tables, Flyway migrations V1–V12, JPA entities), hardened Spring Security 6.x architecture, centralized user authorization (`CurrentUserService`, `ResourceOwnershipService`), role-based access control (`USER` vs `ADMIN`), account state enforcement, transactional security audit logging, email OTP verification & recovery subsystems, and complete Master Career Profile management (`/api/v1/profiles`) with deterministic adaptive completeness calculation verified with automated test suites. Career tracks, resume upload, and AI integration will be introduced in subsequent milestones.
+> *Current State:* Frontend client application, Spring Boot backend foundation, PostgreSQL schema (19 tables, Flyway migrations V1–V13, JPA entities), hardened Spring Security 6.x architecture, centralized user authorization (`CurrentUserService`, `ResourceOwnershipService`), role-based access control (`USER` vs `ADMIN`), account state enforcement, transactional security audit logging, email OTP verification & recovery subsystems, complete Master Career Profile management (`/api/v1/profiles`) with deterministic completeness scoring, and Multiple Career Tracks management (`/api/v1/career-tracks`) with deterministic skill matching and canonical aliasing verified across 140+ automated backend tests and 80+ frontend tests. Resume parsing and AI integration will be introduced in subsequent milestones.
 
 ---
 

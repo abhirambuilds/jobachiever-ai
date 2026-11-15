@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Layers, Plus, Star, Edit2, Trash2, CheckCircle2, TrendingUp } from 'lucide-react';
+import { Layers, Plus, Star, Edit2, Trash2, CheckCircle2, TrendingUp, Eye } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import { TrackModal } from './TrackModal';
+import { TrackOverviewModal } from './TrackOverviewModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,6 +13,7 @@ export function CareerTrackManager() {
   const { profile, setPrimaryCareerTrack, removeCareerTrack } = useProfile();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTrack, setEditingTrack] = useState(null);
+  const [overviewTrack, setOverviewTrack] = useState(null);
 
   const handleOpenCreate = () => {
     setEditingTrack(null);
@@ -103,6 +105,15 @@ export function CareerTrackManager() {
                   </div>
 
                   <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setOverviewTrack(track)}
+                      className="h-7 w-7 text-muted-foreground hover:text-primary"
+                      aria-label="View track overview"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -210,6 +221,13 @@ export function CareerTrackManager() {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         trackToEdit={editingTrack}
+      />
+
+      {/* Modal Dialog for Overview & Skill Match */}
+      <TrackOverviewModal
+        isOpen={!!overviewTrack}
+        onClose={() => setOverviewTrack(null)}
+        track={overviewTrack}
       />
     </div>
   );

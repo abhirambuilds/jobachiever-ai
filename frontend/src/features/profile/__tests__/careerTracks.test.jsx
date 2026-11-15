@@ -94,4 +94,41 @@ describe('Career Track Management & Profile Reference Integrity', () => {
     expect(screen.getByText('Create Career Track')).toBeInTheDocument();
     expect(screen.getByText('Backend Systems Engineer')).toBeInTheDocument();
   });
+
+  it('opens track overview modal with skill coverage indicators when Overview button is clicked', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ProfileProvider>
+        <CareerTrackManager />
+      </ProfileProvider>
+    );
+
+    const overviewButtons = screen.getAllByRole('button', { name: /view track overview/i });
+    expect(overviewButtons.length).toBeGreaterThan(0);
+    await user.click(overviewButtons[0]);
+
+    expect(screen.getByText(/Track Overview:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Required Skills Alignment/i)).toBeInTheDocument();
+  });
+
+  it('computes transparent skill match, missing skills, and additional profile skills', () => {
+    let skillMatch = null;
+    function MatchConsumer() {
+      const { profile, getTrackSkillMatch } = useProfile();
+      skillMatch = getTrackSkillMatch(profile.careerTracks[0].id);
+      return <div data-testid="match-percentage">{skillMatch?.matchPercentage}</div>;
+    }
+
+    render(
+      <ProfileProvider>
+        <MatchConsumer />
+      </ProfileProvider>
+    );
+
+    expect(skillMatch).not.toBeNull();
+    expect(skillMatch.matchPercentage).toBeGreaterThanOrEqual(0);
+    expect(skillMatch.matchedRequired).toBeDefined();
+    expect(skillMatch.missingRequired).toBeDefined();
+  });
 });

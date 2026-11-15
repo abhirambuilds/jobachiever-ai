@@ -370,7 +370,7 @@ The platform provides a provider-independent notification architecture in packag
 
 ---
 
-## 10. Centralized Authorization & Ownership Architecture
+## 11. Centralized Authorization & Ownership Architecture
 
 JobAchiever AI enforces server-authoritative tenant isolation and resource ownership:
 - **`CurrentUserService`:** Resolves user identity, account status, email verification state, and granted authorities directly from the validated `SecurityContext` / live PostgreSQL state. Client-supplied IDs are never trusted for authorization.
@@ -381,7 +381,33 @@ JobAchiever AI enforces server-authoritative tenant isolation and resource owner
 
 ---
 
-## 11. Flyway Schema Migrations
+## 12. Multiple Career Tracks Management APIs (`/api/v1/career-tracks`)
+
+Career tracks enable candidates to pursue multiple career tracks (e.g., "Full-Stack Engineer", "Engineering Manager", "Solutions Architect") under one unified Master Career Profile. All operations are strictly authenticated and user-scoped.
+
+Detailed architecture, DTO schemas, and matching engine specifications are documented in [`docs/career-tracks.md`](file:///c:/Projects/JobAchieverAI/docs/career-tracks.md).
+
+### 12.1 Endpoints Summary
+| Method | Path | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/career-tracks` | List career tracks for current user (optional `?active=true` & pagination) | `USER` |
+| `GET` | `/api/v1/career-tracks/{trackId}` | Retrieve specific career track | `USER` |
+| `POST` | `/api/v1/career-tracks` | Create career track linked to master profile | `USER` |
+| `PUT` | `/api/v1/career-tracks/{trackId}` | Full update of existing career track | `USER` |
+| `PATCH` | `/api/v1/career-tracks/{trackId}/status` | Activate or deactivate career track | `USER` |
+| `PATCH` | `/api/v1/career-tracks/{trackId}/priority` | Update track priority (1–100) | `USER` |
+| `DELETE` | `/api/v1/career-tracks/{trackId}` | Safely delete track (preserves master profile; auto-promotes primary) | `USER` |
+| `GET` | `/api/v1/career-tracks/{trackId}/overview` | Deterministic skill match, gaps, and relevant experiences/projects | `USER` |
+
+### 12.2 Key Architectural Safeguards
+- **Zero Fabrication:** The `CareerTrackSkillService` calculates coverage deterministically against master profile skills using canonical alias mapping (e.g. `react.js` -> `react`, `k8s` -> `kubernetes`, `springboot` -> `spring boot`).
+- **Data Integrity:** Master profile records are shared, not duplicated. Deleting a track never affects master profile records.
+- **Primary Track Auto-Promotion:** Deleting a primary track automatically designates the highest priority remaining active track as primary.
+- **Guardrails:** Rejects duplicate active target roles, enforces case-insensitive track name uniqueness, and caps active tracks at 10.
+
+---
+
+## 13. Flyway Schema Migrations
 
 Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL generation (`ddl-auto: create` or `update`) is strictly forbidden. Schema validation (`hibernate.ddl-auto: validate`) verifies JPA entity alignment against the migrated schema.
 
@@ -389,7 +415,7 @@ Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL
 - **Naming Pattern:** `V{Version}__{Descriptive_Title}.sql`
 - **Detailed Schema Specification & ER Diagram:** See [`docs/database-schema.md`](file:///c:/Projects/JobAchieverAI/docs/database-schema.md)
 
-### 9.1 Migration Catalog
+### 13.1 Migration Catalog
 | Version | Migration Script | Description |
 | :--- | :--- | :--- |
 | **V1** | `V1__create_database_extensions.sql` | Enables `uuid-ossp`, `pgcrypto`, and conditionally initializes `vector` (pgvector) |
@@ -404,8 +430,9 @@ Flyway is the **sole schema migration engine** for JobAchiever AI. Hibernate DDL
 | **V10** | `V10__create_verification_and_reset_tokens.sql` | Creates `email_verification_tokens` and `password_reset_tokens` tables |
 | **V11** | `V11__add_user_roles_and_security_audit.sql` | Adds `role` column to `users` and creates `security_audit_logs` table |
 | **V12** | `V12__add_profile_contact_fields.sql` | Adds `phone_number` and `country` columns to `career_profiles` |
+| **V13** | `V13__enhance_career_tracks_attributes.sql` | Adds `target_seniority`, `industries`, `preferred_skills`, `career_goals`, `priority`, `is_primary`, and priority index |
 
-### 9.2 Migration Execution
+### 13.2 Migration Execution
 Migrations execute automatically when the Spring Boot backend starts with an active database connection:
 ```powershell
 # Migrations run automatically at startup against local PostgreSQL
@@ -417,27 +444,27 @@ To run tests without requiring a live database:
 ./mvnw clean test
 ```
 
-### 8.3 Migration Rules:
+### 13.3 Migration Rules:
 1. Migrations are strictly **append-only**. Never edit a migration once committed and merged.
 2. Destructive operations (`DROP TABLE`, `DROP DATABASE`, `TRUNCATE`) are prohibited in migrations.
 3. Every table must include standard audit fields (`created_at TIMESTAMPTZ`, `updated_at TIMESTAMPTZ`).
 
 ---
 
-## 9. Safe Database Development & Backup
+## 14. Safe Database Development & Backup
 
-### 9.1 Data Persistence
+### 14.1 Data Persistence
 - Data is stored in the Docker named volume `jobachiever_postgres_data`, mapped to `/var/lib/postgresql/data`.
 - This ensures data survives container updates, restarts, and local machine reboots.
 
-### 9.2 Database Backup (pg_dump)
+### 14.2 Database Backup (pg_dump)
 To take a snapshot of the local database:
 ```bash
 docker exec -t jobachiever-postgres pg_dump -U jobachiever -d jobachiever -F c -b -v -f /tmp/jobachiever_backup.dump
 docker cp jobachiever-postgres:/tmp/jobachiever_backup.dump ./jobachiever_backup.dump
 ```
 
-### 9.3 Database Restore (pg_restore)
+### 14.3 Database Restore (pg_restore)
 To restore a snapshot:
 ```bash
 docker cp ./jobachiever_backup.dump jobachiever-postgres:/tmp/jobachiever_backup.dump
@@ -446,7 +473,7 @@ docker exec -t jobachiever-postgres pg_restore -U jobachiever -d jobachiever -v 
 
 ---
 
-## 10. Troubleshooting Connection Issues
+## 15. Troubleshooting Connection Issues
 
 | Issue | Cause | Solution |
 | :--- | :--- | :--- |
@@ -457,7 +484,7 @@ docker exec -t jobachiever-postgres pg_restore -U jobachiever -d jobachiever -v 
 
 ---
 
-## 11. Build & Test Commands
+## 16. Build & Test Commands
 
 Run from the `backend/` directory using Maven Wrapper:
 

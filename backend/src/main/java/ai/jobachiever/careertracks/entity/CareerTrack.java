@@ -29,6 +29,9 @@ public class CareerTrack {
     @Column(name = "target_role", nullable = false, length = 255)
     private String targetRole;
 
+    @Column(name = "target_seniority", length = 50)
+    private String targetSeniority = "ENTRY_LEVEL";
+
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
@@ -38,11 +41,26 @@ public class CareerTrack {
     @Column(name = "employment_types", columnDefinition = "JSONB")
     private String employmentTypes = "[]";
 
-    @Column(name = "required_skills", columnDefinition = "JSONB")
-    private String requiredSkills = "[]";
+    @Column(name = "industries", columnDefinition = "JSONB")
+    private String industries = "[]";
 
     @Column(name = "target_companies", columnDefinition = "JSONB")
     private String targetCompanies = "[]";
+
+    @Column(name = "required_skills", columnDefinition = "JSONB")
+    private String requiredSkills = "[]";
+
+    @Column(name = "preferred_skills", columnDefinition = "JSONB")
+    private String preferredSkills = "[]";
+
+    @Column(name = "career_goals", columnDefinition = "TEXT")
+    private String careerGoals;
+
+    @Column(name = "priority", nullable = false)
+    private int priority = 1;
+
+    @Column(name = "is_primary", nullable = false)
+    private boolean primary = false;
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
@@ -121,6 +139,14 @@ public class CareerTrack {
         this.targetRole = targetRole;
     }
 
+    public String getTargetSeniority() {
+        return targetSeniority;
+    }
+
+    public void setTargetSeniority(String targetSeniority) {
+        this.targetSeniority = targetSeniority;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -145,12 +171,12 @@ public class CareerTrack {
         this.employmentTypes = employmentTypes;
     }
 
-    public String getRequiredSkills() {
-        return requiredSkills;
+    public String getIndustries() {
+        return industries;
     }
 
-    public void setRequiredSkills(String requiredSkills) {
-        this.requiredSkills = requiredSkills;
+    public void setIndustries(String industries) {
+        this.industries = industries;
     }
 
     public String getTargetCompanies() {
@@ -159,6 +185,46 @@ public class CareerTrack {
 
     public void setTargetCompanies(String targetCompanies) {
         this.targetCompanies = targetCompanies;
+    }
+
+    public String getRequiredSkills() {
+        return requiredSkills;
+    }
+
+    public void setRequiredSkills(String requiredSkills) {
+        this.requiredSkills = requiredSkills;
+    }
+
+    public String getPreferredSkills() {
+        return preferredSkills;
+    }
+
+    public void setPreferredSkills(String preferredSkills) {
+        this.preferredSkills = preferredSkills;
+    }
+
+    public String getCareerGoals() {
+        return careerGoals;
+    }
+
+    public void setCareerGoals(String careerGoals) {
+        this.careerGoals = careerGoals;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public boolean isPrimary() {
+        return primary;
+    }
+
+    public void setPrimary(boolean primary) {
+        this.primary = primary;
     }
 
     public boolean isActive() {

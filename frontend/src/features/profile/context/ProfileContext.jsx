@@ -455,6 +455,53 @@ export function ProfileProvider({ children }) {
     }));
   };
 
+  const toggleTrackStatus = (id) => {
+    setProfile((prev) => ({
+      ...prev,
+      careerTracks: prev.careerTracks.map((t) =>
+        t.id === id ? { ...t, active: t.active === undefined ? false : !t.active } : t
+      ),
+    }));
+  };
+
+  const updateTrackPriority = (id, priority) => {
+    setProfile((prev) => ({
+      ...prev,
+      careerTracks: prev.careerTracks.map((t) => (t.id === id ? { ...t, priority } : t)),
+    }));
+  };
+
+  const getTrackSkillMatch = (trackId) => {
+    const track = profile.careerTracks.find((t) => t.id === trackId);
+    if (!track) return null;
+
+    const masterSkillNames = profile.skills.map((s) => s.name.trim().toLowerCase());
+    const req = track.relevantSkills || track.requiredSkills || [];
+    const pref = track.preferredSkills || [];
+
+    const matchedReq = req.filter((s) => masterSkillNames.includes(s.trim().toLowerCase()));
+    const missingReq = req.filter((s) => !masterSkillNames.includes(s.trim().toLowerCase()));
+    const matchedPref = pref.filter((s) => masterSkillNames.includes(s.trim().toLowerCase()));
+    const missingPref = pref.filter((s) => !masterSkillNames.includes(s.trim().toLowerCase()));
+
+    const allTrackNorm = [...req, ...pref].map((s) => s.trim().toLowerCase());
+    const additional = profile.skills
+      .filter((s) => !allTrackNorm.includes(s.name.trim().toLowerCase()))
+      .map((s) => s.name);
+
+    const matchPct = req.length > 0 ? Math.round((matchedReq.length / req.length) * 100) : 100;
+
+    return {
+      track,
+      matchedRequired: matchedReq,
+      missingRequired: missingReq,
+      matchedPreferred: matchedPref,
+      missingPreferred: missingPref,
+      additionalProfileSkills: additional,
+      matchPercentage: matchPct,
+    };
+  };
+
   // Completeness Calculator
   const calculateCompleteness = () => {
     const checks = [
@@ -534,6 +581,9 @@ export function ProfileProvider({ children }) {
     updateCareerTrack,
     removeCareerTrack,
     setPrimaryCareerTrack,
+    toggleTrackStatus,
+    updateTrackPriority,
+    getTrackSkillMatch,
     calculateCompleteness,
     resetToDemo,
     clearProfile,
