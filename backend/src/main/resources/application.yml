@@ -2,14 +2,42 @@ spring:
   application:
     name: jobachiever-backend
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:default}
-  # DataSource/JPA autoconfiguration is safely excluded by default
-  # so health endpoints and services start without requiring a live PostgreSQL instance.
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+  # Database DataSource Configuration
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:jobachiever}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:jobachiever}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:jobachiever_dev_password}}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: JobAchieverHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # Spring Data JPA / Hibernate Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      # Do not use Hibernate automatic schema creation. Schema is validated against Flyway migrations.
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  # Flyway Schema Migrations
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: "0"
+    locations: classpath:db/migration
+    validate-on-migrate: true
+
   jackson:
     serialization:
       write-dates-as-timestamps: false
@@ -54,3 +82,5 @@ logging:
     ai.jobachiever: DEBUG
     org.springframework.web: INFO
     org.springframework.security: INFO
+    org.flywaydb: INFO
+    org.hibernate.SQL: WARN

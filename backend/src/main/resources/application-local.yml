@@ -1,34 +1,37 @@
-# ===================================================================
+# ==============================================================================
 # Local Development Profile (application-local.yml)
-# Activated via: SPRING_PROFILES_ACTIVE=local or --spring.profiles.active=local
-# Note: Prepared for PostgreSQL when local DB infrastructure is provisioned.
-# ===================================================================
+# Activated via: SPRING_PROFILES_ACTIVE=local (default)
+# ==============================================================================
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:jobachiever_db}}
-    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:postgres}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:postgres}}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:jobachiever}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:jobachiever}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:jobachiever_dev_password}}
     driver-class-name: org.postgresql.Driver
     hikari:
-      pool-name: JobAchieverHikariCP
+      pool-name: JobAchieverHikariPool
       maximum-pool-size: 10
       minimum-idle: 2
-      idle-timeout: 300000
-      connection-timeout: 20000
-      max-lifetime: 1200000
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
     show-sql: false
     open-in-view: false
-    properties:
-      hibernate:
-        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: "0"
+    locations: classpath:db/migration
+    validate-on-migrate: true
 
 logging:
   level:
     ai.jobachiever: DEBUG
-    org.hibernate.SQL: INFO
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.flywaydb: INFO

@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: jobachiever-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-jobachiever}
+      POSTGRES_USER: ${POSTGRES_USER:-jobachiever}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jobachiever_dev_password}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      # Bound to localhost interface to avoid public network exposure
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # Persistent named volume ensures data survives container restart/down
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-jobachiever} -d $${POSTGRES_DB:-jobachiever}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+    name: jobachiever_postgres_data

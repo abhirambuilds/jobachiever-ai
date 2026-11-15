@@ -155,9 +155,10 @@ jobachiever-ai/
 | **Milestone 6** | Frontend Prototype & Architecture (Prompts 1–10) | **Completed** |
 | **Milestone 7** | Comprehensive Frontend Audit & Testing Resolution | **Completed** |
 | **Milestone 8** | Java Spring Boot Backend Foundation (Prompt 12) | **Completed** |
-| **Milestone 9+** | Authentication, Profile Persistence, Database & AI Integration | *Upcoming* |
+| **Milestone 9** | PostgreSQL Database Infrastructure & Flyway Setup (Prompt 13) | **Completed** |
+| **Milestone 10+** | Authentication, Profile Persistence, AI Microservice & Integrations | *Upcoming* |
 
-> *Current State:* Frontend client application and Spring Boot backend foundation initialized with automated test suites, health endpoints, and zero-fabrication guardrails. Live PostgreSQL and external AI API keys will be configured in subsequent milestones.
+> *Current State:* Frontend client application, Spring Boot backend foundation, and PostgreSQL/Flyway database infrastructure established with Docker Compose and automated test suites. Relational persistence and AI integration will be introduced in subsequent milestones.
 
 ---
 
