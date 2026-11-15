@@ -152,10 +152,12 @@ jobachiever-ai/
 | **Milestone 3** | Developer & Agent Operating Guide (`AGENTS.md`) | **Completed** |
 | **Milestone 4** | Professional Documentation (`README.md`) | **Completed** |
 | **Milestone 5** | Comprehensive `.gitignore` | **Completed** |
-| **Milestone 6** | Validation & Baseline Git Commit | **In Progress** |
-| **Milestone 7+** | Backend, AI Service, Database & Frontend Implementation | *Upcoming* |
+| **Milestone 6** | Frontend Prototype & Architecture (Prompts 1–10) | **Completed** |
+| **Milestone 7** | Comprehensive Frontend Audit & Testing Resolution | **Completed** |
+| **Milestone 8** | Java Spring Boot Backend Foundation (Prompt 12) | **Completed** |
+| **Milestone 9+** | Authentication, Profile Persistence, Database & AI Integration | *Upcoming* |
 
-> *Current State:* Repository initialized and baseline structure configured. Business logic, database tables, and user features are not yet implemented.
+> *Current State:* Frontend client application and Spring Boot backend foundation initialized with automated test suites, health endpoints, and zero-fabrication guardrails. Live PostgreSQL and external AI API keys will be configured in subsequent milestones.
 
 ---
 

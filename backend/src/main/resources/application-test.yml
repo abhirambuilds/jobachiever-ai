@@ -1,0 +1,20 @@
+# ===================================================================
+# Test Profile (application-test.yml)
+# Activated during automated JUnit 5 / Spring Boot testing
+# ===================================================================
+
+spring:
+  application:
+    name: jobachiever-backend
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+
+logging:
+  level:
+    root: WARN
+    ai.jobachiever: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
