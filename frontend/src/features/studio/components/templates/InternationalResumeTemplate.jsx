@@ -1,7 +1,7 @@
 import { Award, Briefcase, Globe2, GraduationCap, Mail, MapPin, Phone } from 'lucide-react';
 
 export function InternationalResumeTemplate({ resume, designSettings }) {
-  const sections = (resume.sections || []).filter((s) => s.visible);
+  const sections = (resume.sections || []).filter((s) => s.visible !== false);
 
   const personal = sections.find((s) => s.type === 'personal_info')?.data || {};
   const summary = sections.find((s) => s.type === 'summary')?.data;
@@ -14,6 +14,12 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
 
   const primaryColor = designSettings?.primaryColor || '#047857';
   const secondaryColor = designSettings?.secondaryColor || '#10b981';
+
+  const expItems = experience?.items || experience?.entries || [];
+  const projItems = projects?.items || projects?.entries || [];
+  const eduItems = education?.items || education?.entries || [];
+  const certItems = certs?.items || certs?.entries || [];
+  const langItems = languages?.items || languages?.entries || [];
 
   return (
     <div className="w-full text-slate-900 leading-normal space-y-4 font-sans text-xs">
@@ -78,7 +84,7 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
       )}
 
       {/* 3. Language & Cultural Proficiency Matrix (Prominent in International Resumes) */}
-      {languages?.items && languages.items.length > 0 && (
+      {langItems.length > 0 && (
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-900">
@@ -87,9 +93,9 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
             <div className="h-0.5 flex-1" style={{ backgroundColor: secondaryColor }} />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {languages.items.map((lang, idx) => (
+            {langItems.map((lang, idx) => (
               <div key={idx} className="border border-slate-200 rounded p-1.5 bg-slate-50 text-[10px]">
-                <div className="font-bold text-slate-900">{lang.name}</div>
+                <div className="font-bold text-slate-900">{lang.name || lang.language}</div>
                 <div className="text-emerald-700 font-semibold">{lang.proficiency || 'C2 - Native / Fluent'}</div>
               </div>
             ))}
@@ -98,7 +104,7 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
       )}
 
       {/* 4. Professional Experience with International Context */}
-      {experience?.items && experience.items.length > 0 && (
+      {expItems.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
@@ -109,11 +115,11 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
           </div>
 
           <div className="space-y-3 pl-1">
-            {experience.items.map((job) => (
+            {expItems.map((job) => (
               <div key={job.id} className="space-y-1">
                 <div className="flex justify-between items-baseline text-xs">
                   <div>
-                    <span className="font-bold text-slate-900">{job.title}</span>
+                    <span className="font-bold text-slate-900">{job.title || job.jobTitle}</span>
                     <span className="text-slate-500 font-medium"> | </span>
                     <span className="font-semibold" style={{ color: primaryColor }}>{job.company}</span>
                     {job.location && (
@@ -141,7 +147,7 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
       )}
 
       {/* 5. Cross-Functional Projects & Initiatives */}
-      {projects?.items && projects.items.length > 0 && (
+      {projItems.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-900">
@@ -151,9 +157,9 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {projects.items.map((proj) => (
+            {projItems.map((proj) => (
               <div key={proj.id} className="border border-slate-200 rounded p-2 bg-slate-50/50 space-y-1">
-                <div className="font-bold text-slate-900 text-xs">{proj.name}</div>
+                <div className="font-bold text-slate-900 text-xs">{proj.title || proj.name}</div>
                 {proj.description && <p className="text-[10px] text-slate-600 leading-snug">{proj.description}</p>}
                 {proj.technologies && proj.technologies.length > 0 && (
                   <div className="text-[9px] text-slate-500 font-medium">
@@ -168,26 +174,26 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
 
       {/* 6. Education & Global Certifications */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {education?.items && education.items.length > 0 && (
+        {eduItems.length > 0 && (
           <div className="space-y-1.5">
             <div className="flex items-center gap-1.5 border-b pb-0.5">
               <GraduationCap className="w-3.5 h-3.5" style={{ color: primaryColor }} />
               <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-800">
-                Education & Credentials
+                Education &amp; Credentials
               </h3>
             </div>
             <div className="space-y-2">
-              {education.items.map((edu) => (
+              {eduItems.map((edu) => (
                 <div key={edu.id} className="text-[11px]">
                   <div className="font-bold text-slate-900">{edu.degree} in {edu.fieldOfStudy}</div>
-                  <div className="text-slate-600 text-[10px]">{edu.institution} {edu.city && `(${edu.city})`} • {edu.graduationYear}</div>
+                  <div className="text-slate-600 text-[10px]">{edu.institution} {edu.city && `(${edu.city})`} • {edu.graduationYear || edu.endDate}</div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {certs?.items && certs.items.length > 0 && (
+        {certItems.length > 0 && (
           <div className="space-y-1.5">
             <div className="flex items-center gap-1.5 border-b pb-0.5">
               <Award className="w-3.5 h-3.5" style={{ color: primaryColor }} />
@@ -196,7 +202,7 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
               </h3>
             </div>
             <div className="space-y-1.5">
-              {certs.items.map((cert) => (
+              {certItems.map((cert) => (
                 <div key={cert.id} className="text-[11px]">
                   <div className="font-semibold text-slate-900">{cert.name}</div>
                   <div className="text-slate-500 text-[10px]">{cert.issuer} {cert.issueDate && `(${cert.issueDate})`}</div>

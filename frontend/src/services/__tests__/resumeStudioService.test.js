@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import {
   TEMPLATES,
   AVAILABLE_FONTS,
@@ -9,134 +10,130 @@ import {
   resumeStudioApiService,
 } from '../resumeStudioService.js';
 
-console.log('--- TEST 1: TEMPLATES Completeness (5 Distinct Templates) ---');
-console.assert(TEMPLATES.length === 5, `Expected 5 templates, found ${TEMPLATES.length}`);
-const expectedTemplates = [
-  'ats_professional',
-  'modern_professional',
-  'technical_resume',
-  'academic_cv',
-  'international_resume',
-];
-expectedTemplates.forEach((id) => {
-  console.assert(
-    TEMPLATES.some((t) => t.id === id),
-    `Missing template: ${id}`
-  );
-});
-console.log('✓ All 5 distinct templates verified');
+describe('Resume Studio Service Tests', () => {
+  it('verifies TEMPLATES completeness (5 distinct templates)', () => {
+    expect(TEMPLATES.length).toBe(5);
+    const expectedTemplates = [
+      'ats_professional',
+      'modern_professional',
+      'technical_resume',
+      'academic_cv',
+      'international_resume',
+    ];
+    expectedTemplates.forEach((id) => {
+      expect(TEMPLATES.some((t) => t.id === id)).toBe(true);
+    });
+  });
 
-console.log('--- TEST 2: Typography & Design Palette Assets ---');
-console.assert(AVAILABLE_FONTS.length >= 5, 'Should have at least 5 available fonts');
-console.assert(COLOR_PALETTES.length >= 5, 'Should have at least 5 curated color palettes');
-console.assert(DEFAULT_DESIGN_SETTINGS.fontFamily, 'Default font family missing');
-console.assert(DEFAULT_DESIGN_SETTINGS.primaryColor, 'Default primary color missing');
-console.log('✓ Typography & Palettes verified');
+  it('verifies typography and design palette assets', () => {
+    expect(AVAILABLE_FONTS.length).toBeGreaterThanOrEqual(5);
+    expect(COLOR_PALETTES.length).toBeGreaterThanOrEqual(5);
+    expect(DEFAULT_DESIGN_SETTINGS.fontFamily).toBeTruthy();
+    expect(DEFAULT_DESIGN_SETTINGS.primaryColor).toBeTruthy();
+  });
 
-console.log('--- TEST 3: Section Types Architecture (14 Supported Sections) ---');
-console.assert(SECTION_TYPES.length >= 12, 'Must support comprehensive resume sections');
-const mandatorySectionTypes = [
-  'personal_info',
-  'summary',
-  'skills',
-  'experience',
-  'projects',
-  'education',
-  'certifications',
-];
-mandatorySectionTypes.forEach((type) => {
-  console.assert(
-    SECTION_TYPES.some((s) => s.type === type),
-    `Missing mandatory section: ${type}`
-  );
-});
-console.log('✓ Section types verified');
+  it('verifies section types architecture', () => {
+    expect(SECTION_TYPES.length).toBeGreaterThanOrEqual(12);
+    const mandatorySectionTypes = [
+      'personal_info',
+      'summary',
+      'skills',
+      'experience',
+      'projects',
+      'education',
+      'certifications',
+    ];
+    mandatorySectionTypes.forEach((type) => {
+      expect(SECTION_TYPES.some((s) => s.type === type)).toBe(true);
+    });
+  });
 
-console.log('--- TEST 4: buildResumeFromProfile Factory ---');
-const mockProfile = {
-  personalInfo: {
-    fullName: 'Ada Lovelace',
-    headline: 'Computational Systems Engineer',
-    email: 'ada@example.com',
-    phone: '+1 555 0199',
-    city: 'London',
-    country: 'United Kingdom',
-    linkedinUrl: 'https://linkedin.com/in/ada-lovelace',
-    githubUrl: 'https://github.com/ada-lovelace',
-    websiteUrl: 'https://ada.dev',
-    summary: 'Pioneer of computational algorithms with deep mathematical foundations.',
-  },
-  skills: [
-    { id: 'sk-1', name: 'Algorithm Design', category: 'Engineering' },
-    { id: 'sk-2', name: 'Symbolic Computation', category: 'Engineering' },
-  ],
-  experience: [
-    {
-      id: 'exp-1',
-      jobTitle: 'Lead Analytical Architect',
-      company: 'Babbage Engine Laboratories',
-      startDate: '1842-01',
-      endDate: '1843-12',
-      isCurrent: false,
-      location: 'London, UK',
-      bullets: [
-        'Formulated first published computer program for Bernoulli numbers.',
+  it('verifies buildResumeFromProfile factory', () => {
+    const mockProfile = {
+      personalInfo: {
+        fullName: 'Ada Lovelace',
+        headline: 'Computational Systems Engineer',
+        email: 'ada@example.com',
+        phone: '+1 555 0199',
+        city: 'London',
+        country: 'United Kingdom',
+        linkedinUrl: 'https://linkedin.com/in/ada-lovelace',
+        githubUrl: 'https://github.com/ada-lovelace',
+        websiteUrl: 'https://ada.dev',
+        summary: 'Pioneer of computational algorithms with deep mathematical foundations.',
+      },
+      skills: [
+        { id: 'sk-1', name: 'Algorithm Design', category: 'Engineering' },
+        { id: 'sk-2', name: 'Symbolic Computation', category: 'Engineering' },
       ],
-      skillsUsed: ['Algorithm Design'],
-    },
-  ],
-  education: [
-    {
-      id: 'edu-1',
-      institution: 'University of London',
-      degree: 'Master of Mathematics',
-      fieldOfStudy: 'Mathematical Foundations',
-      graduationDate: '1840-06',
-    },
-  ],
-  projects: [
-    {
-      id: 'proj-1',
-      title: 'Analytical Engine Instruction Pipeline',
-      description: 'Pioneered step-by-step memory punched-card calculation architecture.',
-      technologies: ['Mechanics', 'Logic'],
-    },
-  ],
-};
+      experience: [
+        {
+          id: 'exp-1',
+          jobTitle: 'Lead Analytical Architect',
+          company: 'Babbage Engine Laboratories',
+          startDate: '1842-01',
+          endDate: '1843-12',
+          isCurrent: false,
+          location: 'London, UK',
+          bullets: ['Formulated first published computer program for Bernoulli numbers.'],
+          skillsUsed: ['Algorithm Design'],
+        },
+      ],
+      education: [
+        {
+          id: 'edu-1',
+          institution: 'University of London',
+          degree: 'Master of Mathematics',
+          fieldOfStudy: 'Mathematical Foundations',
+          graduationDate: '1840-06',
+        },
+      ],
+      projects: [
+        {
+          id: 'proj-1',
+          title: 'Analytical Engine Instruction Pipeline',
+          description: 'Pioneered step-by-step memory punched-card calculation architecture.',
+          technologies: ['Mechanics', 'Logic'],
+        },
+      ],
+    };
 
-const builtResume = buildResumeFromProfile(mockProfile, 'track-analytical');
-console.assert(builtResume.id, 'Resume must have an ID');
-console.assert(builtResume.title.includes('Ada Lovelace'), 'Title must incorporate candidate name');
-console.assert(builtResume.sections.length >= 6, 'Must produce populated sections array');
-const personalSec = builtResume.sections.find((s) => s.type === 'personal_info');
-console.assert(personalSec && personalSec.data.fullName === 'Ada Lovelace', 'Personal info mismatch');
-const expSec = builtResume.sections.find((s) => s.type === 'experience');
-console.assert(expSec && expSec.data.items.length === 1, 'Experience items count mismatch');
-console.log('✓ buildResumeFromProfile verified');
+    const builtResume = buildResumeFromProfile(mockProfile, 'track-analytical');
+    expect(builtResume.id).toBeTruthy();
+    expect(builtResume.title).toContain('Ada Lovelace');
+    expect(builtResume.sections.length).toBeGreaterThanOrEqual(6);
 
-console.log('--- TEST 5: AI Writing Assistant Simulation ---');
-async function testAiWriter() {
-  const inputSentence = 'Responsible for making backend services faster and fixed database bugs.';
-  const rewriteResult = await aiWritingService.rewriteSentence(inputSentence, 'action_verbs');
-  console.assert(rewriteResult.original === inputSentence, 'Original sentence preserved');
-  console.assert(rewriteResult.rewritten, 'Rewritten sentence must be produced');
-  console.assert(rewriteResult.explanation, 'Explanation must accompany rewrite');
-  console.assert(rewriteResult.atsScore >= 80, 'ATS score must be high');
-  console.log('✓ AI Writing Assistant passed');
+    const personalSec = builtResume.sections.find((s) => s.type === 'personal_info');
+    expect(personalSec).toBeDefined();
+    expect(personalSec.data.fullName).toBe('Ada Lovelace');
 
-  console.log('--- TEST 6: Mock API Service Persistence Contract ---');
-  const saveResp = await resumeStudioApiService.saveResumeDraft(builtResume);
-  console.assert(saveResp.success === true, 'Save draft failed');
-  console.assert(saveResp.data.id === builtResume.id, 'ID mismatch in save response');
+    const expSec = builtResume.sections.find((s) => s.type === 'experience');
+    expect(expSec).toBeDefined();
+    expect(expSec.data.items.length).toBe(1);
+    expect(expSec.data.entries.length).toBe(1);
+  });
 
-  const fetchResp = await resumeStudioApiService.fetchResumeDraft(builtResume.id);
-  console.assert(fetchResp.success === true, 'Fetch draft failed');
-  console.assert(fetchResp.data.title === builtResume.title, 'Fetched draft title mismatch');
-  console.log('✓ Mock API Service contracts verified');
+  it('verifies AI writing assistant simulation', async () => {
+    const inputSentence = 'Responsible for making backend services faster and fixed database bugs.';
+    const rewriteResult = await aiWritingService.rewriteSentence(inputSentence, 'action_verbs');
+    expect(rewriteResult.original).toBe(inputSentence);
+    expect(rewriteResult.rewritten).toBeTruthy();
+    expect(rewriteResult.explanation).toBeTruthy();
+    expect(rewriteResult.atsScore).toBeGreaterThanOrEqual(80);
+  });
 
-  console.log('\n========================================');
-  console.log('ALL RESUME STUDIO TESTS PASSED CLEANLY!');
-  console.log('========================================');
-}
+  it('verifies mock API service persistence contract', async () => {
+    const mockResume = {
+      id: 'res-test-persist',
+      title: 'Persistent Resume Draft',
+      sections: [],
+    };
+    const saveResp = await resumeStudioApiService.saveResumeDraft(mockResume);
+    expect(saveResp.success).toBe(true);
+    expect(saveResp.data.id).toBe(mockResume.id);
 
-testAiWriter();
+    const fetchResp = await resumeStudioApiService.fetchResumeDraft(mockResume.id);
+    expect(fetchResp.success).toBe(true);
+    expect(fetchResp.data.title).toBe(mockResume.title);
+  });
+});

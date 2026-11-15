@@ -1,7 +1,7 @@
 import { BookOpen, ExternalLink, GraduationCap, Mail, MapPin, Phone } from 'lucide-react';
 
 export function AcademicCvTemplate({ resume, designSettings }) {
-  const sections = (resume.sections || []).filter((s) => s.visible);
+  const sections = (resume.sections || []).filter((s) => s.visible !== false);
 
   const personal = sections.find((s) => s.type === 'personal_info')?.data || {};
   const summary = sections.find((s) => s.type === 'summary')?.data;
@@ -9,11 +9,22 @@ export function AcademicCvTemplate({ resume, designSettings }) {
   const experience = sections.find((s) => s.type === 'experience')?.data;
   const publications = sections.find((s) => s.type === 'publications')?.data;
   const research = sections.find((s) => s.type === 'research')?.data;
-  const awards = sections.find((s) => s.type === 'awards')?.data || sections.find((s) => s.type === 'achievements')?.data;
+  const awards =
+    sections.find((s) => s.type === 'awards')?.data ||
+    sections.find((s) => s.type === 'achievements')?.data ||
+    sections.find((s) => s.type === 'certifications')?.data;
   const skills = sections.find((s) => s.type === 'skills')?.data;
   const languages = sections.find((s) => s.type === 'languages')?.data;
 
   const primaryColor = designSettings?.primaryColor || '#1e293b';
+
+  const eduItems = education?.items || education?.entries || [];
+  const expItems = experience?.items || experience?.entries || [];
+  const researchItems = research?.items || research?.entries || [];
+  const pubItems = publications?.items || publications?.entries || [];
+  const awardItems = awards?.items || awards?.entries || [];
+  const langItems = languages?.items || languages?.entries || [];
+  const academicExp = researchItems.length > 0 ? researchItems : expItems;
 
   return (
     <div className="w-full text-slate-900 leading-normal space-y-4 font-serif text-xs">
@@ -68,14 +79,14 @@ export function AcademicCvTemplate({ resume, designSettings }) {
       )}
 
       {/* 3. Education (Primary in Academic CV) */}
-      {education?.items && education.items.length > 0 && (
+      {eduItems.length > 0 && (
         <div className="space-y-2">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5 flex items-center gap-1.5" style={{ color: primaryColor }}>
             <GraduationCap className="w-3.5 h-3.5" />
             <span>Higher Education</span>
           </h2>
           <div className="space-y-2">
-            {education.items.map((edu) => (
+            {eduItems.map((edu) => (
               <div key={edu.id} className="flex justify-between items-baseline">
                 <div>
                   <div className="font-bold text-slate-900 text-xs">
@@ -91,7 +102,7 @@ export function AcademicCvTemplate({ resume, designSettings }) {
                   )}
                 </div>
                 <div className="text-xs text-slate-700 font-sans font-medium">
-                  {edu.graduationYear}
+                  {edu.graduationYear || edu.endDate}
                 </div>
               </div>
             ))}
@@ -100,18 +111,18 @@ export function AcademicCvTemplate({ resume, designSettings }) {
       )}
 
       {/* 4. Research & Academic Appointments */}
-      {((research?.items && research.items.length > 0) || (experience?.items && experience.items.length > 0)) && (
+      {academicExp.length > 0 && (
         <div className="space-y-2.5">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5 flex items-center gap-1.5" style={{ color: primaryColor }}>
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Academic & Research Experience</span>
+            <span>Academic &amp; Research Experience</span>
           </h2>
           <div className="space-y-3">
-            {(research?.items || experience.items).map((item) => (
+            {academicExp.map((item) => (
               <div key={item.id} className="space-y-1">
                 <div className="flex justify-between items-baseline text-xs">
                   <div>
-                    <span className="font-bold text-slate-900">{item.title}</span>
+                    <span className="font-bold text-slate-900">{item.title || item.jobTitle}</span>
                     <span className="italic text-slate-700">, {item.institution || item.company}</span>
                     {item.location && <span className="text-[11px] text-slate-600"> ({item.location})</span>}
                   </div>
@@ -136,13 +147,13 @@ export function AcademicCvTemplate({ resume, designSettings }) {
       )}
 
       {/* 5. Publications & Manuscripts */}
-      {publications?.items && publications.items.length > 0 && (
+      {pubItems.length > 0 && (
         <div className="space-y-2">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5" style={{ color: primaryColor }}>
             Peer-Reviewed Publications
           </h2>
           <ol className="list-decimal list-outside pl-5 space-y-1.5 text-[11px] text-slate-800">
-            {publications.items.map((pub, idx) => (
+            {pubItems.map((pub, idx) => (
               <li key={idx} className="leading-relaxed">
                 <span className="font-semibold text-slate-900">{pub.authors || personal.fullName}. </span>
                 <span className="italic">&ldquo;{pub.title}&rdquo;</span>. In{' '}
@@ -155,15 +166,17 @@ export function AcademicCvTemplate({ resume, designSettings }) {
       )}
 
       {/* 6. Grants, Honors & Fellowships */}
-      {awards?.items && awards.items.length > 0 && (
+      {awardItems.length > 0 && (
         <div className="space-y-1.5">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5" style={{ color: primaryColor }}>
-            Grants, Fellowships & Honors
+            Grants, Fellowships &amp; Honors
           </h2>
           <ul className="list-disc list-outside pl-5 space-y-1 text-[11px] text-slate-800">
-            {awards.items.map((award, idx) => (
+            {awardItems.map((award, idx) => (
               <li key={idx} className="leading-snug">
-                {typeof award === 'string' ? award : `${award.title} (${award.year || ''}) - ${award.issuer || ''}`}
+                {typeof award === 'string'
+                  ? award
+                  : `${award.title || award.name} (${award.year || award.issueDate || ''}) - ${award.issuer || ''}`}
               </li>
             ))}
           </ul>
@@ -174,7 +187,7 @@ export function AcademicCvTemplate({ resume, designSettings }) {
       {skills?.categories && (
         <div className="space-y-1.5">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5" style={{ color: primaryColor }}>
-            Methodologies & Scientific Computing
+            Methodologies &amp; Scientific Computing
           </h2>
           <div className="space-y-0.5 text-[11px] text-slate-800">
             {skills.categories.map((cat, idx) => (
@@ -188,15 +201,15 @@ export function AcademicCvTemplate({ resume, designSettings }) {
       )}
 
       {/* 8. Languages & Scholarly Memberships */}
-      {languages?.items && languages.items.length > 0 && (
+      {langItems.length > 0 && (
         <div className="space-y-1 pt-1">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5" style={{ color: primaryColor }}>
-            Languages & Scholarly Affiliations
+            Languages &amp; Scholarly Affiliations
           </h2>
           <div className="flex flex-wrap gap-4 text-[11px] text-slate-700">
-            {languages.items.map((lang, idx) => (
+            {langItems.map((lang, idx) => (
               <span key={idx}>
-                <strong>{lang.name}</strong> ({lang.proficiency})
+                <strong>{lang.name || lang.language}</strong> ({lang.proficiency})
               </span>
             ))}
           </div>

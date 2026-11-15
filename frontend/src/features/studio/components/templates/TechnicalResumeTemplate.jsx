@@ -1,7 +1,7 @@
 import { ExternalLink, Github, Globe, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 
 export function TechnicalResumeTemplate({ resume, designSettings }) {
-  const sections = (resume.sections || []).filter((s) => s.visible);
+  const sections = (resume.sections || []).filter((s) => s.visible !== false);
 
   const personal = sections.find((s) => s.type === 'personal_info')?.data || {};
   const summary = sections.find((s) => s.type === 'summary')?.data;
@@ -14,6 +14,12 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
 
   const primaryColor = designSettings?.primaryColor || '#0284c7';
   const secondaryColor = designSettings?.secondaryColor || '#0ea5e9';
+
+  const expItems = experience?.items || experience?.entries || [];
+  const projItems = projects?.items || projects?.entries || [];
+  const eduItems = education?.items || education?.entries || [];
+  const certItems = certs?.items || certs?.entries || [];
+  const achItems = achievements?.items || achievements?.entries || [];
 
   return (
     <div className="w-full text-slate-900 leading-normal space-y-4 font-sans text-xs">
@@ -120,7 +126,7 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
       )}
 
       {/* 4. Engineering Experience */}
-      {experience?.items && experience.items.length > 0 && (
+      {expItems.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-xs" style={{ backgroundColor: secondaryColor }} />
@@ -131,11 +137,11 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
           </div>
 
           <div className="space-y-3.5 pl-4">
-            {experience.items.map((job) => (
+            {expItems.map((job) => (
               <div key={job.id} className="space-y-1">
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between text-xs">
                   <div>
-                    <span className="font-bold text-slate-900">{job.title}</span>
+                    <span className="font-bold text-slate-900">{job.title || job.jobTitle}</span>
                     <span className="text-slate-500 font-medium"> @ </span>
                     <span className="font-semibold text-slate-800">{job.company}</span>
                     {job.location && (
@@ -177,33 +183,33 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
       )}
 
       {/* 5. Key Engineering Projects */}
-      {projects?.items && projects.items.length > 0 && (
+      {projItems.length > 0 && (
         <div className="space-y-2.5">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-xs" style={{ backgroundColor: secondaryColor }} />
             <h2 className="text-[11px] font-bold uppercase tracking-wider font-mono text-slate-900">
-              Key Projects & Systems
+              Key Projects &amp; Systems
             </h2>
             <div className="h-px bg-slate-200 flex-1" />
           </div>
 
           <div className="grid grid-cols-1 gap-2.5 pl-4">
-            {projects.items.map((proj) => (
+            {projItems.map((proj) => (
               <div key={proj.id} className="border border-slate-200 rounded p-2 bg-white space-y-1">
                 <div className="flex items-baseline justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900">{proj.name}</span>
+                    <span className="font-bold text-slate-900">{proj.title || proj.name}</span>
                     {proj.role && <span className="text-[10px] text-slate-500 font-mono">({proj.role})</span>}
                   </div>
                   <div className="flex items-center gap-2 text-[10px] font-mono">
-                    {proj.github && (
-                      <a href={proj.github.startsWith('http') ? proj.github : `https://${proj.github}`} target="_blank" rel="noreferrer" className="flex items-center gap-0.5 text-sky-600 hover:underline">
+                    {(proj.github || proj.link) && (
+                      <a href={(proj.github || proj.link).startsWith('http') ? (proj.github || proj.link) : `https://${proj.github || proj.link}`} target="_blank" rel="noreferrer" className="flex items-center gap-0.5 text-sky-600 hover:underline">
                         <Github className="w-2.5 h-2.5" />
                         <span>Code</span>
                       </a>
                     )}
-                    {proj.liveUrl && (
-                      <a href={proj.liveUrl.startsWith('http') ? proj.liveUrl : `https://${proj.liveUrl}`} target="_blank" rel="noreferrer" className="flex items-center gap-0.5 text-sky-600 hover:underline">
+                    {(proj.liveUrl || proj.link) && (
+                      <a href={(proj.liveUrl || proj.link).startsWith('http') ? (proj.liveUrl || proj.link) : `https://${proj.liveUrl || proj.link}`} target="_blank" rel="noreferrer" className="flex items-center gap-0.5 text-sky-600 hover:underline">
                         <ExternalLink className="w-2.5 h-2.5" />
                         <span>Live</span>
                       </a>
@@ -242,16 +248,16 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
 
       {/* 6. Education & Certifications Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4">
-        {education?.items && education.items.length > 0 && (
+        {eduItems.length > 0 && (
           <div className="space-y-1.5">
             <h3 className="text-[10px] font-bold uppercase tracking-wider font-mono text-slate-700 border-b pb-0.5">
               Education
             </h3>
             <div className="space-y-2">
-              {education.items.map((edu) => (
+              {eduItems.map((edu) => (
                 <div key={edu.id} className="text-[11px]">
                   <div className="font-bold text-slate-900">{edu.degree} {edu.fieldOfStudy && `in ${edu.fieldOfStudy}`}</div>
-                  <div className="text-slate-600 text-[10px]">{edu.institution} • {edu.graduationYear}</div>
+                  <div className="text-slate-600 text-[10px]">{edu.institution} • {edu.graduationYear || edu.endDate}</div>
                   {edu.grade && <div className="text-[10px] font-mono text-slate-500">GPA / Score: {edu.grade}</div>}
                 </div>
               ))}
@@ -259,13 +265,13 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
           </div>
         )}
 
-        {certs?.items && certs.items.length > 0 && (
+        {certItems.length > 0 && (
           <div className="space-y-1.5">
             <h3 className="text-[10px] font-bold uppercase tracking-wider font-mono text-slate-700 border-b pb-0.5">
-              Certifications & Credentials
+              Certifications &amp; Credentials
             </h3>
             <div className="space-y-1.5">
-              {certs.items.map((cert) => (
+              {certItems.map((cert) => (
                 <div key={cert.id} className="text-[11px]">
                   <div className="font-semibold text-slate-900">{cert.name}</div>
                   <div className="text-slate-500 text-[10px] font-mono">{cert.issuer} {cert.issueDate && `(${cert.issueDate})`}</div>
@@ -277,14 +283,16 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
       </div>
 
       {/* 7. Key Achievements if present */}
-      {achievements?.items && achievements.items.length > 0 && (
+      {achItems.length > 0 && (
         <div className="space-y-1 pl-4 pt-1">
           <h3 className="text-[10px] font-bold uppercase tracking-wider font-mono text-slate-700 border-b pb-0.5">
-            Selected Honors & Achievements
+            Selected Honors &amp; Achievements
           </h3>
           <ul className="list-disc list-outside pl-4 space-y-0.5 text-slate-700 text-[11px]">
-            {achievements.items.map((ach, idx) => (
-              <li key={idx} className="leading-snug">{ach}</li>
+            {achItems.map((ach, idx) => (
+              <li key={idx} className="leading-snug">
+                {typeof ach === 'string' ? ach : (ach.title || ach.name)}
+              </li>
             ))}
           </ul>
         </div>

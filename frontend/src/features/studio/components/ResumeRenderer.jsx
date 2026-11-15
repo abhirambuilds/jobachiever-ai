@@ -50,7 +50,7 @@ export function ResumeRenderer({ resume, designSettings }) {
       id="resume-preview-sheet"
       className={`resume-sheet bg-white text-slate-900 shadow-2xl rounded-sm transition-all duration-200 mx-auto w-[210mm] min-h-[297mm] ${paddingClass}`}
       style={{
-        fontFamily: selectedFont.fontFamily,
+        fontFamily: selectedFont.fontFamily || selectedFont.family,
         lineHeight: designSettings?.lineHeight || 1.45,
       }}
     >

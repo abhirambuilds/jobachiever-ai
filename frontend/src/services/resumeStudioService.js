@@ -56,11 +56,11 @@ export const TEMPLATES = [
 ];
 
 export const AVAILABLE_FONTS = [
-  { id: 'font-inter', name: 'Inter (Modern Sans)', family: "'Inter', sans-serif", type: 'sans' },
-  { id: 'font-roboto', name: 'Roboto (Clean Sans)', family: "'Roboto', sans-serif", type: 'sans' },
-  { id: 'font-merriweather', name: 'Merriweather (Editorial Serif)', family: "'Merriweather', Georgia, serif", type: 'serif' },
-  { id: 'font-playfair', name: 'Playfair (Executive Serif)', family: "'Playfair Display', Georgia, serif", type: 'serif' },
-  { id: 'font-mono', name: 'JetBrains Mono (Technical)', family: "'JetBrains Mono', monospace", type: 'mono' },
+  { id: 'font-inter', name: 'Inter (Modern Sans)', family: "'Inter', sans-serif", fontFamily: "'Inter', sans-serif", type: 'sans' },
+  { id: 'font-roboto', name: 'Roboto (Clean Sans)', family: "'Roboto', sans-serif", fontFamily: "'Roboto', sans-serif", type: 'sans' },
+  { id: 'font-merriweather', name: 'Merriweather (Editorial Serif)', family: "'Merriweather', Georgia, serif", fontFamily: "'Merriweather', Georgia, serif", type: 'serif' },
+  { id: 'font-playfair', name: 'Playfair (Executive Serif)', family: "'Playfair Display', Georgia, serif", fontFamily: "'Playfair Display', Georgia, serif", type: 'serif' },
+  { id: 'font-mono', name: 'JetBrains Mono (Technical)', family: "'JetBrains Mono', monospace", fontFamily: "'JetBrains Mono', monospace", type: 'mono' },
 ];
 
 export const COLOR_PALETTES = [
@@ -175,8 +175,8 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
         title: 'Professional Experience',
         order: 4,
         visible: true,
-        data: {
-          items: (profile.experience && profile.experience.length > 0)
+        data: (() => {
+          const expItems = (profile.experience && profile.experience.length > 0)
             ? profile.experience.map((exp) => ({
                 id: exp.id || `exp-${Math.random().toString(36).substring(2, 7)}`,
                 title: exp.title || exp.jobTitle || 'Senior Software Engineer',
@@ -222,8 +222,9 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
                     'Optimized PostgreSQL query execution plans, reducing p99 latency by 35% on critical transactional workflows.',
                   ],
                 },
-              ],
-        },
+              ];
+          return { items: expItems, entries: expItems };
+        })(),
       },
       {
         id: 'sec-projects',
@@ -231,8 +232,8 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
         title: 'Key Engineering Projects',
         order: 5,
         visible: true,
-        data: {
-          items: (profile.projects && profile.projects.length > 0)
+        data: (() => {
+          const projectItems = (profile.projects && profile.projects.length > 0)
             ? profile.projects.map((proj) => ({
                 id: proj.id || `proj-${Math.random().toString(36).substring(2, 7)}`,
                 name: proj.name || proj.title || 'VectorDB Query Engine',
@@ -240,6 +241,7 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
                 technologies: proj.technologies || ['Java 21', 'Spring Boot 3', 'pgvector', 'Docker'],
                 link: proj.link || proj.github || 'https://github.com/abhirambuilds/vectordb-engine',
                 github: proj.github || proj.link || 'https://github.com/abhirambuilds/vectordb-engine',
+                liveUrl: proj.liveUrl || proj.website || '',
                 description: proj.description || '',
                 bullets: proj.bullets || [
                   proj.description || 'High-throughput similarity search microservice delivering cosine vector retrieval for AI agents.',
@@ -254,14 +256,16 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
                   technologies: ['Java 21', 'Spring Boot 3', 'pgvector', 'Docker'],
                   link: 'https://github.com/abhirambuilds/vectordb-engine',
                   github: 'https://github.com/abhirambuilds/vectordb-engine',
+                  liveUrl: '',
                   description: 'High-throughput similarity search microservice delivering sub-50ms cosine vector retrieval for AI agents.',
                   bullets: [
                     'High-throughput similarity search microservice delivering sub-50ms cosine vector retrieval for AI agents.',
                     'Built automated integration test harness with JUnit 5 and Testcontainers ensuring strict multi-tenant isolation.',
                   ],
                 },
-              ],
-        },
+              ];
+          return { items: projectItems, entries: projectItems };
+        })(),
       },
       {
         id: 'sec-education',
@@ -269,8 +273,8 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
         title: 'Education',
         order: 6,
         visible: true,
-        data: {
-          items: (profile.education && profile.education.length > 0)
+        data: (() => {
+          const eduItems = (profile.education && profile.education.length > 0)
             ? profile.education.map((edu) => ({
                 id: edu.id || `edu-${Math.random().toString(36).substring(2, 7)}`,
                 institution: edu.institution || 'State University of Technology',
@@ -280,7 +284,7 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
                 startDate: edu.startDate || '2017',
                 endDate: edu.graduationDate || edu.endDate || '2021',
                 grade: edu.grade || edu.gpa || 'GPA: 3.8/4.0',
-                highlights: 'Dean’s Honor List • Algorithms & Distributed Computing Specialization',
+                highlights: edu.coursework || 'Dean’s Honor List • Algorithms & Distributed Computing Specialization',
               }))
             : [
                 {
@@ -294,8 +298,9 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
                   grade: 'GPA: 3.8/4.0',
                   highlights: 'Dean’s Honor List • Algorithms & Distributed Computing Specialization',
                 },
-              ],
-        },
+              ];
+          return { items: eduItems, entries: eduItems };
+        })(),
       },
       {
         id: 'sec-certifications',
@@ -303,12 +308,21 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
         title: 'Certifications',
         order: 7,
         visible: true,
-        data: {
-          entries: [
-            { id: 'cert-1', name: 'AWS Certified Solutions Architect — Associate', issuer: 'Amazon Web Services', issueDate: '2023', credentialId: 'AWS-SA-9824' },
-            { id: 'cert-2', name: 'Oracle Certified Professional: Java SE 21 Developer', issuer: 'Oracle', issueDate: '2024', credentialId: 'OCP-JAVA-21' },
-          ],
-        },
+        data: (() => {
+          const certItems = (profile.certifications && profile.certifications.length > 0)
+            ? profile.certifications.map((c) => ({
+                id: c.id || `cert-${Math.random().toString(36).substring(2, 7)}`,
+                name: c.name || c.title || 'Certification Name',
+                issuer: c.issuer || c.issuingOrg || 'Issuing Authority',
+                issueDate: c.issueDate || c.date || '2023',
+                credentialId: c.credentialId || '',
+              }))
+            : [
+                { id: 'cert-1', name: 'AWS Certified Solutions Architect — Associate', issuer: 'Amazon Web Services', issueDate: '2023', credentialId: 'AWS-SA-9824' },
+                { id: 'cert-2', name: 'Oracle Certified Professional: Java SE 21 Developer', issuer: 'Oracle', issueDate: '2024', credentialId: 'OCP-JAVA-21' },
+              ];
+          return { items: certItems, entries: certItems };
+        })(),
       },
       {
         id: 'sec-languages',
@@ -316,12 +330,13 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
         title: 'Languages',
         order: 8,
         visible: false, // Hidden by default, can be toggled
-        data: {
-          entries: [
-            { language: 'English', proficiency: 'Full Professional / Native' },
-            { language: 'Spanish', proficiency: 'Professional Working Proficiency' },
-          ],
-        },
+        data: (() => {
+          const langItems = [
+            { id: 'lang-1', name: 'English', language: 'English', proficiency: 'Full Professional / Native' },
+            { id: 'lang-2', name: 'Spanish', language: 'Spanish', proficiency: 'Professional Working Proficiency' },
+          ];
+          return { items: langItems, entries: langItems };
+        })(),
       },
     ],
     versions: [

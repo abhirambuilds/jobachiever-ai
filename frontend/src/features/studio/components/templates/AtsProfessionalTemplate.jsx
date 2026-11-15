@@ -1,5 +1,5 @@
 export function AtsProfessionalTemplate({ resume, designSettings }) {
-  const sections = (resume.sections || []).filter((s) => s.visible);
+  const sections = (resume.sections || []).filter((s) => s.visible !== false);
 
   const personal = sections.find((s) => s.type === 'personal_info')?.data || {};
   const summary = sections.find((s) => s.type === 'summary')?.data;
@@ -11,6 +11,12 @@ export function AtsProfessionalTemplate({ resume, designSettings }) {
   const languages = sections.find((s) => s.type === 'languages')?.data;
 
   const primaryColor = designSettings?.primaryColor || '#0f172a';
+
+  const expItems = experience?.items || experience?.entries || [];
+  const projItems = projects?.items || projects?.entries || [];
+  const eduItems = education?.items || education?.entries || [];
+  const certItems = certs?.items || certs?.entries || [];
+  const langItems = languages?.items || languages?.entries || [];
 
   return (
     <div className="w-full text-slate-900 leading-normal space-y-4 font-sans">
@@ -26,8 +32,8 @@ export function AtsProfessionalTemplate({ resume, designSettings }) {
           {personal.city && <span>{personal.city}, {personal.country}</span>}
           {personal.email && <span>• {personal.email}</span>}
           {personal.phone && <span>• {personal.phone}</span>}
-          {personal.linkedin && <span>• {personal.linkedin.replace('https://', '')}</span>}
-          {personal.github && <span>• {personal.github.replace('https://', '')}</span>}
+          {personal.linkedin && <span>• {personal.linkedin.replace(/^https?:\/\//, '')}</span>}
+          {personal.github && <span>• {personal.github.replace(/^https?:\/\//, '')}</span>}
         </div>
       </div>
 
@@ -61,24 +67,26 @@ export function AtsProfessionalTemplate({ resume, designSettings }) {
       )}
 
       {/* 4. Professional Experience */}
-      {experience?.entries && (
+      {expItems.length > 0 && (
         <div className="space-y-2">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b pb-0.5" style={{ color: primaryColor, borderColor: '#cbd5e1' }}>
             Professional Experience
           </h2>
           <div className="space-y-3 text-xs">
-            {experience.entries.map((entry) => (
+            {expItems.map((entry) => (
               <div key={entry.id} className="space-y-1">
                 <div className="flex justify-between items-baseline font-bold text-slate-900">
-                  <span>{entry.jobTitle} — <span className="font-semibold text-slate-700">{entry.company}</span></span>
-                  <span className="font-mono text-[10px] text-slate-600">{entry.startDate} – {entry.endDate}</span>
+                  <span>{entry.title || entry.jobTitle} — <span className="font-semibold text-slate-700">{entry.company}</span></span>
+                  <span className="font-mono text-[10px] text-slate-600">{entry.startDate} – {entry.current ? 'Present' : entry.endDate}</span>
                 </div>
-                <div className="text-[10px] text-slate-500 italic">{entry.location}</div>
-                <ul className="list-disc list-inside space-y-0.5 text-slate-800">
-                  {entry.bullets.map((b, bIdx) => (
-                    <li key={bIdx} className="leading-relaxed pl-1">{b}</li>
-                  ))}
-                </ul>
+                {entry.location && <div className="text-[10px] text-slate-500 italic">{entry.location}</div>}
+                {entry.bullets && entry.bullets.length > 0 && (
+                  <ul className="list-disc list-inside space-y-0.5 text-slate-800">
+                    {entry.bullets.map((b, bIdx) => (
+                      <li key={bIdx} className="leading-relaxed pl-1">{b}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </div>
@@ -86,28 +94,34 @@ export function AtsProfessionalTemplate({ resume, designSettings }) {
       )}
 
       {/* 5. Key Engineering Projects */}
-      {projects?.entries && (
+      {projItems.length > 0 && (
         <div className="space-y-2">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b pb-0.5" style={{ color: primaryColor, borderColor: '#cbd5e1' }}>
             Key Engineering Projects
           </h2>
           <div className="space-y-2.5 text-xs">
-            {projects.entries.map((proj) => (
+            {projItems.map((proj) => (
               <div key={proj.id} className="space-y-0.5">
                 <div className="flex justify-between items-baseline font-bold text-slate-900">
-                  <span>{proj.name} {proj.role && <span className="font-normal text-slate-600">({proj.role})</span>}</span>
-                  {proj.link && <span className="text-[10px] font-mono text-slate-500">{proj.link.replace('https://', '')}</span>}
+                  <span>{proj.title || proj.name} {proj.role && <span className="font-normal text-slate-600">({proj.role})</span>}</span>
+                  {(proj.link || proj.github || proj.liveUrl) && (
+                    <span className="text-[10px] font-mono text-slate-500">
+                      {(proj.link || proj.github || proj.liveUrl).replace(/^https?:\/\//, '')}
+                    </span>
+                  )}
                 </div>
-                {proj.technologies && (
+                {proj.technologies && proj.technologies.length > 0 && (
                   <div className="text-[10px] text-slate-600 font-mono">
                     Technologies: {proj.technologies.join(', ')}
                   </div>
                 )}
-                <ul className="list-disc list-inside space-y-0.5 text-slate-800">
-                  {proj.bullets.map((b, bIdx) => (
-                    <li key={bIdx} className="leading-relaxed pl-1">{b}</li>
-                  ))}
-                </ul>
+                {proj.bullets && proj.bullets.length > 0 && (
+                  <ul className="list-disc list-inside space-y-0.5 text-slate-800">
+                    {proj.bullets.map((b, bIdx) => (
+                      <li key={bIdx} className="leading-relaxed pl-1">{b}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </div>
@@ -115,19 +129,19 @@ export function AtsProfessionalTemplate({ resume, designSettings }) {
       )}
 
       {/* 6. Education */}
-      {education?.entries && (
+      {eduItems.length > 0 && (
         <div className="space-y-1.5">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b pb-0.5" style={{ color: primaryColor, borderColor: '#cbd5e1' }}>
             Education
           </h2>
           <div className="space-y-1 text-xs">
-            {education.entries.map((edu) => (
+            {eduItems.map((edu) => (
               <div key={edu.id} className="flex justify-between items-baseline">
                 <div>
                   <span className="font-bold text-slate-900">{edu.degree} in {edu.fieldOfStudy}</span>
                   <div className="text-slate-700">{edu.institution} {edu.grade && `• ${edu.grade}`}</div>
                 </div>
-                <span className="font-mono text-[10px] text-slate-600">{edu.startDate} – {edu.endDate}</span>
+                <span className="font-mono text-[10px] text-slate-600">{edu.startDate ? `${edu.startDate} – ` : ''}{edu.graduationYear || edu.endDate}</span>
               </div>
             ))}
           </div>
@@ -135,13 +149,13 @@ export function AtsProfessionalTemplate({ resume, designSettings }) {
       )}
 
       {/* 7. Certifications */}
-      {certs?.entries && (
+      {certItems.length > 0 && (
         <div className="space-y-1">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b pb-0.5" style={{ color: primaryColor, borderColor: '#cbd5e1' }}>
             Certifications
           </h2>
           <div className="space-y-1 text-xs text-slate-800">
-            {certs.entries.map((c) => (
+            {certItems.map((c) => (
               <div key={c.id} className="flex justify-between items-baseline">
                 <span><strong className="text-slate-900">{c.name}</strong> — {c.issuer}</span>
                 <span className="font-mono text-[10px] text-slate-600">{c.issueDate}</span>
@@ -152,14 +166,14 @@ export function AtsProfessionalTemplate({ resume, designSettings }) {
       )}
 
       {/* 8. Languages */}
-      {languages?.entries && (
+      {langItems.length > 0 && (
         <div className="space-y-1">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b pb-0.5" style={{ color: primaryColor, borderColor: '#cbd5e1' }}>
             Languages
           </h2>
           <div className="flex flex-wrap gap-4 text-xs text-slate-800">
-            {languages.entries.map((l, i) => (
-              <span key={i}><strong>{l.language}:</strong> {l.proficiency}</span>
+            {langItems.map((l, i) => (
+              <span key={i}><strong>{l.name || l.language}:</strong> {l.proficiency}</span>
             ))}
           </div>
         </div>
