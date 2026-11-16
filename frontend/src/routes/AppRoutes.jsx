@@ -1,7 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
 import {
-  Layers,
-  Compass,
   FileSignature,
   Globe,
   GraduationCap,
@@ -25,6 +23,7 @@ import { ResumeAnalyzerPage } from '@/pages/ResumeAnalyzerPage';
 import ResumeStudioPage from '@/pages/ResumeStudioPage';
 import { JobMatcherPage } from '@/pages/JobMatcherPage';
 import { JobDescriptionAnalyzerPage } from '@/pages/JobDescriptionAnalyzerPage';
+import { JobDiscoveryPage } from '@/pages/JobDiscoveryPage';
 import { AiSettingsPage } from '@/features/settings/AiSettingsPage';
 import CareerIntelligencePage from '@/features/career/CareerIntelligencePage';
 import { ApplicationTrackerPage } from '@/pages/ApplicationTrackerPage';
@@ -52,33 +51,13 @@ export function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/profile" element={<ProfilePage />} />
 
-        {/* Milestone Features Routed to Polish Placeholders */}
-        <Route
-          path="/tracks"
-          element={
-            <FeaturePlaceholderPage
-              title="Career Tracks &amp; Personas"
-              description="Manage distinct professional personas (e.g. Full-Stack Engineer, Solutions Architect) with isolated skill alignments."
-              milestone="Milestone 7"
-              icon={Layers}
-            />
-          }
-        />
+        {/* Core Career Architecture Suite */}
+        <Route path="/tracks" element={<ProfilePage initialTab="tracks" />} />
         <Route path="/resumes" element={<ResumeLibraryPage />} />
         <Route path="/resume-studio" element={<ResumeStudioPage />} />
         <Route path="/studio" element={<ResumeStudioPage />} />
         <Route path="/resume-analyzer" element={<ResumeAnalyzerPage />} />
-        <Route
-          path="/jobs"
-          element={
-            <FeaturePlaceholderPage
-              title="Job Opportunity Discovery"
-              description="Aggregated real-world openings matched semantically against your active career personas."
-              milestone="Milestone 8"
-              icon={Compass}
-            />
-          }
-        />
+        <Route path="/jobs" element={<JobDiscoveryPage />} />
         <Route path="/jd-analyzer" element={<JobDescriptionAnalyzerPage />} />
         <Route path="/jobs/analyze" element={<JobDescriptionAnalyzerPage />} />
         <Route path="/job-match" element={<JobMatcherPage />} />

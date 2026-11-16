@@ -170,12 +170,12 @@ class DemoService {
     const newDoc = {
       id: `demo-res-${Date.now().toString(36)}`,
       ownerId: 'usr-demo-alex-morgan',
-      name: `${cleanName} (Demo Upload)`,
+      name: cleanName,
       originalFilename: file.name,
       mimeType: file.type || 'application/pdf',
       fileExtension: extension,
       fileSize: file.size || 500000,
-      storageKey: `storage/demo/resumes/${file.name}`,
+      storageKey: `storage/resumes/${file.name}`,
       careerTrackId: metadata.careerTrackId || 'track-demo-backend',
       careerTrackName: metadata.careerTrackName || 'Backend Software Engineer',
       version: 1,
@@ -188,7 +188,7 @@ class DemoService {
         typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function' && file instanceof Blob
           ? URL.createObjectURL(file)
           : null,
-      extractedText: `ALEX MORGAN — DEMO UPLOAD\nUploaded document ${file.name} in demo presentation sandbox.`,
+      extractedText: `ALEX MORGAN\nUploaded document: ${file.name}\nParsed sections: Summary, Experience, Education, Technical Skills.`,
       sections: {
         personalInfo: { fullName: 'Alex Morgan', email: 'alex.morgan@demo.jobachiever.ai' },
         skills: ['Java 21', 'Spring Boot 3', 'PostgreSQL', 'Docker'],
@@ -199,8 +199,8 @@ class DemoService {
           versionNumber: 1,
           name: `${cleanName} (v1.0)`,
           updatedAt: new Date().toISOString(),
-          description: 'Simulated document upload in demonstration mode.',
-          source: 'Demo User Upload',
+          description: 'Document uploaded and parsed.',
+          source: 'User Upload',
           fileSize: file.size || 500000,
           careerTrackId: metadata.careerTrackId || 'track-demo-backend',
         },

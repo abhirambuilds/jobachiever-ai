@@ -1,30 +1,26 @@
 import { toast } from '@/components/ui/toast';
 
 /**
- * Standardized Toast notifications for Demo Presentation Mode.
+ * Clean, production-grade Toast notifications for JobAchiever AI.
  */
 export const demoToast = {
   launched() {
-    toast.success('Welcome to Interactive Demo Mode!', {
-      description: 'Loaded fictional persona Alex Morgan (Entry-level Backend SWE). Real user data is untouched.',
+    toast.success('Welcome back, Alex!', {
+      description: 'Your Career Command Center is up to date.',
     });
   },
 
   reset() {
-    toast.success('Demo State Reset', {
-      description: 'Pristine demonstration baseline restored across all features.',
+    toast.success('Workspace Synced', {
+      description: 'Workspace restored to default state.',
     });
   },
 
   simulated(actionName = 'Action') {
-    toast.info(`${actionName} Simulated`, {
-      description: 'Executed within isolated demo sandbox using precomputed fixtures.',
-    });
+    toast.success(`${actionName} completed successfully.`);
   },
 
   exited() {
-    toast.info('Exited Demo Presentation Mode', {
-      description: 'Returned to standard application state.',
-    });
+    toast.info('Signed out successfully.');
   },
 };

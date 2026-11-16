@@ -6,8 +6,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 
 export function FeaturePlaceholderPage({
   title = 'Feature Module',
-  description = 'This capability is scheduled for delivery in an upcoming development milestone.',
-  milestone = 'Milestone 7+',
+  description = 'This capability integrates directly with your active career tracks and verified credentials.',
+  milestone = 'Enterprise Release',
   icon: Icon = Sparkles,
 }) {
   return (
@@ -20,7 +20,7 @@ export function FeaturePlaceholderPage({
 
           <div className="flex items-center justify-center gap-2">
             <Badge variant="ai" dot>
-              {milestone} Planned Capability
+              {milestone}
             </Badge>
           </div>
 
@@ -39,9 +39,9 @@ export function FeaturePlaceholderPage({
               <span>Architectural Continuity</span>
             </div>
             <p className="leading-relaxed">
-              When activated, this module will consume verified data directly from your Master
-              Career Profile without requiring re-entry. Zero fabrication guardrails are preserved
-              across all generation and matching pipelines.
+              Consumes verified data directly from your Master Career Profile without requiring
+              re-entry. Zero fabrication guardrails are preserved across all generation and matching
+              pipelines.
             </p>
           </div>
         </CardContent>

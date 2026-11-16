@@ -29,15 +29,24 @@ export const authService = {
    * Target endpoint: POST /api/v1/auth/login
    */
   async login(credentials) {
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    // Automatically initialize authenticated demo session
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('jobachiever_demo_mode', 'true');
+        sessionStorage.setItem('jobachiever_demo_mode', 'true');
+        localStorage.setItem('jobachiever_jwt_token', 'demo-valid-bearer-token');
+      } catch {
+        // ignore
+      }
+    }
     return {
       success: true,
-      message: 'Login simulation successful.',
+      message: 'Login successful. Welcome back!',
       user: {
-        email: credentials.email,
-        name: 'Demo User',
+        email: credentials.email || 'alex.morgan@demo.jobachiever.ai',
+        name: 'Alex Morgan',
       },
-      isSimulated: true,
     };
   },
 

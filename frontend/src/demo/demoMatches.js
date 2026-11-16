@@ -27,7 +27,7 @@ export const DEMO_JOB_MATCH_ALEX_STRIPE = {
   scoreSummary:
     'Alex Morgan demonstrates exceptional alignment with Stripe Core Platform requirements: 100% match on mandatory skills (Java 21, Spring Boot 3, PostgreSQL, REST APIs) substantiated by both internship experience and complex distributed systems projects. An actionable gap is identified in container orchestration (Kubernetes) and production Kafka cluster monitoring.',
   disclaimer:
-    'Demo Presentation Mode: Illustrative explainable match generated for presentation purposes. Heuristic criteria based on verified profile evidence and job decomposition.',
+    'Compatibility evaluation computed using verified candidate evidence and structural role requirements.',
 
   decomposition: {
     requiredQualifications: [

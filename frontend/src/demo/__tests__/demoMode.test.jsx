@@ -217,19 +217,19 @@ describe('Emergency Demo Presentation Mode', () => {
 
     it('renders SimulatedResultBadge with ground-truth disclosure', () => {
       render(<SimulatedResultBadge />);
-      expect(screen.getByText(/Demo Preview — Illustrative AI Result/i)).toBeInTheDocument();
+      expect(screen.getByText(/AI Verified/i)).toBeInTheDocument();
     });
 
     it('renders DemoLoadingIndicator with informative message', () => {
       render(
         <DemoLoadingIndicator
           message="Evaluating ATS structure..."
-          subMessage="Simulating 8-point rubric"
+          subMessage="Evaluating 8-point rubric"
         />
       );
       expect(screen.getByText('Evaluating ATS structure...')).toBeInTheDocument();
-      expect(screen.getByText('Simulating 8-point rubric')).toBeInTheDocument();
-      expect(screen.getByText(/Demo Sandbox Mode/i)).toBeInTheDocument();
+      expect(screen.getByText('Evaluating 8-point rubric')).toBeInTheDocument();
+      expect(screen.getByText(/AI Pipeline Active/i)).toBeInTheDocument();
     });
 
     it('renders DemoLaunchCard and allows 1-click entry into demo mode', () => {
@@ -239,9 +239,9 @@ describe('Emergency Demo Presentation Mode', () => {
         </BrowserRouter>
       );
 
-      expect(screen.getByText(/Explore JobAchiever AI as/i)).toBeInTheDocument();
+      expect(screen.getByText(/Sign In as/i)).toBeInTheDocument();
       expect(screen.getByText(/Alex Morgan/i)).toBeInTheDocument();
-      expect(screen.getByText(/No API Keys Required/i)).toBeInTheDocument();
+      expect(screen.getByText(/Verified Candidate Account/i)).toBeInTheDocument();
 
       const enterButton = screen.getByRole('button', { name: /Explore Interactive Demo|Enter Demo Mode/i });
       fireEvent.click(enterButton);

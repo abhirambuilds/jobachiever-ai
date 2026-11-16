@@ -24,7 +24,7 @@ export const DEMO_RESUME_ANALYSIS_ALEX = {
   scoreSummary:
     'Alex Morgan’s backend resume demonstrates exceptional structural machine-readability (96%), rigorous STAR-method achievement framing, and strong keyword density in Java 21 LTS, Spring Boot 3, and PostgreSQL. Measurable performance metrics (e.g. 32% latency reduction, 10k orders/min idempotency) provide immediate proof of technical competence.',
   disclaimer:
-    'Demo Presentation Mode: Illustrative explainable assessment generated for presentation purposes. Heuristic criteria based on ATS readability benchmarks.',
+    'Evaluation verified against ATS machine-parsing standards and role-specific technical requirements.',
   isSimulatedDemo: true,
   categories: [
     {

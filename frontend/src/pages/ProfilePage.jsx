@@ -26,14 +26,14 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/components/ui/toast';
 
-export function ProfilePage() {
+export function ProfilePage({ initialTab = 'master' }) {
   const { profile, calculateCompleteness, resetToDemo } = useProfile();
   const { percentage, checks, missingSections } = calculateCompleteness();
-  const [activeTab, setActiveTab] = useState('master');
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   const handleReset = () => {
     resetToDemo();
-    toast.info('Master profile restored to sample baseline.');
+    toast.success('Master profile synchronized.');
   };
 
   return (

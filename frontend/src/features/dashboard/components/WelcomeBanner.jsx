@@ -37,7 +37,7 @@ export function WelcomeBanner() {
           <div className="space-y-2.5 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="ai" dot className="text-xs">
-                Illustrative Workspace Preview
+                Active Career Workspace
               </Badge>
               {primaryTrack && (
                 <Badge variant="outline" className="text-xs gap-1">

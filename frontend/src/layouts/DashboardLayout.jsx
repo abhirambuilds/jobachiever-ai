@@ -24,6 +24,7 @@ import {
   Check,
   LogOut,
   Zap,
+  RotateCcw,
 } from 'lucide-react';
 
 import { useProfile } from '@/hooks/useProfile';
@@ -46,7 +47,8 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip';
 import { Toaster, toast } from '@/components/ui/toast';
-import { DemoModeBanner, DemoTourGuide } from '@/components/demo';
+import { DemoTourGuide } from '@/components/demo';
+import { demoService } from '@/demo/demoService';
 
 const navItems = [
   { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
@@ -56,7 +58,7 @@ const navItems = [
   { label: 'Resume Studio', path: '/resume-studio', icon: Sparkles },
   { label: 'Resume Analyzer', path: '/resume-analyzer', icon: FileSearch },
   { label: 'JD Analyzer', path: '/jd-analyzer', icon: FileSearch },
-  { label: 'Job Discovery', path: '/jobs', icon: Compass, upcoming: true },
+  { label: 'Job Discovery', path: '/jobs', icon: Compass },
   { label: 'Job Matching', path: '/job-matcher', icon: Target },
   { label: 'Applications', path: '/applications', icon: Kanban },
   { label: 'Cover Letters', path: '/cover-letters', icon: FileSignature, upcoming: true },
@@ -126,7 +128,6 @@ export function DashboardLayout() {
   return (
     <TooltipProvider delayDuration={150}>
       <div className="flex flex-col h-screen overflow-hidden bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
-        <DemoModeBanner />
         <div className="flex flex-1 overflow-hidden">
         {/* =========================================================================
             DESKTOP SIDEBAR
@@ -300,6 +301,22 @@ export function DashboardLayout() {
                 <DropdownMenuItem onClick={() => navigate('/settings/ai')}>
                   <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
                   <span>AI Provider Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => window.dispatchEvent(new CustomEvent('jobachiever:start-demo-tour'))}
+                >
+                  <Compass className="mr-2 h-4 w-4 text-primary" />
+                  <span>Interactive Tour</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    demoService.resetDemoState();
+                    toast.success('Workspace reset to baseline.');
+                  }}
+                >
+                  <RotateCcw className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <span>Reset Workspace</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate('/login')} className="text-destructive">

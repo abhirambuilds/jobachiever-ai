@@ -57,8 +57,8 @@ export const TOUR_STEPS = [
     icon: FileText,
     headline: 'Multi-Persona Document Management',
     description:
-      'Examine 3 distinct fictional candidate resumes with instant vector-accurate HTML previews: Alex’s Master Backend Resume (94% ATS), Full Stack variant (91%), and AI/ML Systems variant (89%).',
-    takeaway: 'Live document operations: Try renaming, setting primary, or uploading resumes in isolated demo state.',
+      'Examine 3 targeted resumes with instant vector-accurate HTML previews: Alex’s Master Backend Resume (94% ATS), Full Stack variant (91%), and AI/ML Systems variant (89%).',
+    takeaway: 'Live document operations: Try renaming, setting primary, or uploading resumes directly.',
   },
   {
     step: 4,

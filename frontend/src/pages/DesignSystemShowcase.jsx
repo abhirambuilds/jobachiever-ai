@@ -86,7 +86,7 @@ export function DesignSystemShowcase() {
     setBtnLoading(true);
     setTimeout(() => {
       setBtnLoading(false);
-      toast.success('Simulated task completed successfully!');
+      toast.success('Task completed successfully!');
     }, 1500);
   };
 

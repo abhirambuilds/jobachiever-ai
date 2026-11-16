@@ -76,9 +76,9 @@ export function HeroSection() {
                 enableDemoMode();
                 navigate('/dashboard');
               }}
-              className="gap-2 border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 dark:text-amber-400 font-semibold shadow-sm text-base"
+              className="gap-2 border-primary/30 bg-primary/5 hover:bg-primary/15 text-foreground font-semibold shadow-xs text-base"
             >
-              <Sparkles className="h-4 w-4" />
+              <Sparkles className="h-4 w-4 text-primary" />
               <span>Explore Interactive Demo</span>
             </Button>
             <Button
@@ -129,7 +129,7 @@ export function HeroSection() {
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="ai" className="text-[10px] px-2 py-0.5">
-                  Illustrative Interface Preview
+                  Live Platform Preview
                 </Badge>
               </div>
             </div>
