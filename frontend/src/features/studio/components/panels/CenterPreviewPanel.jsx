@@ -19,6 +19,7 @@ import { SimulatedResultBadge } from '@/components/demo';
 import { isDemoMode } from '@/demo/demoConfig';
 import { generateWritingAssistance } from '@/services/resumeStudioService';
 import { toast } from '@/components/ui/toast';
+import { Badge } from '@/components/ui/badge';
 
 export function CenterPreviewPanel() {
   const {

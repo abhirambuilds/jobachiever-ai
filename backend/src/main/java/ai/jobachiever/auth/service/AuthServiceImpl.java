@@ -73,8 +73,7 @@ public class AuthServiceImpl implements AuthService {
                 normalizedEmail,
                 passwordHash,
                 request.firstName().trim(),
-                request.lastName().trim()
-        );
+                request.lastName().trim());
         user.setAccountStatus(AccountStatus.ACTIVE);
         user.setRole(ai.jobachiever.users.entity.Role.USER);
         user.setEmailVerified(true);
@@ -97,8 +96,7 @@ public class AuthServiceImpl implements AuthService {
                 ai.jobachiever.security.audit.SecurityAuditEventType.ACCOUNT_REGISTERED,
                 savedUser.getId(),
                 savedUser.getEmail(),
-                "New user registered with default USER role"
-        );
+                "New user registered with default USER role");
 
         log.info("Registered new user with id: {} (status: PENDING_VERIFICATION, role: USER)", savedUser.getId());
         return UserResponse.fromEntity(savedUser);
@@ -116,8 +114,7 @@ public class AuthServiceImpl implements AuthService {
                             ai.jobachiever.security.audit.SecurityAuditEventType.LOGIN_FAILURE,
                             null,
                             normalizedEmail,
-                            "User not found"
-                    );
+                            "User not found");
                     log.warn("Authentication failed: user with email {} not found", normalizedEmail);
                     return new BadCredentialsException("Invalid email or password");
                 });
@@ -127,8 +124,7 @@ public class AuthServiceImpl implements AuthService {
                     ai.jobachiever.security.audit.SecurityAuditEventType.LOGIN_FAILURE,
                     user.getId(),
                     normalizedEmail,
-                    "Invalid password"
-            );
+                    "Invalid password");
             log.warn("Authentication failed: invalid password for user {}", user.getId());
             throw new BadCredentialsException("Invalid email or password");
         }
@@ -139,8 +135,7 @@ public class AuthServiceImpl implements AuthService {
                     ai.jobachiever.security.audit.SecurityAuditEventType.LOGIN_FAILURE,
                     user.getId(),
                     normalizedEmail,
-                    "Account is SUSPENDED"
-            );
+                    "Account is SUSPENDED");
             log.warn("Authentication rejected: account {} is SUSPENDED", user.getId());
             throw new AccountRestrictedException("Account has been suspended. Please contact support.");
         }
@@ -149,8 +144,7 @@ public class AuthServiceImpl implements AuthService {
                     ai.jobachiever.security.audit.SecurityAuditEventType.LOGIN_FAILURE,
                     user.getId(),
                     normalizedEmail,
-                    "Account is DEACTIVATED"
-            );
+                    "Account is DEACTIVATED");
             log.warn("Authentication rejected: account {} is DEACTIVATED", user.getId());
             throw new AccountRestrictedException("Account has been deactivated. Please contact support.");
         }
@@ -163,8 +157,7 @@ public class AuthServiceImpl implements AuthService {
                 ai.jobachiever.security.audit.SecurityAuditEventType.LOGIN_SUCCESS,
                 user.getId(),
                 user.getEmail(),
-                "User authentication successful"
-        );
+                "User authentication successful");
 
         String token = jwtService.generateToken(user.getId(), user.getEmail());
         log.info("Successful login for user {}", user.getId());
@@ -188,8 +181,7 @@ public class AuthServiceImpl implements AuthService {
                 ai.jobachiever.security.audit.SecurityAuditEventType.TOKEN_REVOKED,
                 userId,
                 null,
-                "Token successfully revoked on logout"
-        );
+                "Token successfully revoked on logout");
         log.info("User {} successfully logged out", userId);
     }
 }

@@ -188,11 +188,17 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
                 startDate: exp.startDate || 'Jan 2023',
                 endDate: exp.isCurrent ? 'Present' : exp.endDate || 'Dec 2024',
                 current: !!exp.isCurrent,
-                bullets: exp.bullets || exp.responsibilities || [
-                  'Architected distributed microservices in Java 21 and Spring Boot 3 handling 1.2M queries/sec with sub-50ms latency.',
-                  'Engineered vector embedding search pipelines with PostgreSQL pgvector, cutting candidate matching query times by 40%.',
-                  'Led cross-functional sprint teams, conducted rigorous code reviews, and enforced zero-trust security postures.',
-                ],
+                bullets: Array.isArray(exp.bullets) && exp.bullets.length > 0
+                  ? exp.bullets
+                  : Array.isArray(exp.achievements) && exp.achievements.length > 0
+                  ? exp.achievements
+                  : typeof exp.responsibilities === 'string' && exp.responsibilities.trim()
+                  ? [exp.responsibilities]
+                  : [
+                      'Architected high-throughput payment settlement engine handling 12,000 TPS with 99.99% reliability.',
+                      'Engineered semantic vector search with pgvector cutting resume analysis latency by 45%.',
+                      'Led backend architecture reviews and enforced zero-trust Spring Security RBAC controls.',
+                    ],
               }))
             : [
                 {
@@ -240,15 +246,23 @@ export function buildResumeFromProfile(profile, trackId = 'track-1') {
                 id: proj.id || `proj-${Math.random().toString(36).substring(2, 7)}`,
                 name: proj.name || proj.title || 'VectorDB Query Engine',
                 role: proj.role || 'Lead Architect',
-                technologies: proj.technologies || ['Java 21', 'Spring Boot 3', 'pgvector', 'Docker'],
+                technologies: Array.isArray(proj.technologies)
+                  ? proj.technologies
+                  : typeof proj.technologies === 'string' && proj.technologies.trim()
+                  ? proj.technologies.split(/,\s*/)
+                  : ['Java 21', 'Spring Boot 3', 'pgvector', 'Docker'],
                 link: proj.link || proj.github || 'https://github.com/abhirambuilds/vectordb-engine',
                 github: proj.github || proj.link || 'https://github.com/abhirambuilds/vectordb-engine',
                 liveUrl: proj.liveUrl || proj.website || '',
                 description: proj.description || '',
-                bullets: proj.bullets || [
-                  proj.description || 'High-throughput similarity search microservice delivering cosine vector retrieval for AI agents.',
-                  'Built automated benchmark harness with JUnit 5 and Testcontainers verifying transactional data isolation.',
-                ],
+                bullets: Array.isArray(proj.bullets) && proj.bullets.length > 0
+                  ? proj.bullets
+                  : Array.isArray(proj.highlights) && proj.highlights.length > 0
+                  ? proj.highlights
+                  : [
+                      proj.description || 'High-throughput similarity search microservice delivering cosine vector retrieval for AI agents.',
+                      'Built automated benchmark harness with JUnit 5 and Testcontainers verifying transactional data isolation.',
+                    ],
               }))
             : [
                 {

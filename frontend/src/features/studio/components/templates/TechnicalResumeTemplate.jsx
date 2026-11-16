@@ -167,7 +167,7 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
                   </div>
                 )}
 
-                {job.bullets && job.bullets.length > 0 && (
+                {Array.isArray(job.bullets) && job.bullets.length > 0 ? (
                   <ul className="list-disc list-outside pl-4 space-y-0.5 text-slate-700">
                     {job.bullets.map((bullet, bIdx) => (
                       <li key={bIdx} className="leading-snug">
@@ -175,7 +175,9 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
                       </li>
                     ))}
                   </ul>
-                )}
+                ) : typeof job.bullets === 'string' && job.bullets.trim() ? (
+                  <p className="text-slate-700 leading-snug text-[11px] pl-4">{job.bullets}</p>
+                ) : null}
               </div>
             ))}
           </div>
@@ -231,7 +233,7 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
                   <p className="text-slate-600 text-[11px] leading-snug">{proj.description}</p>
                 )}
 
-                {proj.bullets && proj.bullets.length > 0 && (
+                {Array.isArray(proj.bullets) && proj.bullets.length > 0 ? (
                   <ul className="list-disc list-outside pl-4 space-y-0.5 text-slate-700 pt-0.5">
                     {proj.bullets.map((b, idx) => (
                       <li key={idx} className="leading-snug text-[11px]">
@@ -239,7 +241,9 @@ export function TechnicalResumeTemplate({ resume, designSettings }) {
                       </li>
                     ))}
                   </ul>
-                )}
+                ) : typeof proj.bullets === 'string' && proj.bullets.trim() ? (
+                  <p className="text-slate-700 leading-snug text-[11px] pt-0.5">{proj.bullets}</p>
+                ) : null}
               </div>
             ))}
           </div>

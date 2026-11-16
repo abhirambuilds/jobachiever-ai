@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { AnimatedCounter } from '@/components/common/AnimatedCounter';
 import { SimulatedResultBadge } from '@/components/demo';
 import { isDemoMode } from '@/demo/demoConfig';

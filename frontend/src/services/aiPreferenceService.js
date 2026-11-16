@@ -14,11 +14,11 @@ export const AI_API_BASE =
 
 export const DEFAULT_AI_PREFERENCES = {
   selectedProvider: 'GROQ',
-  preferredModel: 'llama-3.3-70b-versatile',
+  preferredModel: 'openai/gpt-oss-120b',
   temperature: 0.2,
   maxTokens: 2048,
-  externalProcessingConsent: false,
-  consentUpdatedAt: null,
+  externalProcessingConsent: true,
+  consentUpdatedAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
 
@@ -91,8 +91,11 @@ export const aiPreferenceService = {
       if (typeof window !== 'undefined' && window.__JA_MOCK_PREFERENCES__) {
         return window.__JA_MOCK_PREFERENCES__;
       }
-      if (err.message && err.message.includes('Authentication')) {
-        throw err;
+      if (typeof window !== 'undefined') {
+        const cached = localStorage.getItem('jobachiever_ai_preferences');
+        if (cached) {
+          try { return JSON.parse(cached); } catch { /* fallback */ }
+        }
       }
       return DEFAULT_AI_PREFERENCES;
     }

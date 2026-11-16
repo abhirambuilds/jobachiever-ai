@@ -131,7 +131,7 @@ export function AcademicCvTemplate({ resume, designSettings }) {
                   </div>
                 </div>
 
-                {item.bullets && item.bullets.length > 0 && (
+                {Array.isArray(item.bullets) && item.bullets.length > 0 ? (
                   <ul className="list-disc list-outside pl-5 space-y-0.5 text-slate-800 text-[11px]">
                     {item.bullets.map((b, idx) => (
                       <li key={idx} className="leading-relaxed">
@@ -139,7 +139,9 @@ export function AcademicCvTemplate({ resume, designSettings }) {
                       </li>
                     ))}
                   </ul>
-                )}
+                ) : typeof item.bullets === 'string' && item.bullets.trim() ? (
+                  <p className="text-slate-800 text-[11px] leading-relaxed pl-5">{item.bullets}</p>
+                ) : null}
               </div>
             ))}
           </div>

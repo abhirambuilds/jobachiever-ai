@@ -216,22 +216,6 @@ export function AiSettingsPage() {
         )}
       </div>
 
-      {/* Demo Mode Notice */}
-      {isDemoMode() && (
-        <div
-          role="region"
-          aria-label="Demo Mode Settings Information"
-          className="flex items-start gap-3 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs sm:text-sm"
-        >
-          <Sparkles className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <p className="font-semibold text-amber-200">Interactive Demo Mode Active</p>
-            <p className="text-amber-300/80 leading-relaxed text-xs">
-              Live Groq and Gemini API keys are optional during presentation mode. Precomputed, fact-preserving demonstration simulations are enabled for candidate persona Alex Morgan.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Inline Feedback Banner */}
       {formFeedback && (
@@ -606,9 +590,8 @@ export function AiSettingsPage() {
                   role="switch"
                   checked={externalProcessingConsent}
                   onChange={(e) => setExternalProcessingConsent(e.target.checked)}
-                  className="sr-only peer"
+                  className="h-6 w-11 cursor-pointer appearance-none rounded-full bg-muted border-2 border-transparent transition-colors duration-200 checked:bg-emerald-500 relative before:inline-block before:h-5 before:w-5 before:rounded-full before:bg-white before:shadow-md before:transition-transform before:duration-200 checked:before:translate-x-5"
                 />
-                <div className="w-11 h-6 bg-muted peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
               </label>
             </div>
           </CardHeader>

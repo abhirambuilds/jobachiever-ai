@@ -80,13 +80,15 @@ export function AtsProfessionalTemplate({ resume, designSettings }) {
                   <span className="font-mono text-[10px] text-slate-600">{entry.startDate} – {entry.current ? 'Present' : entry.endDate}</span>
                 </div>
                 {entry.location && <div className="text-[10px] text-slate-500 italic">{entry.location}</div>}
-                {entry.bullets && entry.bullets.length > 0 && (
+                {Array.isArray(entry.bullets) && entry.bullets.length > 0 ? (
                   <ul className="list-disc list-inside space-y-0.5 text-slate-800">
                     {entry.bullets.map((b, bIdx) => (
                       <li key={bIdx} className="leading-relaxed pl-1">{b}</li>
                     ))}
                   </ul>
-                )}
+                ) : typeof entry.bullets === 'string' && entry.bullets.trim() ? (
+                  <p className="text-slate-800 leading-relaxed text-[11px]">{entry.bullets}</p>
+                ) : null}
               </div>
             ))}
           </div>
@@ -110,18 +112,20 @@ export function AtsProfessionalTemplate({ resume, designSettings }) {
                     </span>
                   )}
                 </div>
-                {proj.technologies && proj.technologies.length > 0 && (
+                {(Array.isArray(proj.technologies) ? proj.technologies.length > 0 : !!proj.technologies) && (
                   <div className="text-[10px] text-slate-600 font-mono">
-                    Technologies: {proj.technologies.join(', ')}
+                    Technologies: {Array.isArray(proj.technologies) ? proj.technologies.join(', ') : String(proj.technologies)}
                   </div>
                 )}
-                {proj.bullets && proj.bullets.length > 0 && (
+                {Array.isArray(proj.bullets) && proj.bullets.length > 0 ? (
                   <ul className="list-disc list-inside space-y-0.5 text-slate-800">
                     {proj.bullets.map((b, bIdx) => (
                       <li key={bIdx} className="leading-relaxed pl-1">{b}</li>
                     ))}
                   </ul>
-                )}
+                ) : typeof proj.bullets === 'string' && proj.bullets.trim() ? (
+                  <p className="text-slate-800 leading-relaxed text-[11px]">{proj.bullets}</p>
+                ) : null}
               </div>
             ))}
           </div>

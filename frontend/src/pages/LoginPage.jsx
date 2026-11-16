@@ -24,6 +24,7 @@ export function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
@@ -102,6 +103,24 @@ export function LoginPage() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+              </div>
+
+              {/* Reviewer / Evaluator Demo Credentials Auto-Fill */}
+              <div className="flex items-center justify-between text-[11px] text-muted-foreground bg-muted/40 px-3 py-2 rounded-xl border border-border/60">
+                <span className="flex items-center gap-1.5 font-medium text-foreground">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span>Reviewer Account:</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setValue('email', 'aarav.dev@jobachiever.ai', { shouldValidate: true });
+                    setValue('password', 'Password123!', { shouldValidate: true });
+                  }}
+                  className="font-mono text-primary hover:underline font-semibold text-[11px]"
+                >
+                  aarav.dev@jobachiever.ai (Auto-fill)
+                </button>
               </div>
 
               {/* Remember Me & Forgot Password Row */}

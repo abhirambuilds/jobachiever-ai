@@ -131,7 +131,7 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
                   </div>
                 </div>
 
-                {job.bullets && job.bullets.length > 0 && (
+                {Array.isArray(job.bullets) && job.bullets.length > 0 ? (
                   <ul className="list-disc list-outside pl-4 space-y-0.5 text-slate-700 text-[11px]">
                     {job.bullets.map((bullet, bIdx) => (
                       <li key={bIdx} className="leading-relaxed">
@@ -139,7 +139,9 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
                       </li>
                     ))}
                   </ul>
-                )}
+                ) : typeof job.bullets === 'string' && job.bullets.trim() ? (
+                  <p className="text-slate-700 text-[11px] leading-relaxed pl-4">{job.bullets}</p>
+                ) : null}
               </div>
             ))}
           </div>
@@ -161,9 +163,9 @@ export function InternationalResumeTemplate({ resume, designSettings }) {
               <div key={proj.id} className="border border-slate-200 rounded p-2 bg-slate-50/50 space-y-1">
                 <div className="font-bold text-slate-900 text-xs">{proj.title || proj.name}</div>
                 {proj.description && <p className="text-[10px] text-slate-600 leading-snug">{proj.description}</p>}
-                {proj.technologies && proj.technologies.length > 0 && (
+                {(Array.isArray(proj.technologies) ? proj.technologies.length > 0 : !!proj.technologies) && (
                   <div className="text-[9px] text-slate-500 font-medium">
-                    Focus: {proj.technologies.join(' • ')}
+                    Focus: {Array.isArray(proj.technologies) ? proj.technologies.join(' • ') : String(proj.technologies)}
                   </div>
                 )}
               </div>
