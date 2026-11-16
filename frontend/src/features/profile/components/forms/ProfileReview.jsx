@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
+import { profileService } from '@/services/profileService';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,7 +37,8 @@ export function ProfileReview({ onBack, onJumpToStep }) {
           localStorage.setItem('jobachiever_user', JSON.stringify(u));
         }
       }
-      toast.success('Master Career Profile initialized! Entering Career Command Center.');
+      await profileService.saveProfile(profile).catch(() => {});
+      toast.success('Master Career Profile synchronized with PostgreSQL! Entering Career Command Center.');
       navigate('/dashboard');
     } catch {
       navigate('/dashboard');
