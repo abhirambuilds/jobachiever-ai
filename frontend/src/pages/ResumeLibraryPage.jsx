@@ -19,6 +19,8 @@ import { DeleteConfirmDialog } from '@/features/resumes/components/dialogs/Delet
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { SimulatedResultBadge } from '@/components/demo';
+import { isDemoMode } from '@/demo/demoConfig';
 
 function ResumeLibraryContent() {
   const {
@@ -59,13 +61,14 @@ function ResumeLibraryContent() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-5">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Badge variant="ai" dot className="text-xs">
               Document Workspace
             </Badge>
             <span className="text-xs text-muted-foreground font-mono">
               Spring Boot Ingestion Ready
             </span>
+            {isDemoMode() && <SimulatedResultBadge />}
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
             My Resume Library

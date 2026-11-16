@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   MapPin,
   Mail,
@@ -12,6 +13,8 @@ import { useProfile } from '@/hooks/useProfile';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { SimulatedResultBadge } from '@/components/demo';
+import { isDemoMode } from '@/demo/demoConfig';
 
 export function ProfileHeader() {
   const { profile, calculateCompleteness } = useProfile();
@@ -54,6 +57,7 @@ export function ProfileHeader() {
                     {primaryTrack.name}
                   </Badge>
                 )}
+                {isDemoMode() && <SimulatedResultBadge size="sm" />}
               </div>
 
               <p className="text-sm sm:text-base font-medium text-primary">
@@ -133,9 +137,11 @@ export function ProfileHeader() {
                 </span>
               </div>
               <div className="h-2 w-36 sm:w-48 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-primary to-cyan-400 rounded-full transition-all duration-300"
-                  style={{ width: `${percentage}%` }}
+                <motion.div
+                  className="h-full bg-gradient-to-r from-primary to-cyan-400 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${percentage}%` }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
                 />
               </div>
               <span className="text-[10px] text-muted-foreground block">

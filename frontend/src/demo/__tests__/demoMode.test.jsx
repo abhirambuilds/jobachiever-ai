@@ -275,4 +275,108 @@ describe('Emergency Demo Presentation Mode', () => {
       expect(screen.getByText(/Backend Software Engineer/)).toBeInTheDocument();
     });
   });
+
+  describe('7. Resume Library Multi-Resume & Document Actions', () => {
+    it('provides all 3 fictional resumes with ATS scores and HTML previews', () => {
+      expect(DEMO_RESUMES.length).toBe(3);
+
+      const backendRes = DEMO_RESUMES.find((r) => r.id === 'demo-res-1');
+      expect(backendRes).toBeDefined();
+      expect(backendRes.name).toContain('Backend Software Engineer');
+      expect(backendRes.atsScore).toBe(94);
+      expect(backendRes.isPrimary).toBe(true);
+
+      const fullStackRes = DEMO_RESUMES.find((r) => r.id === 'demo-res-2');
+      expect(fullStackRes).toBeDefined();
+      expect(fullStackRes.name).toContain('Full Stack Developer');
+      expect(fullStackRes.atsScore).toBe(91);
+      expect(fullStackRes.isPrimary).toBe(false);
+
+      const aimlRes = DEMO_RESUMES.find((r) => r.id === 'demo-res-3');
+      expect(aimlRes).toBeDefined();
+      expect(aimlRes.name).toContain('AI / ML');
+      expect(aimlRes.atsScore).toBe(89);
+      expect(aimlRes.isPrimary).toBe(false);
+    });
+
+    it('supports interactive document operations in isolated demo state', async () => {
+      enableDemoMode();
+
+      // 1. Rename
+      const renamed = await demoService.renameResume('demo-res-2', 'Alex Morgan — Senior Full Stack');
+      expect(renamed.name).toBe('Alex Morgan — Senior Full Stack');
+
+      // 2. Set primary
+      const updatedPrimary = await demoService.setPrimaryResume('demo-res-2');
+      expect(updatedPrimary.isPrimary).toBe(true);
+      const allResumes = await demoService.getResumes();
+      const oldPrimary = allResumes.find((r) => r.id === 'demo-res-1');
+      expect(oldPrimary.isPrimary).toBe(false);
+
+      // 3. Upload new resume
+      const mockFile = new File(['mock content'], 'alex_devops.pdf', { type: 'application/pdf' });
+      const uploaded = await demoService.uploadResume(mockFile, { careerTrackId: 'track-demo-cloud' });
+      expect(uploaded.id).toBeDefined();
+      expect(uploaded.name).toContain('alex devops');
+
+      // 4. Delete uploaded resume
+      const deleteResult = await demoService.deleteResume(uploaded.id);
+      expect(deleteResult).toBe(true);
+      const remaining = await demoService.getResumes();
+      expect(remaining.find((r) => r.id === uploaded.id)).toBeUndefined();
+    });
+  });
+
+  describe('8. Application Kanban Pipeline Actions', () => {
+    it('loads applications covering 5 standard stages', async () => {
+      enableDemoMode();
+      const apps = await demoService.getApplications();
+      expect(apps.length).toBeGreaterThanOrEqual(5);
+
+      const stages = apps.map((a) => a.stage);
+      expect(stages).toContain('SAVED');
+      expect(stages).toContain('APPLIED');
+      expect(stages).toContain('INTERVIEWING');
+      expect(stages).toContain('OFFER');
+      expect(stages).toContain('REJECTED');
+    });
+
+    it('filters applications by career track', async () => {
+      enableDemoMode();
+      const backendApps = await demoService.getApplications('track-demo-backend');
+      expect(backendApps.every((a) => a.careerTrackId === 'track-demo-backend')).toBe(true);
+
+      const cloudApps = await demoService.getApplications('track-demo-cloud');
+      expect(cloudApps.every((a) => a.careerTrackId === 'track-demo-cloud')).toBe(true);
+    });
+
+    it('moves stage, updates notes, adds and deletes application in demo storage', async () => {
+      enableDemoMode();
+
+      // Move Stripe from INTERVIEWING to OFFER
+      const moved = await demoService.updateApplicationStage('app-demo-1', 'OFFER');
+      expect(moved.stage).toBe('OFFER');
+
+      // Update notes
+      const withNotes = await demoService.updateApplicationNotes('app-demo-1', 'Offer negotiation call scheduled for Friday.');
+      expect(withNotes.notes).toContain('negotiation call');
+
+      // Add application
+      const added = await demoService.addApplication({
+        company: 'Netflix',
+        role: 'Distributed Systems Engineer',
+        careerTrackId: 'track-demo-backend',
+        stage: 'APPLIED',
+        salary: '$160,000 - $185,000',
+      });
+      expect(added.id).toBeDefined();
+      expect(added.company).toBe('Netflix');
+
+      // Delete application
+      const del = await demoService.deleteApplication(added.id);
+      expect(del.success).toBe(true);
+      const afterDel = await demoService.getApplications();
+      expect(afterDel.find((a) => a.id === added.id)).toBeUndefined();
+    });
+  });
 });

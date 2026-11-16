@@ -129,6 +129,135 @@ class DemoService {
     return list.find((r) => r.id === id) || list[0] || null;
   }
 
+  async setPrimaryResume(id) {
+    await simulateDelay(200);
+    const list = this.getResumesSync().map((r) => ({
+      ...r,
+      isPrimary: r.id === id,
+    }));
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(DEMO_STORAGE_KEYS.RESUMES, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
+    }
+    return list.find((r) => r.id === id) || null;
+  }
+
+  async deleteResume(id) {
+    await simulateDelay(200);
+    const list = this.getResumesSync().filter((r) => r.id !== id);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(DEMO_STORAGE_KEYS.RESUMES, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
+    }
+    return true;
+  }
+
+  async uploadResume(file, metadata = {}) {
+    await simulateDelay(350);
+    const cleanName =
+      metadata.name ||
+      file.name
+        .replace(/\.[^/.]+$/, '')
+        .replace(/[_-]/g, ' ')
+        .trim();
+    const extension = file.name.split('.').pop().toLowerCase();
+    const newDoc = {
+      id: `demo-res-${Date.now().toString(36)}`,
+      ownerId: 'usr-demo-alex-morgan',
+      name: `${cleanName} (Demo Upload)`,
+      originalFilename: file.name,
+      mimeType: file.type || 'application/pdf',
+      fileExtension: extension,
+      fileSize: file.size || 500000,
+      storageKey: `storage/demo/resumes/${file.name}`,
+      careerTrackId: metadata.careerTrackId || 'track-demo-backend',
+      careerTrackName: metadata.careerTrackName || 'Backend Software Engineer',
+      version: 1,
+      processingStatus: 'processed',
+      uploadedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isPrimary: false,
+      atsScore: 92,
+      previewUrl:
+        typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function' && file instanceof Blob
+          ? URL.createObjectURL(file)
+          : null,
+      extractedText: `ALEX MORGAN — DEMO UPLOAD\nUploaded document ${file.name} in demo presentation sandbox.`,
+      sections: {
+        personalInfo: { fullName: 'Alex Morgan', email: 'alex.morgan@demo.jobachiever.ai' },
+        skills: ['Java 21', 'Spring Boot 3', 'PostgreSQL', 'Docker'],
+      },
+      versions: [
+        {
+          versionId: `demo-ver-${Date.now()}`,
+          versionNumber: 1,
+          name: `${cleanName} (v1.0)`,
+          updatedAt: new Date().toISOString(),
+          description: 'Simulated document upload in demonstration mode.',
+          source: 'Demo User Upload',
+          fileSize: file.size || 500000,
+          careerTrackId: metadata.careerTrackId || 'track-demo-backend',
+        },
+      ],
+    };
+
+    const list = [newDoc, ...this.getResumesSync()];
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(DEMO_STORAGE_KEYS.RESUMES, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
+    }
+    return newDoc;
+  }
+
+  async renameResume(id, newTitle) {
+    await simulateDelay(150);
+    let updated = null;
+    const list = this.getResumesSync().map((r) => {
+      if (r.id === id) {
+        updated = { ...r, name: newTitle, updatedAt: new Date().toISOString() };
+        return updated;
+      }
+      return r;
+    });
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(DEMO_STORAGE_KEYS.RESUMES, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
+    }
+    return updated;
+  }
+
+  async updateResumeTrack(id, newTrackId, newTrackName = 'Backend Software Engineer') {
+    await simulateDelay(150);
+    let updated = null;
+    const list = this.getResumesSync().map((r) => {
+      if (r.id === id) {
+        updated = { ...r, careerTrackId: newTrackId, careerTrackName: newTrackName, updatedAt: new Date().toISOString() };
+        return updated;
+      }
+      return r;
+    });
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(DEMO_STORAGE_KEYS.RESUMES, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
+    }
+    return updated;
+  }
+
   // ==========================================
   // JOB OPPORTUNITIES
   // ==========================================
@@ -327,9 +456,124 @@ class DemoService {
     };
   }
 
-  async getApplications() {
-    await simulateDelay(200);
+  // ==========================================
+  // APPLICATIONS PIPELINE
+  // ==========================================
+
+  getApplicationsSync() {
+    if (typeof window === 'undefined') return [...DEMO_APPLICATIONS];
+    try {
+      const saved = localStorage.getItem(DEMO_STORAGE_KEYS.APPLICATIONS);
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // Fallback
+    }
     return [...DEMO_APPLICATIONS];
+  }
+
+  async getApplications(careerTrackId = null) {
+    await simulateDelay(200);
+    const list = this.getApplicationsSync();
+    if (careerTrackId && careerTrackId !== 'all') {
+      return list.filter((app) => app.careerTrackId === careerTrackId);
+    }
+    return list;
+  }
+
+  async updateApplicationStage(appId, newStage) {
+    await simulateDelay(200);
+    const validStages = ['SAVED', 'APPLIED', 'INTERVIEWING', 'OFFER', 'REJECTED'];
+    const stage = validStages.includes(newStage) ? newStage : 'SAVED';
+    let updatedApp = null;
+
+    const list = this.getApplicationsSync().map((app) => {
+      if (app.id === appId) {
+        updatedApp = {
+          ...app,
+          stage,
+          lastUpdated: new Date().toISOString().split('T')[0],
+        };
+        return updatedApp;
+      }
+      return app;
+    });
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(DEMO_STORAGE_KEYS.APPLICATIONS, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
+    }
+    return updatedApp;
+  }
+
+  async updateApplicationNotes(appId, notes) {
+    await simulateDelay(150);
+    let updatedApp = null;
+    const list = this.getApplicationsSync().map((app) => {
+      if (app.id === appId) {
+        updatedApp = {
+          ...app,
+          notes,
+          lastUpdated: new Date().toISOString().split('T')[0],
+        };
+        return updatedApp;
+      }
+      return app;
+    });
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(DEMO_STORAGE_KEYS.APPLICATIONS, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
+    }
+    return updatedApp;
+  }
+
+  async addApplication(appData) {
+    await simulateDelay(200);
+    const newApp = {
+      id: `app-demo-${Date.now()}`,
+      company: appData.company || 'Innovative Tech Corp',
+      role: appData.role || 'Backend Engineer',
+      careerTrackId: appData.careerTrackId || 'track-demo-backend',
+      careerTrackName: appData.careerTrackName || 'Backend Software Engineer',
+      stage: appData.stage || 'SAVED',
+      stageLabel: appData.stage || 'Saved Opportunity',
+      location: appData.location || 'Remote',
+      salary: appData.salary || '$130,000 - $150,000',
+      appliedDate: appData.stage === 'APPLIED' || appData.stage === 'INTERVIEWING' ? new Date().toISOString().split('T')[0] : null,
+      lastUpdated: new Date().toISOString().split('T')[0],
+      matchScore: appData.matchScore || 85,
+      nextStep: appData.nextStep || 'Review role details',
+      notes: appData.notes || '',
+    };
+
+    const list = [newApp, ...this.getApplicationsSync()];
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(DEMO_STORAGE_KEYS.APPLICATIONS, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
+    }
+    return newApp;
+  }
+
+  async deleteApplication(appId) {
+    await simulateDelay(150);
+    const list = this.getApplicationsSync().filter((app) => app.id !== appId);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(DEMO_STORAGE_KEYS.APPLICATIONS, JSON.stringify(list));
+      } catch {
+        // ignore
+      }
+    }
+    return { success: true };
   }
 }
 

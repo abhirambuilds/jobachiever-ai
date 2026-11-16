@@ -4,19 +4,24 @@ import {
   buildResumeFromProfile,
   DEFAULT_DESIGN_SETTINGS,
 } from '@/services/resumeStudioService';
+import { isDemoMode } from '@/demo/demoConfig';
 
-const STUDIO_STORAGE_KEY = 'jobachiever_studio_resume_draft';
-const STUDIO_VERSIONS_KEY = 'jobachiever_studio_resume_versions';
+const PROD_STUDIO_STORAGE_KEY = 'jobachiever_studio_resume_draft';
+const PROD_STUDIO_VERSIONS_KEY = 'jobachiever_studio_resume_versions';
+const DEMO_STUDIO_STORAGE_KEY = 'jobachiever_demo_studio_resume_draft';
+const DEMO_STUDIO_VERSIONS_KEY = 'jobachiever_demo_studio_resume_versions';
 
 export const ResumeStudioContext = createContext(null);
 
 export function ResumeStudioProvider({ children }) {
   const { profile, tracks, activeTrackId } = useProfile();
+  const storageKey = isDemoMode() ? DEMO_STUDIO_STORAGE_KEY : PROD_STUDIO_STORAGE_KEY;
+  const versionsKey = isDemoMode() ? DEMO_STUDIO_VERSIONS_KEY : PROD_STUDIO_VERSIONS_KEY;
 
   // Load initial resume from local storage or profile
   const [resume, setResume] = useState(() => {
     try {
-      const saved = localStorage.getItem(STUDIO_STORAGE_KEY);
+      const saved = localStorage.getItem(storageKey);
       if (saved) {
         return JSON.parse(saved);
       }
@@ -29,7 +34,7 @@ export function ResumeStudioProvider({ children }) {
   // Saved versions history
   const [versions, setVersions] = useState(() => {
     try {
-      const saved = localStorage.getItem(STUDIO_VERSIONS_KEY);
+      const saved = localStorage.getItem(versionsKey);
       if (saved) {
         return JSON.parse(saved);
       }
@@ -67,20 +72,49 @@ export function ResumeStudioProvider({ children }) {
   useEffect(() => {
     if (resume) {
       try {
-        localStorage.setItem(STUDIO_STORAGE_KEY, JSON.stringify(resume));
+        localStorage.setItem(storageKey, JSON.stringify(resume));
       } catch {
         // Storage quota full or unavailable
       }
     }
-  }, [resume]);
+  }, [resume, storageKey]);
 
   useEffect(() => {
     try {
-      localStorage.setItem(STUDIO_VERSIONS_KEY, JSON.stringify(versions));
+      localStorage.setItem(versionsKey, JSON.stringify(versions));
     } catch {
       // Storage quota full
     }
-  }, [versions]);
+  }, [versions, versionsKey]);
+
+  // Demo reset listener
+  useEffect(() => {
+    const handleReset = () => {
+      if (isDemoMode()) {
+        try {
+          localStorage.removeItem(DEMO_STUDIO_STORAGE_KEY);
+          localStorage.removeItem(DEMO_STUDIO_VERSIONS_KEY);
+        } catch {
+          // ignore
+        }
+        const fresh = buildResumeFromProfile(profile, activeTrackId);
+        setResume(fresh);
+        setVersions([
+          {
+            id: 'ver-initial',
+            versionNumber: 'v1.0.0',
+            timestamp: new Date().toISOString(),
+            note: 'Initial draft generated from Master Career Profile',
+            templateId: 'ats_professional',
+          },
+        ]);
+        setHasUnsavedChanges(false);
+      }
+    };
+
+    window.addEventListener('jobachiever:demo-state-reset', handleReset);
+    return () => window.removeEventListener('jobachiever:demo-state-reset', handleReset);
+  }, [profile, activeTrackId]);
 
   // Design settings proxy
   const designSettings = resume?.designSettings || DEFAULT_DESIGN_SETTINGS;

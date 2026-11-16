@@ -34,7 +34,7 @@ export function CareerTrackSummary() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {tracks.map((track) => {
             const isPrimary = track.isPrimary;
-            const mappedSkills = track.skills || [];
+            const mappedSkills = track.skills || track.relevantSkills || [];
 
             return (
               <div

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   CheckCircle2,
   Layers,
@@ -84,48 +85,55 @@ export function CareerOverviewCards() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-      {cards.map((card) => {
+      {cards.map((card, idx) => {
         const Icon = card.icon;
         return (
-          <Card
+          <motion.div
             key={card.id}
-            className="group relative overflow-hidden border-border/80 bg-card/75 backdrop-blur-sm transition-all duration-200 hover:border-primary/50 hover:shadow-glow-xs flex flex-col justify-between"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, delay: idx * 0.05 }}
+            className="flex"
           >
-            <CardContent className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted/60 border border-border/60 group-hover:border-primary/30 transition-colors">
-                    <Icon className={`h-4 w-4 ${card.iconColor}`} />
+            <Card
+              className="group relative overflow-hidden border-border/80 bg-card/75 backdrop-blur-sm transition-all duration-200 hover:border-primary/50 hover:shadow-glow-xs flex flex-col justify-between w-full"
+            >
+              <CardContent className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted/60 border border-border/60 group-hover:border-primary/30 transition-colors">
+                      <Icon className={`h-4 w-4 ${card.iconColor}`} />
+                    </div>
+                    <Badge variant={card.badgeVariant} className="text-[10px] px-1.5 py-0">
+                      {card.badge}
+                    </Badge>
                   </div>
-                  <Badge variant={card.badgeVariant} className="text-[10px] px-1.5 py-0">
-                    {card.badge}
-                  </Badge>
+
+                  <div className="space-y-1">
+                    <span className="text-xs font-medium text-muted-foreground block truncate">
+                      {card.title}
+                    </span>
+                    <div className="text-2xl font-bold tracking-tight text-foreground">
+                      {card.value}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground/90 truncate">
+                      {card.subtitle}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="space-y-1">
-                  <span className="text-xs font-medium text-muted-foreground block truncate">
-                    {card.title}
-                  </span>
-                  <div className="text-2xl font-bold tracking-tight text-foreground">
-                    {card.value}
-                  </div>
-                  <p className="text-[11px] text-muted-foreground/90 truncate">
-                    {card.subtitle}
-                  </p>
+                <div className="pt-4 mt-3 border-t border-border/40 flex items-center justify-between">
+                  <Link
+                    to={card.link}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+                  >
+                    <span>{card.linkText}</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </Link>
                 </div>
-              </div>
-
-              <div className="pt-4 mt-3 border-t border-border/40 flex items-center justify-between">
-                <Link
-                  to={card.link}
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
-                >
-                  <span>{card.linkText}</span>
-                  <ArrowUpRight className="h-3 w-3" />
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
         );
       })}
     </div>

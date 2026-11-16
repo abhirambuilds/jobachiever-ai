@@ -7,6 +7,7 @@ import {
   TrendingUp,
   Clock,
   Sparkles,
+  Award,
 } from 'lucide-react';
 import { dashboardService } from '@/services/dashboardService';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -19,6 +20,7 @@ const iconMap = {
   Bookmark: Bookmark,
   FileText: FileText,
   TrendingUp: TrendingUp,
+  Award: Award,
 };
 
 export function RecentActivityTimeline() {

@@ -152,6 +152,16 @@ export const dashboardService = {
     if (isDemoMode()) {
       return [
         {
+          id: 'demo-ins-3',
+          category: 'Active Interview Prep',
+          title: 'Technical Screen Scheduled: Stripe Core Platform',
+          description: 'Practice STAR behavioral and Java 21 concurrency questions before your interview on Thursday.',
+          actionLabel: 'Inspect Match Insights',
+          actionRoute: '/job-match',
+          badge: '91% Match',
+          badgeVariant: 'success',
+        },
+        {
           id: 'demo-ins-1',
           category: 'Skill Gap Strategy',
           title: 'Critical Gap for Stripe Backend Engineer: Kubernetes',
@@ -170,16 +180,6 @@ export const dashboardService = {
           actionRoute: '/career-assistant',
           badge: '45% Complete',
           badgeVariant: 'ai',
-        },
-        {
-          id: 'demo-ins-3',
-          category: 'Active Interview Prep',
-          title: 'Technical Screen Scheduled: Stripe Core Platform',
-          description: 'Practice STAR behavioral and Java 21 concurrency questions before your interview on Thursday.',
-          actionLabel: 'Inspect Match Insights',
-          actionRoute: '/job-match',
-          badge: '91% Match',
-          badgeVariant: 'success',
         },
       ];
     }

@@ -58,7 +58,7 @@ const navItems = [
   { label: 'JD Analyzer', path: '/jd-analyzer', icon: FileSearch },
   { label: 'Job Discovery', path: '/jobs', icon: Compass, upcoming: true },
   { label: 'Job Matching', path: '/job-matcher', icon: Target },
-  { label: 'Applications', path: '/applications', icon: Kanban, upcoming: true },
+  { label: 'Applications', path: '/applications', icon: Kanban },
   { label: 'Cover Letters', path: '/cover-letters', icon: FileSignature, upcoming: true },
   { label: 'Portfolio', path: '/portfolio', icon: Globe, upcoming: true },
   { label: 'Interview Prep', path: '/interviews', icon: GraduationCap, upcoming: true },

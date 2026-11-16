@@ -2,7 +2,6 @@ import { Routes, Route } from 'react-router-dom';
 import {
   Layers,
   Compass,
-  Kanban,
   FileSignature,
   Globe,
   GraduationCap,
@@ -28,6 +27,7 @@ import { JobMatcherPage } from '@/pages/JobMatcherPage';
 import { JobDescriptionAnalyzerPage } from '@/pages/JobDescriptionAnalyzerPage';
 import { AiSettingsPage } from '@/features/settings/AiSettingsPage';
 import CareerIntelligencePage from '@/features/career/CareerIntelligencePage';
+import { ApplicationTrackerPage } from '@/pages/ApplicationTrackerPage';
 import { FeaturePlaceholderPage } from '@/pages/FeaturePlaceholderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -84,17 +84,7 @@ export function AppRoutes() {
         <Route path="/job-match" element={<JobMatcherPage />} />
         <Route path="/job-matcher" element={<JobMatcherPage />} />
         <Route path="/matching" element={<JobMatcherPage />} />
-        <Route
-          path="/applications"
-          element={
-            <FeaturePlaceholderPage
-              title="Application Kanban Pipeline"
-              description="Full lifecycle tracking from wishlisted to applied, interview stages, offers, and decisions."
-              milestone="Milestone 8"
-              icon={Kanban}
-            />
-          }
-        />
+        <Route path="/applications" element={<ApplicationTrackerPage />} />
         <Route
           path="/cover-letters"
           element={

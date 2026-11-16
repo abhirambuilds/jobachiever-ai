@@ -4,6 +4,8 @@ import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { SimulatedResultBadge } from '@/components/demo';
+import { isDemoMode } from '@/demo/demoConfig';
 
 export function WelcomeBanner() {
   const { profile, calculateCompleteness } = useProfile();
@@ -42,6 +44,7 @@ export function WelcomeBanner() {
                   <span>Focus: {primaryTrack.name}</span>
                 </Badge>
               )}
+              {isDemoMode() && <SimulatedResultBadge size="sm" />}
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">

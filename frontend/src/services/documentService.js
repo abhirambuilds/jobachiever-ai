@@ -336,6 +336,14 @@ export const documentService = {
       throw new Error(validation.errors.join(' '));
     }
 
+    if (isDemoMode()) {
+      for (let p = 25; p <= 100; p += 25) {
+        await new Promise((resolve) => setTimeout(resolve, 60));
+        onProgress(p);
+      }
+      return demoService.uploadResume(file, metadata);
+    }
+
     // 2. Simulate initial progress ticks
     for (let p = 20; p <= 60; p += 20) {
       await new Promise((resolve) => setTimeout(resolve, 50));
@@ -513,6 +521,9 @@ export const documentService = {
    * Target endpoint: PATCH /api/v1/resumes/{id}
    */
   async renameDocument(documentId, newTitle) {
+    if (isDemoMode()) {
+      return demoService.renameResume(documentId, newTitle);
+    }
     try {
       const token = localStorage.getItem('jobachiever_jwt_token');
       if (token && !documentId.startsWith('res-10')) {
@@ -540,6 +551,9 @@ export const documentService = {
    * Target endpoint: PATCH /api/v1/resumes/{id}
    */
   async updateDocumentTrack(documentId, newTrackId) {
+    if (isDemoMode()) {
+      return demoService.updateResumeTrack(documentId, newTrackId);
+    }
     try {
       const token = localStorage.getItem('jobachiever_jwt_token');
       if (token && !documentId.startsWith('res-10')) {
@@ -567,6 +581,9 @@ export const documentService = {
    * Target endpoint: DELETE /api/v1/resumes/{id}
    */
   async deleteDocument(documentId) {
+    if (isDemoMode()) {
+      return demoService.deleteResume(documentId);
+    }
     try {
       const token = localStorage.getItem('jobachiever_jwt_token');
       if (token && !documentId.startsWith('res-10')) {
@@ -587,6 +604,9 @@ export const documentService = {
    * Target endpoint: PATCH /api/v1/resumes/{id}/primary
    */
   async setPrimaryResume(documentId) {
+    if (isDemoMode()) {
+      return demoService.setPrimaryResume(documentId);
+    }
     try {
       const token = localStorage.getItem('jobachiever_jwt_token');
       if (token && !documentId.startsWith('res-10')) {
