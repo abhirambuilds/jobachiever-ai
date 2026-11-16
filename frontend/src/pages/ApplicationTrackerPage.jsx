@@ -62,8 +62,17 @@ export function ApplicationTrackerPage() {
         const apps = await demoService.getApplications();
         setApplications(apps);
       } else {
-        // Fallback for live environments
-        setApplications([]);
+        const userAppsKey = 'jobachiever_user_applications';
+        const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(userAppsKey) : null;
+        if (saved) {
+          try {
+            setApplications(JSON.parse(saved));
+          } catch {
+            setApplications([]);
+          }
+        } else {
+          setApplications([]);
+        }
       }
     } catch (err) {
       console.error('Failed to load applications:', err);
@@ -102,6 +111,13 @@ export function ApplicationTrackerPage() {
 
     if (isDemoMode()) {
       await demoService.updateApplicationNotes(appId, notesDraft);
+    } else {
+      try {
+        const userAppsKey = 'jobachiever_user_applications';
+        const existing = JSON.parse(localStorage.getItem(userAppsKey) || '[]');
+        const updated = existing.map((app) => (app.id === appId ? { ...app, notes: notesDraft } : app));
+        localStorage.setItem(userAppsKey, JSON.stringify(updated));
+      } catch {}
     }
   };
 
@@ -109,6 +125,13 @@ export function ApplicationTrackerPage() {
     setApplications((prev) => prev.filter((app) => app.id !== appId));
     if (isDemoMode()) {
       await demoService.deleteApplication(appId);
+    } else {
+      try {
+        const userAppsKey = 'jobachiever_user_applications';
+        const existing = JSON.parse(localStorage.getItem(userAppsKey) || '[]');
+        const updated = existing.filter((app) => app.id !== appId);
+        localStorage.setItem(userAppsKey, JSON.stringify(updated));
+      } catch {}
     }
   };
 
@@ -116,11 +139,25 @@ export function ApplicationTrackerPage() {
     e.preventDefault();
     if (!newAppForm.company || !newAppForm.role) return;
 
+    let created = null;
     if (isDemoMode()) {
-      const created = await demoService.addApplication(newAppForm);
-      setApplications((prev) => [created, ...prev]);
+      created = await demoService.addApplication(newAppForm);
+    } else {
+      created = {
+        ...newAppForm,
+        id: `app-${Date.now().toString(36)}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      try {
+        const userAppsKey = 'jobachiever_user_applications';
+        const existing = JSON.parse(localStorage.getItem(userAppsKey) || '[]');
+        localStorage.setItem(userAppsKey, JSON.stringify([created, ...existing]));
+      } catch {}
     }
 
+    setApplications((prev) => [created, ...prev]);
+    toast.success(`Added ${newAppForm.role} at ${newAppForm.company} to pipeline!`);
     setIsAddModalOpen(false);
     setNewAppForm({
       company: '',
@@ -128,9 +165,9 @@ export function ApplicationTrackerPage() {
       careerTrackId: 'track-demo-backend',
       careerTrackName: 'Backend Software Engineer',
       stage: 'SAVED',
-      salary: '$120,000 - $140,000',
-      location: 'Remote',
-      matchScore: 85,
+      salary: '₹22 LPA - ₹35 LPA',
+      location: 'Bengaluru / Hybrid',
+      matchScore: 91,
       nextStep: 'Research engineering blog and team structure',
       notes: '',
     });

@@ -86,11 +86,25 @@ export default function CareerIntelligencePage() {
           aiPreferenceService.getAiPreferences(),
         ]);
 
+        const activeRes = typeof localStorage !== 'undefined' ? (localStorage.getItem('jobachiever_active_resume') || '').toLowerCase() : '';
+        let fallbackTrackName = 'Senior Backend Platform Engineer';
+        let fallbackTargetRole = 'Senior Backend Developer';
+        let trackId = 'track-backend';
+        if (activeRes.includes('rohan') || activeRes.includes('frontend')) {
+          fallbackTrackName = 'Staff Frontend Architect';
+          fallbackTargetRole = 'Senior Frontend Engineer';
+          trackId = 'track-frontend';
+        } else if (activeRes.includes('vikram') || activeRes.includes('ai') || activeRes.includes('data')) {
+          fallbackTrackName = 'Lead AI & Data Systems Engineer';
+          fallbackTargetRole = 'AI / ML Engineer';
+          trackId = 'track-aiml';
+        }
+
         const loadedTracks = tracksRes && tracksRes.length > 0 ? tracksRes : [
           {
-            id: 'default-track-backend',
-            name: 'Senior Backend Engineer',
-            targetRole: 'Senior Backend Developer',
+            id: trackId,
+            name: fallbackTrackName,
+            targetRole: fallbackTargetRole,
             targetSeniority: 'SENIOR',
             primary: true,
           },

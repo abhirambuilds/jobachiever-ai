@@ -62,7 +62,14 @@ function getInitialProfile() {
     if (user) {
       const userKey = `${STORAGE_KEY}_${user.id || user.email}`;
       const saved = localStorage.getItem(userKey);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (!isAarav && user.name && (!parsed.personalInfo?.fullName || parsed.personalInfo?.fullName.includes('Aarav'))) {
+          parsed.personalInfo = parsed.personalInfo || {};
+          parsed.personalInfo.fullName = user.name;
+        }
+        return parsed;
+      }
 
       if (isAarav) {
         return DEMO_PROFILE;
@@ -115,7 +122,9 @@ export function ProfileProvider({ children }) {
             ...prev,
             personalInfo: {
               ...prev.personalInfo,
-              fullName: d.personalInfo?.fullName || `${d.firstName || ''} ${d.lastName || ''}`.trim() || prev.personalInfo.fullName,
+              fullName: (!isAarav && user?.name)
+                ? user.name
+                : (d.personalInfo?.fullName || `${d.firstName || ''} ${d.lastName || ''}`.trim() || prev.personalInfo.fullName),
               headline: d.headline || d.personalInfo?.headline || (isAarav ? prev.personalInfo.headline : ''),
               email: d.email || prev.personalInfo.email,
               phone: d.phoneNumber || d.personalInfo?.phone || (isAarav ? prev.personalInfo.phone : ''),
@@ -505,8 +514,28 @@ export function ProfileProvider({ children }) {
     return { percentage: Math.min(100, completedScore), checks, missingSections };
   };
 
-  const resetToDemo = () => {
-    setProfile(DEFAULT_PROFILE);
+  const resetToDemo = (overrideUser) => {
+    const rawUser = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_user') : null;
+    const user = rawUser ? JSON.parse(rawUser) : null;
+    const isAarav = user?.email?.toLowerCase().includes('aarav');
+    const registeredName = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_registered_name') : null;
+    const finalName = overrideUser?.fullName || (!isAarav && (user?.name || registeredName)) || DEFAULT_PROFILE.personalInfo.fullName;
+    const finalEmail = overrideUser?.email || (!isAarav && user?.email) || DEFAULT_PROFILE.personalInfo.email;
+
+    const sampleProfile = {
+      ...DEFAULT_PROFILE,
+      personalInfo: {
+        ...DEFAULT_PROFILE.personalInfo,
+        fullName: finalName,
+        email: finalEmail,
+      },
+    };
+    setProfile(sampleProfile);
+    if (typeof localStorage !== 'undefined' && user) {
+      const userKey = `${STORAGE_KEY}_${user.id || user.email}`;
+      localStorage.setItem(userKey, JSON.stringify(sampleProfile));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleProfile));
+    }
   };
 
   const clearProfile = () => {

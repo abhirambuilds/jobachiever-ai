@@ -96,9 +96,13 @@ export function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile } = useProfile();
-
-  const fullName = profile.personalInfo.fullName || 'Candidate';
-  const email = profile.personalInfo.email || 'user@example.com';
+  const storedUserRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_user') : null;
+  const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
+  const isAarav = storedUser?.email?.toLowerCase().includes('aarav');
+  const fullName = !isAarav && storedUser?.name
+    ? storedUser.name
+    : (profile?.personalInfo?.fullName || 'Candidate');
+  const email = storedUser?.email || profile?.personalInfo?.email || 'user@jobachiever.ai';
   const initials = fullName
     .split(' ')
     .map((n) => n[0])

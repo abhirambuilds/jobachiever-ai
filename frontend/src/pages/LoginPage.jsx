@@ -55,8 +55,13 @@ export function LoginPage() {
       setAuthStatus('success');
       toast.success(response.message || 'Login successful!');
       // Brief pause to allow the user to view the success verification animation
+      const needsOnboarding = typeof localStorage !== 'undefined' && localStorage.getItem('jobachiever_needs_onboarding') === 'true';
       setTimeout(() => {
-        navigate('/dashboard');
+        if (needsOnboarding) {
+          navigate('/onboarding');
+        } else {
+          navigate('/dashboard');
+        }
       }, 700);
     } catch (err) {
       setAuthStatus('error');

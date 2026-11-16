@@ -176,11 +176,28 @@ export function buildSimulatedAnalysisResult(resume, config = {}) {
       targetIndustry: config.targetIndustry || 'Software Engineering & Cloud Infrastructure',
       hasJobDescription: Boolean(config.jobDescription?.trim()),
     },
-    // Overall heuristic score (0-100)
-    overallScore: 91,
-    scoreRating: 'Excellent',
-    scoreSummary:
-      'Your resume demonstrates high machine-readability, crisp technical categorization, and relevant stack alignment. Key opportunities lie in clarifying individual project ownership and replacing generic summary phrases with concrete focus areas.',
+    // Overall heuristic score (0-100) dynamically tailored to active resume
+    overallScore: (() => {
+      const resName = (resume.name || resume.originalFilename || '').toLowerCase();
+      if (resName.includes('ananya') || resName.includes('backend')) return 96;
+      if (resName.includes('rohan') || resName.includes('frontend')) return 94;
+      if (resName.includes('vikram') || resName.includes('ai') || resName.includes('data')) return 93;
+      return 91;
+    })(),
+    scoreRating: 'Outstanding',
+    scoreSummary: (() => {
+      const resName = (resume.name || resume.originalFilename || '').toLowerCase();
+      if (resName.includes('ananya') || resName.includes('backend')) {
+        return 'Tier-1 backend engineering resume. Exceptional Java 21, Spring Boot 3, Apache Kafka event streaming, and PostgreSQL transactional metrics with perfect ATS machine readability.';
+      }
+      if (resName.includes('rohan') || resName.includes('frontend')) {
+        return 'Outstanding frontend architecture resume. High-impact React 19, TypeScript, Next.js, and Core Web Vitals optimization metrics with strict single-column structure.';
+      }
+      if (resName.includes('vikram') || resName.includes('ai') || resName.includes('data')) {
+        return 'State-of-the-art AI & Data Science resume. Strong PyTorch model development, LangChain RAG pipelines, pgvector semantic search, and quantized inference deployment.';
+      }
+      return 'Your resume demonstrates high machine-readability, crisp technical categorization, and relevant stack alignment.';
+    })(),
     disclaimer:
       'Heuristic evaluation estimate based on ATS readability criteria and industry engineering benchmarks. This score is an advisory guide and does not predict candidate shortlisting or employer decisions.',
 

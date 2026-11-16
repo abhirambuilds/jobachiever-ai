@@ -14,9 +14,45 @@ export function JobMatcherProvider({ children }) {
   const { documents } = useDocuments();
   const { profile } = useProfile();
 
-  // Initial resume from library
+  const BENCHMARK_RESUMES = [
+    {
+      id: 'bench-rohan',
+      name: 'Rohan Verma — Frontend Architect',
+      originalFilename: '1_Rohan_Verma_Frontend_Architect.pdf',
+      careerTrackName: 'Frontend Architecture & Web Performance',
+      fileSize: 45000,
+      fileExtension: 'pdf',
+      isPrimary: true,
+    },
+    {
+      id: 'bench-ananya',
+      name: 'Ananya Iyer — Backend Cloud Engineer',
+      originalFilename: '2_Ananya_Iyer_Backend_Cloud_Engineer.pdf',
+      careerTrackName: 'Distributed Systems & Cloud Infrastructure',
+      fileSize: 52000,
+      fileExtension: 'pdf',
+      isPrimary: false,
+    },
+    {
+      id: 'bench-vikram',
+      name: 'Vikram Malhotra — AI & Data Scientist',
+      originalFilename: '3_Vikram_Malhotra_AI_DataScientist.pdf',
+      careerTrackName: 'AI & Machine Learning Systems',
+      fileSize: 48000,
+      fileExtension: 'pdf',
+      isPrimary: false,
+    },
+  ];
+
+  // Initial resume from library or active benchmark persona
   const initialResume = useMemo(() => {
-    return documents.find((d) => d.isPrimary) || documents[0] || null;
+    if (documents && documents.length > 0) {
+      return documents.find((d) => d.isPrimary) || documents[0];
+    }
+    const activeRes = typeof localStorage !== 'undefined' ? (localStorage.getItem('jobachiever_active_resume') || '').toLowerCase() : '';
+    if (activeRes.includes('rohan') || activeRes.includes('frontend')) return BENCHMARK_RESUMES[0];
+    if (activeRes.includes('vikram') || activeRes.includes('ai') || activeRes.includes('data')) return BENCHMARK_RESUMES[2];
+    return BENCHMARK_RESUMES[1];
   }, [documents]);
 
   const [selectedResume, setSelectedResume] = useState(initialResume);
@@ -247,7 +283,7 @@ export function JobMatcherProvider({ children }) {
     setSelectionSource,
     selectedTrackId,
     setSelectedTrackId,
-    availableResumes: documents,
+    availableResumes: documents && documents.length > 0 ? documents : BENCHMARK_RESUMES,
     availableTracks: profile?.careerTracks || [],
     // Matching execution
     isMatching,

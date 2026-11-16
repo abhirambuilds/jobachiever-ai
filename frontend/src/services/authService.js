@@ -17,8 +17,10 @@ export const authService = {
   async register(data) {
     const rawName = (data.fullName || data.name || '').trim();
     const parts = rawName.split(/\s+/);
-    const firstName = parts[0] || 'Aarav';
-    const lastName = parts.slice(1).join(' ') || 'Sharma';
+    const emailPrefix = data.email ? data.email.split('@')[0] : 'User';
+    const fallbackName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
+    const firstName = parts[0] || fallbackName;
+    const lastName = parts.slice(1).join(' ') || '';
 
     try {
       const response = await fetch(`${AUTH_API_BASE}/auth/register`, {
@@ -40,6 +42,23 @@ export const authService = {
         throw new Error(json.message || json.error || 'Registration failed. Please verify your details.');
       }
 
+      if (typeof window !== 'undefined') {
+        try {
+          const registeredUser = {
+            email: data.email.trim().toLowerCase(),
+            name: rawName || `${firstName} ${lastName}`.trim(),
+            firstName,
+            lastName,
+            onboardingCompleted: false,
+          };
+          localStorage.setItem('jobachiever_registered_name', registeredUser.name);
+          localStorage.setItem('jobachiever_user', JSON.stringify(registeredUser));
+          localStorage.setItem('jobachiever_needs_onboarding', 'true');
+        } catch {
+          // ignore
+        }
+      }
+
       return {
         success: true,
         message: 'Account created successfully in database! You may now sign in.',
@@ -50,6 +69,18 @@ export const authService = {
       // If network is down, gracefully fallback
       if (err.message && !err.message.includes('fetch')) {
         throw err;
+      }
+      if (typeof window !== 'undefined') {
+        const registeredUser = {
+          email: data.email.trim().toLowerCase(),
+          name: rawName || `${firstName} ${lastName}`.trim(),
+          firstName,
+          lastName,
+          onboardingCompleted: false,
+        };
+        localStorage.setItem('jobachiever_registered_name', registeredUser.name);
+        localStorage.setItem('jobachiever_user', JSON.stringify(registeredUser));
+        localStorage.setItem('jobachiever_needs_onboarding', 'true');
       }
       return {
         success: true,
@@ -84,7 +115,22 @@ export const authService = {
 
       const authData = json.data;
       const token = authData?.token;
-      const user = authData?.user || { email, name: 'Aarav Sharma' };
+      const apiUser = authData?.user;
+      const registeredName = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_registered_name') : null;
+      const prefix = email ? email.split('@')[0] : 'User';
+      const fallbackName = registeredName || (prefix.charAt(0).toUpperCase() + prefix.slice(1));
+      const derivedFullName = apiUser?.firstName && apiUser?.lastName
+        ? `${apiUser.firstName} ${apiUser.lastName}`
+        : (apiUser?.name || fallbackName);
+
+      const user = {
+        email,
+        name: derivedFullName,
+        firstName: apiUser?.firstName || derivedFullName.split(' ')[0],
+        lastName: apiUser?.lastName || (derivedFullName.split(' ').slice(1).join(' ') || ''),
+        id: apiUser?.id,
+        onboardingCompleted: localStorage.getItem('jobachiever_needs_onboarding') !== 'true',
+      };
 
       if (typeof window !== 'undefined') {
         try {
@@ -114,13 +160,27 @@ export const authService = {
         throw err;
       }
       // Fallback
+      const registeredName = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_registered_name') : null;
+      const prefix = email ? email.split('@')[0] : 'User';
+      const fallbackName = registeredName || (prefix.charAt(0).toUpperCase() + prefix.slice(1));
+      const fallbackUser = {
+        email,
+        name: fallbackName,
+        firstName: fallbackName.split(' ')[0],
+        lastName: fallbackName.split(' ').slice(1).join(' ') || '',
+        onboardingCompleted: localStorage.getItem('jobachiever_needs_onboarding') !== 'true',
+      };
       if (typeof window !== 'undefined') {
         localStorage.setItem('jobachiever_jwt_token', 'demo-valid-bearer-token');
+        localStorage.setItem('jobachiever_user', JSON.stringify(fallbackUser));
+        localStorage.removeItem('jobachiever_demo_mode');
+        sessionStorage.removeItem('jobachiever_demo_mode');
+        window.dispatchEvent(new CustomEvent('jobachiever:auth-changed'));
       }
       return {
         success: true,
         message: 'Login successful. Welcome back!',
-        user: { email, name: 'Aarav Sharma' },
+        user: fallbackUser,
       };
     }
   },

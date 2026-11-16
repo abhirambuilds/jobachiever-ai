@@ -166,18 +166,6 @@ export function DemoTourGuide() {
   }, []);
 
   useEffect(() => {
-    // Only available in demo mode
-    if (!isDemoMode()) {
-      setIsOpen(false);
-      return;
-    }
-
-    // Auto-launch on first demo entry if not dismissed
-    const dismissed = localStorage.getItem(TOUR_STORAGE_KEY) === 'true';
-    if (!dismissed) {
-      setIsOpen(true);
-    }
-
     // Listen for manual tour launch events from DemoModeBanner or buttons
     const handleStartTour = (e) => {
       const targetStep = e?.detail?.stepIndex ?? 0;
@@ -205,7 +193,7 @@ export function DemoTourGuide() {
     }
   }, [location.pathname, isOpen, currentStepIndex]);
 
-  if (!isDemoMode() || !isOpen) {
+  if (!isOpen) {
     return null;
   }
 

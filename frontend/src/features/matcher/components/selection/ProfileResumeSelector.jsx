@@ -105,14 +105,14 @@ export function ProfileResumeSelector() {
             )}
 
             {/* Quick Switch Dropdown */}
-            {!isMasterProfile && availableResumes.length > 1 && (
+            {!isMasterProfile && (
               <select
                 value={selectedResume?.id || ''}
                 onChange={(e) => {
                   const res = availableResumes.find((r) => r.id === e.target.value);
                   if (res) setSelectedResume(res);
                 }}
-                className="rounded-lg border border-input bg-background px-2.5 py-1 text-xs text-foreground focus:ring-1 focus:ring-primary max-w-[180px]"
+                className="rounded-lg border border-input bg-background px-2.5 py-1 text-xs text-foreground focus:ring-1 focus:ring-primary max-w-[200px]"
                 aria-label="Switch active resume"
               >
                 {availableResumes.map((r) => (

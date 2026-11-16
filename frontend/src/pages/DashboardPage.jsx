@@ -7,7 +7,17 @@ import { OpportunityPreviewList } from '@/features/dashboard/components/Opportun
 import { RecentActivityTimeline } from '@/features/dashboard/components/RecentActivityTimeline';
 import { CareerInsightsPanel } from '@/features/dashboard/components/CareerInsightsPanel';
 
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 export function DashboardPage() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('jobachiever_needs_onboarding') === 'true') {
+      navigate('/onboarding');
+    }
+  }, [navigate]);
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       {/* Personalized Welcome Banner */}

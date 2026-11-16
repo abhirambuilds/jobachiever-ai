@@ -24,7 +24,15 @@ export function ResumeStudioProvider({ children }) {
     try {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (profile?.personalInfo?.fullName && !profile.personalInfo.fullName.includes('Aarav') && parsed?.sections) {
+          const personalSec = parsed.sections.find((s) => s.type === 'personal_info');
+          if (personalSec && (personalSec.data?.fullName?.includes('Aarav') || !personalSec.data?.fullName)) {
+            personalSec.data.fullName = profile.personalInfo.fullName;
+            parsed.title = `${profile.personalInfo.fullName} — Resume`;
+          }
+        }
+        return parsed;
       }
     } catch {
       // Fallback
@@ -207,13 +215,20 @@ export function ResumeStudioProvider({ children }) {
 
   // Section content data update
   const updateSectionData = useCallback((sectionId, newData) => {
-    setResume((prev) => ({
-      ...prev,
-      sections: prev.sections.map((sec) =>
-        sec.id === sectionId ? { ...sec, data: newData } : sec
-      ),
-      lastSaved: new Date().toISOString(),
-    }));
+    setResume((prev) => {
+      const updated = {
+        ...prev,
+        sections: prev.sections.map((sec) =>
+          sec.id === sectionId ? { ...sec, data: newData } : sec
+        ),
+        lastSaved: new Date().toISOString(),
+      };
+      if (newData.fullName) {
+        updated.title = `${newData.fullName} — Resume`;
+        updated.name = updated.title;
+      }
+      return updated;
+    });
     setHasUnsavedChanges(true);
   }, []);
 

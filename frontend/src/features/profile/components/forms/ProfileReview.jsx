@@ -25,9 +25,22 @@ export function ProfileReview({ onBack, onJumpToStep }) {
 
   const { percentage, missingSections } = calculateCompleteness();
 
-  const handleComplete = () => {
-    toast.success('Master Career Profile initialized! Entering Career Command Center.');
-    navigate('/dashboard');
+  const handleComplete = async () => {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('jobachiever_needs_onboarding', 'false');
+        const rawUser = localStorage.getItem('jobachiever_user');
+        if (rawUser) {
+          const u = JSON.parse(rawUser);
+          u.onboardingCompleted = true;
+          localStorage.setItem('jobachiever_user', JSON.stringify(u));
+        }
+      }
+      toast.success('Master Career Profile initialized! Entering Career Command Center.');
+      navigate('/dashboard');
+    } catch {
+      navigate('/dashboard');
+    }
   };
 
   return (

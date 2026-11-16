@@ -12,9 +12,13 @@ export function WelcomeBanner() {
   const { profile, calculateCompleteness } = useProfile();
   const { percentage } = calculateCompleteness();
 
-  const firstName = profile.personalInfo.fullName
-    ? profile.personalInfo.fullName.split(' ')[0]
-    : 'Candidate';
+  const storedUserRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_user') : null;
+  const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
+  const isAarav = storedUser?.email?.toLowerCase().includes('aarav');
+  const candidateName = (!isAarav && storedUser?.name)
+    ? storedUser.name
+    : (profile.personalInfo.fullName || 'Candidate');
+  const firstName = candidateName.split(' ')[0] || 'Candidate';
 
   const primaryTrack =
     profile.careerTracks?.find((t) => t.isPrimary) || profile.careerTracks?.[0];

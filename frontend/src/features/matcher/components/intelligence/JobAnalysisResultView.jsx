@@ -68,6 +68,15 @@ export function JobAnalysisResultView({ analysis, rawText }) {
     });
   };
 
+  const renderTextValue = (val) => {
+    if (val === null || val === undefined) return '';
+    if (typeof val === 'string' || typeof val === 'number') return val;
+    if (typeof val === 'object') {
+      return val.name || val.title || val.description || val.degree || val.rawRequirement || JSON.stringify(val);
+    }
+    return String(val);
+  };
+
   const getImportanceBadge = (importance) => {
     switch (importance) {
       case 'CRITICAL':
@@ -244,7 +253,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                         key={i}
                         className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20"
                       >
-                        {skill}
+                        {renderTextValue(skill)}
                       </span>
                     ))
                   ) : (
@@ -266,7 +275,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                         key={i}
                         className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20"
                       >
-                        {skill}
+                        {renderTextValue(skill)}
                       </span>
                     ))
                   ) : (
@@ -285,7 +294,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                         key={i}
                         className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-cyan-500/10 text-cyan-300 border border-cyan-500/20"
                       >
-                        {tool}
+                        {renderTextValue(tool)}
                       </span>
                     ))}
                   </div>
@@ -302,7 +311,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                         key={i}
                         className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border"
                       >
-                        {skill}
+                        {renderTextValue(skill)}
                       </span>
                     ))}
                   </div>
@@ -326,7 +335,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                     {qualifications.education.map((edu, i) => (
                       <li key={i} className="text-xs text-foreground/90 flex items-start gap-2 bg-muted/30 p-2.5 rounded border border-border/40">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
-                        <span>{edu}</span>
+                        <span>{renderTextValue(edu)}</span>
                       </li>
                     ))}
                   </ul>
@@ -345,7 +354,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                     {qualifications.certifications.map((cert, i) => (
                       <li key={i} className="text-xs text-foreground/90 flex items-start gap-2 bg-muted/30 p-2.5 rounded border border-border/40">
                         <span className="h-1.5 w-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
-                        <span>{cert}</span>
+                        <span>{renderTextValue(cert)}</span>
                       </li>
                     ))}
                   </ul>
@@ -361,7 +370,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                     {qualifications.otherRequirements.map((req, i) => (
                       <li key={i} className="text-xs text-foreground/90 flex items-start gap-2 bg-muted/30 p-2.5 rounded border border-border/40">
                         <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                        <span>{req}</span>
+                        <span>{renderTextValue(req)}</span>
                       </li>
                     ))}
                   </ul>
@@ -383,7 +392,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                       <span className="flex items-center justify-center h-5 w-5 rounded-full bg-primary/10 text-primary font-bold text-[10px] shrink-0">
                         {i + 1}
                       </span>
-                      <span>{resp}</span>
+                      <span>{renderTextValue(resp)}</span>
                     </div>
                   ))}
                 </div>
@@ -404,21 +413,21 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         {getImportanceBadge(req.importance)}
-                        <span className="text-xs font-semibold text-foreground">{req.name}</span>
+                        <span className="text-xs font-semibold text-foreground">{renderTextValue(req.name || req)}</span>
                       </div>
                       <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                        <Badge variant="outline" className="text-[10px]">{req.category}</Badge>
-                        <Badge variant="secondary" className="text-[10px]">{req.requirementType}</Badge>
+                        <Badge variant="outline" className="text-[10px]">{renderTextValue(req.category)}</Badge>
+                        <Badge variant="secondary" className="text-[10px]">{renderTextValue(req.requirementType)}</Badge>
                       </div>
                     </div>
                     {req.evidenceExcerpt && (
                       <div className="text-xs bg-muted/40 p-2.5 rounded border border-border/40 font-mono text-muted-foreground italic">
-                        &quot;{req.evidenceExcerpt}&quot;
+                        &quot;{renderTextValue(req.evidenceExcerpt)}&quot;
                       </div>
                     )}
                     <div className="text-[11px] text-muted-foreground flex items-center justify-between">
-                      <span>Source Section: <strong>{req.section}</strong></span>
-                      <span>Confidence: {Math.round(req.confidence * 100)}%</span>
+                      <span>Source Section: <strong>{renderTextValue(req.section)}</strong></span>
+                      <span>Confidence: {Math.round((req.confidence || 0.85) * 100)}%</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -441,7 +450,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                 <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Core Technical Keywords</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {(keywords?.coreTechnical || []).map((k, i) => (
-                    <Badge key={i} variant="outline" className="text-xs font-mono">{k}</Badge>
+                    <Badge key={i} variant="outline" className="text-xs font-mono">{renderTextValue(k)}</Badge>
                   ))}
                 </div>
               </div>
@@ -450,7 +459,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                 <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Frameworks &amp; Tools</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {(keywords?.frameworksAndTools || []).map((k, i) => (
-                    <Badge key={i} variant="secondary" className="text-xs font-mono">{k}</Badge>
+                    <Badge key={i} variant="secondary" className="text-xs font-mono">{renderTextValue(k)}</Badge>
                   ))}
                 </div>
               </div>
@@ -459,7 +468,7 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                 <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Domain &amp; Industry Concepts</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {(keywords?.domain || []).map((k, i) => (
-                    <Badge key={i} className="bg-primary/10 text-primary border-primary/20 text-xs font-mono">{k}</Badge>
+                    <Badge key={i} className="bg-primary/10 text-primary border-primary/20 text-xs font-mono">{renderTextValue(k)}</Badge>
                   ))}
                 </div>
               </div>
