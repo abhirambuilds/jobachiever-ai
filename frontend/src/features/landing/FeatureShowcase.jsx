@@ -10,6 +10,8 @@ import {
   Globe2,
   GraduationCap,
   Bot,
+  Layers,
+  FileCode2,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -52,6 +54,24 @@ const features = [
     accentColor: 'text-indigo-400',
   },
   {
+    icon: Layers,
+    title: 'Multi-Track Personas',
+    category: 'Career Architecture',
+    description:
+      'Manage distinct career tracks (e.g., Backend Systems, Cloud Architect) under one unified account with track-specific skills and goals.',
+    badge: 'Multi-Persona',
+    accentColor: 'text-amber-400',
+  },
+  {
+    icon: FileCode2,
+    title: 'JD Decomposition',
+    category: 'Requirements Parsing',
+    description:
+      'Deconstruct complex job postings into atomic requirements, categorized technical proficiencies, seniority criteria, and cultural signals.',
+    badge: 'Atomic Extraction',
+    accentColor: 'text-rose-400',
+  },
+  {
     icon: Compass,
     title: 'Job Discovery',
     category: 'Aggregation',
@@ -70,31 +90,31 @@ const features = [
     accentColor: 'text-blue-400',
   },
   {
-    icon: FileSignature,
-    title: 'Cover Letter Studio',
-    category: 'Tailored Outreach',
+    icon: Bot,
+    title: 'AI Career Copilot',
+    category: 'Conversational Intelligence',
     description:
-      'Context-aware, personalized cover letters highlighting role-relevant user achievements and answering specific job requirements.',
-    badge: 'Grounded Outreach',
+      'Interactive AI chatbot powered by Groq LPUs. Ask questions about interview strategies, market salary benchmarks, role transitions, or resume improvements.',
+    badge: 'Live Groq Chat',
     accentColor: 'text-teal-400',
   },
   {
-    icon: Globe2,
-    title: 'Portfolio Builder',
-    category: 'Personal Web Presence',
+    icon: Sparkles,
+    title: 'Live Studio Prompting',
+    category: 'Interactive Editing',
     description:
-      'Generates clean, shareable web portfolio profiles showcasing verified credentials, case studies, open-source projects, and career milestones.',
-    badge: 'Shareable Link',
+      'Edit resumes in real time with natural language prompts. Instruct the AI to add skills, tailor summaries, or modify details with immediate canvas re-rendering.',
+    badge: 'Prompt-to-Edit',
     accentColor: 'text-violet-400',
   },
   {
-    icon: GraduationCap,
-    title: 'Interview Preparation',
-    category: 'Readiness & Mock Rounds',
+    icon: Layers,
+    title: 'PostgreSQL Architecture',
+    category: 'Enterprise Persistence',
     description:
-      'AI-driven mock interviews, behavioral coaching using the STAR method, technical deep-dives, and role-specific question banks.',
-    badge: 'STAR Methodology',
-    accentColor: 'text-rose-400',
+      'True relational data persistence powered by PostgreSQL. User accounts, master profiles, multi-track personas, and tailored resumes are safely stored.',
+    badge: 'Verified DB Sync',
+    accentColor: 'text-emerald-400',
   },
   {
     icon: Bot,
@@ -117,7 +137,7 @@ export function FeatureShowcase() {
             Core Capabilities
           </Badge>
           <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl">
-            Ten Powerful Tools.{' '}
+            Twelve Core Capabilities.{' '}
             <span className="gradient-text-primary">One Unified Platform.</span>
           </h2>
           <p className="mt-4 text-base sm:text-lg text-muted-foreground leading-relaxed">

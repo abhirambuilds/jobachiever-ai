@@ -23,8 +23,61 @@ import { demoService } from '@/demo/demoService';
 
 export function JobDiscoveryPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTrack, setSelectedTrack] = useState('all');
+  const [selectedTrack, setSelectedTrack] = useState(() => {
+    if (typeof localStorage === 'undefined') return 'all';
+    const activeRes = (localStorage.getItem('jobachiever_active_resume') || '').toLowerCase();
+    if (activeRes.includes('rohan') || activeRes.includes('frontend')) return 'frontend';
+    if (activeRes.includes('vikram') || activeRes.includes('ai') || activeRes.includes('data')) return 'aiml';
+    if (activeRes.includes('ananya') || activeRes.includes('backend')) return 'backend';
+    return 'all';
+  });
+  const [liveJobs, setLiveJobs] = useState([]);
+  const [isSearchingLive, setIsSearchingLive] = useState(false);
   const navigate = useNavigate();
+
+  const handleLiveRapidApiSearch = async () => {
+    if (!searchQuery.trim()) return;
+    setIsSearchingLive(true);
+    const rapidKey =
+      (typeof localStorage !== 'undefined' && localStorage.getItem('jobachiever_rapidapi_key')) ||
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_RAPIDAPI_KEY) ||
+      '';
+
+    try {
+      const res = await fetch(`https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(searchQuery + ' India')}&page=1&num_pages=1`, {
+        headers: {
+          'X-RapidAPI-Key': rapidKey,
+          'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
+        },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        const items = (json.data || []).map((j, i) => ({
+          id: `rapid-${j.job_id || i}`,
+          company: j.employer_name || 'Tech Enterprise',
+          title: j.job_title || searchQuery,
+          location: `${j.job_city || 'Bengaluru'}, ${j.job_country || 'India'}`,
+          employmentType: j.job_employment_type || 'Full-time',
+          salaryRange: j.job_salary_currency ? `${j.job_salary_currency} Competitive` : '₹20 LPA - ₹35 LPA',
+          postedAgo: 'Live (RapidAPI)',
+          url: j.job_apply_link || 'https://www.linkedin.com/jobs',
+          requiredSkills: [searchQuery, 'Problem Solving', 'System Design'],
+          preferredSkills: ['Cloud Infrastructure', 'Agile'],
+          matchScore: 91,
+          isRapidApi: true,
+        }));
+        if (items.length > 0) {
+          setLiveJobs(items);
+          toast.success(`Found ${items.length} live jobs via RapidAPI JSearch!`);
+          return;
+        }
+      }
+    } catch {
+      // fallback to filtered
+    } finally {
+      setIsSearchingLive(false);
+    }
+  };
 
   const handleTrackInPipeline = async (job) => {
     try {
@@ -32,7 +85,7 @@ export function JobDiscoveryPage() {
         company: job.company,
         role: job.title,
         careerTrackId: 'track-demo-backend',
-        careerTrackName: 'Senior Backend Software Engineer',
+        careerTrackName: job.title,
         stage: 'SAVED',
         salary: job.salaryRange,
         location: job.location,
@@ -46,7 +99,9 @@ export function JobDiscoveryPage() {
     }
   };
 
-  const filteredJobs = DEMO_JOBS.filter((job) => {
+  const pool = liveJobs.length > 0 ? [...liveJobs, ...DEMO_JOBS] : DEMO_JOBS;
+
+  const filteredJobs = pool.filter((job) => {
     const matchesSearch =
       searchQuery === '' ||
       job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -55,8 +110,9 @@ export function JobDiscoveryPage() {
 
     const matchesTrack =
       selectedTrack === 'all' ||
-      (selectedTrack === 'backend' && job.title.toLowerCase().includes('backend')) ||
-      (selectedTrack === 'cloud' && (job.title.toLowerCase().includes('cloud') || job.title.toLowerCase().includes('infrastructure')));
+      (selectedTrack === 'frontend' && (job.track === 'frontend' || job.title.toLowerCase().includes('frontend') || job.title.toLowerCase().includes('ui'))) ||
+      (selectedTrack === 'backend' && (job.track === 'backend' || (!job.track && job.title.toLowerCase().includes('backend')))) ||
+      (selectedTrack === 'aiml' && (job.track === 'aiml' || job.title.toLowerCase().includes('ai') || job.title.toLowerCase().includes('data')));
 
     return matchesSearch && matchesTrack;
   });
@@ -92,15 +148,28 @@ export function JobDiscoveryPage() {
 
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-muted/40 p-3 rounded-xl border border-border/70">
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by company, role, or skill (e.g. Java, Docker)..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-background border border-border focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
-          />
+        <div className="relative flex-1 max-w-md flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleLiveRapidApiSearch()}
+              placeholder="Search roles, skills (e.g. React, Java, PyTorch)..."
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-background border border-border focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+            />
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleLiveRapidApiSearch}
+            disabled={isSearchingLive || !searchQuery.trim()}
+            className="text-xs h-8 gap-1.5 shrink-0 border-primary/40 hover:bg-primary/10"
+          >
+            <Compass className={`w-3.5 h-3.5 text-primary ${isSearchingLive ? 'animate-spin' : ''}`} />
+            <span>{isSearchingLive ? 'Searching...' : 'Search Live (RapidAPI)'}</span>
+          </Button>
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto">
@@ -117,6 +186,16 @@ export function JobDiscoveryPage() {
             All Tracks
           </button>
           <button
+            onClick={() => setSelectedTrack('frontend')}
+            className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
+              selectedTrack === 'frontend'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-background hover:bg-muted text-muted-foreground'
+            }`}
+          >
+            Frontend &amp; UI
+          </button>
+          <button
             onClick={() => setSelectedTrack('backend')}
             className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
               selectedTrack === 'backend'
@@ -124,17 +203,17 @@ export function JobDiscoveryPage() {
                 : 'bg-background hover:bg-muted text-muted-foreground'
             }`}
           >
-            Backend Software Engineer
+            Backend &amp; Cloud
           </button>
           <button
-            onClick={() => setSelectedTrack('cloud')}
+            onClick={() => setSelectedTrack('aiml')}
             className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
-              selectedTrack === 'cloud'
+              selectedTrack === 'aiml'
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-background hover:bg-muted text-muted-foreground'
             }`}
           >
-            Cloud Systems &amp; DevOps
+            AI &amp; Data Science
           </button>
         </div>
       </div>

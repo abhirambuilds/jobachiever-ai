@@ -16,7 +16,7 @@ const aiProviders = [
     tagline: 'Ultra-Low Latency Inference',
     models: 'Llama 3.3, Llama 3.1 70B',
     description:
-      'Lightning-fast parsing and analysis powered by Groq LPUs. Ideal for instantaneous resume critiquing and real-time cover letter drafting.',
+      'Lightning-fast parsing and analysis powered by Groq LPUs. Ideal for instantaneous resume critiquing, real-time prompt-to-edit canvas, and AI Copilot dialogue.',
     badge: 'High Speed',
     icon: Zap,
     accent: 'text-amber-500',
@@ -26,7 +26,7 @@ const aiProviders = [
     tagline: 'Deep Reasoning & Context',
     models: 'Gemini 2.0 Flash, Gemini 1.5 Pro',
     description:
-      'Massive context windows and state-of-the-art reasoning for complex job description decomposition and STAR behavioral interview mock coaching.',
+      'Massive context windows and state-of-the-art reasoning for complex job description decomposition and granular semantic match analysis.',
     badge: 'Deep Reasoning',
     icon: Sparkles,
     accent: 'text-cyan-400',

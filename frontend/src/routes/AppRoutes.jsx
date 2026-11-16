@@ -1,9 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
-import {
-  FileSignature,
-  Globe,
-  GraduationCap,
-} from 'lucide-react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { AppLayout } from '@/layouts/AppLayout';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
@@ -26,6 +21,7 @@ import { JobDescriptionAnalyzerPage } from '@/pages/JobDescriptionAnalyzerPage';
 import { JobDiscoveryPage } from '@/pages/JobDiscoveryPage';
 import { AiSettingsPage } from '@/features/settings/AiSettingsPage';
 import CareerIntelligencePage from '@/features/career/CareerIntelligencePage';
+import CareerCopilotPage from '@/features/copilot/CareerCopilotPage';
 import { ApplicationTrackerPage } from '@/pages/ApplicationTrackerPage';
 import { FeaturePlaceholderPage } from '@/pages/FeaturePlaceholderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -69,44 +65,15 @@ export function AppRoutes() {
         <Route path="/job-matcher" element={<JobMatcherPage />} />
         <Route path="/matching" element={<JobMatcherPage />} />
         <Route path="/applications" element={<ApplicationTrackerPage />} />
-        <Route
-          path="/cover-letters"
-          element={
-            <FeaturePlaceholderPage
-              title="Targeted Cover Letter Generator"
-              description="Context-aware, personalized cover letters highlighting role-relevant user achievements."
-              milestone="Milestone 9"
-              icon={FileSignature}
-            />
-          }
-        />
-        <Route
-          path="/portfolio"
-          element={
-            <FeaturePlaceholderPage
-              title="Professional Web Portfolio Builder"
-              description="Clean, shareable web portfolio profiles showcasing projects, verified credentials, and milestones."
-              milestone="Milestone 9"
-              icon={Globe}
-            />
-          }
-        />
-        <Route
-          path="/interviews"
-          element={
-            <FeaturePlaceholderPage
-              title="Interview Preparation Suite"
-              description="AI-powered mock interviews, behavioral STAR practice, and role-specific technical question banks."
-              milestone="Milestone 9"
-              icon={GraduationCap}
-            />
-          }
-        />
+        <Route path="/cover-letters" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/portfolio" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/interviews" element={<Navigate to="/copilot" replace />} />
         <Route path="/career" element={<CareerIntelligencePage />} />
         <Route path="/intelligence" element={<CareerIntelligencePage />} />
         <Route path="/career-intelligence" element={<CareerIntelligencePage />} />
         <Route path="/career/intelligence" element={<CareerIntelligencePage />} />
         <Route path="/career-assistant" element={<CareerIntelligencePage />} />
+        <Route path="/copilot" element={<CareerCopilotPage />} />
         <Route path="/settings" element={<AiSettingsPage />} />
         <Route path="/settings/ai" element={<AiSettingsPage />} />
       </Route>

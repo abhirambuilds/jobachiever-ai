@@ -22,7 +22,7 @@ describe('Dashboard Layout & Navigation', () => {
       { name: 'Match Job Description', href: '/job-match' },
       { name: 'Discover Opportunities', href: '/jobs' },
       { name: 'Update Master Profile', href: '/profile' },
-      { name: 'Practice Interviews', href: '/interviews' },
+      { name: 'AI Career Copilot', href: '/copilot' },
     ];
 
     expectedActions.forEach(({ name, href }) => {

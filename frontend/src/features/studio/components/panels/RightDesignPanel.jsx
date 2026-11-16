@@ -6,6 +6,7 @@ import {
   Palette,
   Sliders,
   Type,
+  X,
 } from 'lucide-react';
 import { useResumeStudio } from '../../context/ResumeStudioContext';
 import {
@@ -15,7 +16,7 @@ import {
 } from '@/services/resumeStudioService';
 
 export function RightDesignPanel() {
-  const { resume, designSettings, setTemplate, updateDesignSettings } = useResumeStudio();
+  const { resume, designSettings, setTemplate, updateDesignSettings, setShowDesignPanel } = useResumeStudio();
 
   const [activeTab, setActiveTab] = useState('templates'); // 'templates' | 'typography' | 'colors' | 'layout'
 
@@ -25,11 +26,20 @@ export function RightDesignPanel() {
     <aside className="w-full lg:w-80 xl:w-96 border-l border-border bg-card/60 backdrop-blur-sm flex flex-col h-full overflow-hidden">
       {/* 1. Header & Navigation Tabs */}
       <div className="border-b border-border bg-muted/20">
-        <div className="p-3">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-            Resume Styling & Layout
-          </span>
-          <h2 className="text-sm font-bold text-foreground">Design Studio</h2>
+        <div className="p-3 flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+              Resume Styling & Layout
+            </span>
+            <h2 className="text-sm font-bold text-foreground">Design Studio</h2>
+          </div>
+          <button
+            onClick={() => setShowDesignPanel(false)}
+            className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+            title="Close Design Panel"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Tab Buttons */}

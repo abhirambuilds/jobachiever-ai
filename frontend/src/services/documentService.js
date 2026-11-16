@@ -296,9 +296,14 @@ export const documentService = {
    * Target endpoint: GET /api/v1/resumes
    */
   async getDocuments() {
-    if (isDemoMode()) {
+    const rawUser = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_user') : null;
+    const user = rawUser ? JSON.parse(rawUser) : null;
+    const isAarav = user?.email?.toLowerCase().includes('aarav') || isDemoMode();
+
+    if (isAarav) {
       return demoService.getResumes();
     }
+
     try {
       const token = localStorage.getItem('jobachiever_jwt_token');
       if (token) {
@@ -318,11 +323,27 @@ export const documentService = {
         }
       }
     } catch {
-      // Fallback to local default resumes if offline
+      // Fallback to user-scoped local uploads
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return [...INITIAL_RESUMES];
+    if (user) {
+      const userResumesKey = `jobachiever_user_resumes_${user.id || user.email}`;
+      const saved = localStorage.getItem(userResumesKey);
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          // ignore
+        }
+      }
+      return [];
+    }
+
+    if (!user) {
+      return [...INITIAL_RESUMES];
+    }
+
+    return [];
   },
 
   /**
@@ -403,7 +424,7 @@ export const documentService = {
     const previewUrl =
       extension === 'pdf' && typeof URL !== 'undefined' ? URL.createObjectURL(file) : null;
 
-    return {
+    const createdDoc = {
       id: documentId,
       ownerId: 'usr-dev-001',
       name: cleanName,
@@ -435,6 +456,20 @@ export const documentService = {
         },
       ],
     };
+
+    const rawUser = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_user') : null;
+    const user = rawUser ? JSON.parse(rawUser) : null;
+    if (user) {
+      const userResumesKey = `jobachiever_user_resumes_${user.id || user.email}`;
+      try {
+        const existing = JSON.parse(localStorage.getItem(userResumesKey) || '[]');
+        localStorage.setItem(userResumesKey, JSON.stringify([createdDoc, ...existing]));
+      } catch {
+        // ignore
+      }
+    }
+
+    return createdDoc;
   },
 
   /**
@@ -591,11 +626,24 @@ export const documentService = {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },
         });
-        return true;
+        // continue to clean up local storage
       }
     } catch {
       // offline fallback
     }
+
+    const rawUser = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_user') : null;
+    const user = rawUser ? JSON.parse(rawUser) : null;
+    if (user) {
+      const userResumesKey = `jobachiever_user_resumes_${user.id || user.email}`;
+      try {
+        const existing = JSON.parse(localStorage.getItem(userResumesKey) || '[]');
+        localStorage.setItem(userResumesKey, JSON.stringify(existing.filter((d) => d.id !== documentId)));
+      } catch {
+        // ignore
+      }
+    }
+
     return true;
   },
 
@@ -678,6 +726,10 @@ export const documentService = {
     } catch {
       // offline fallback
     }
+    if (!user) {
+      return [...INITIAL_RESUMES];
+    }
+
     return [];
   },
 };

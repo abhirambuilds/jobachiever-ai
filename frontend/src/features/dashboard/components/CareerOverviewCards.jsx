@@ -13,11 +13,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AnimatedCounter } from '@/components/common/AnimatedCounter';
 
+import { isDemoMode } from '@/demo/demoConfig';
+
 export function CareerOverviewCards() {
   const { profile, calculateCompleteness } = useProfile();
   const { percentage } = calculateCompleteness();
 
-  const activeTracksCount = profile.careerTracks?.length || 1;
+  const isAarav = profile.personalInfo?.email?.toLowerCase().includes('aarav') || isDemoMode();
+  const activeTracksCount = profile.careerTracks?.length || (isAarav ? 3 : 0);
   const primaryTrack =
     profile.careerTracks?.find((t) => t.isPrimary) || profile.careerTracks?.[0];
 
@@ -27,10 +30,10 @@ export function CareerOverviewCards() {
       title: 'Profile Completeness',
       numValue: percentage,
       suffix: '%',
-      subtitle: 'Verified credentials & experience',
+      subtitle: percentage >= 85 ? 'Verified credentials & experience' : 'Complete profile to boost match',
       icon: CheckCircle2,
       iconColor: 'text-emerald-500',
-      badge: percentage >= 85 ? 'Strong' : 'In Progress',
+      badge: percentage >= 85 ? 'Strong' : (percentage > 0 ? 'In Progress' : 'Initial'),
       badgeVariant: percentage >= 85 ? 'success' : 'warning',
       link: '/profile',
       linkText: 'Inspect Profile',
@@ -40,36 +43,36 @@ export function CareerOverviewCards() {
       title: 'Active Career Tracks',
       numValue: activeTracksCount,
       suffix: '',
-      subtitle: primaryTrack ? primaryTrack.name : 'Target Personas',
+      subtitle: primaryTrack ? primaryTrack.name : 'Define your target role',
       icon: Layers,
       iconColor: 'text-primary',
-      badge: 'Primary Active',
-      badgeVariant: 'secondary',
+      badge: activeTracksCount > 0 ? 'Primary Active' : 'Setup Needed',
+      badgeVariant: activeTracksCount > 0 ? 'secondary' : 'outline',
       link: '/career-tracks',
-      linkText: 'Manage Tracks',
+      linkText: activeTracksCount > 0 ? 'Manage Tracks' : 'Add First Track',
     },
     {
       id: 'resume-health',
       title: 'ATS Resume Score',
-      numValue: 94,
+      numValue: isAarav ? 94 : 0,
       suffix: '%',
-      subtitle: '3 Tailored versions ready',
+      subtitle: isAarav ? '3 Tailored versions ready' : 'Upload resume to calculate',
       icon: FileCheck2,
       iconColor: 'text-cyan-400',
-      badge: 'High Impact',
-      badgeVariant: 'ai',
-      link: '/resume-analyzer',
-      linkText: 'View Analysis',
+      badge: isAarav ? 'High Impact' : 'Not Uploaded',
+      badgeVariant: isAarav ? 'ai' : 'outline',
+      link: isAarav ? '/resume-analyzer' : '/resumes',
+      linkText: isAarav ? 'View Analysis' : 'Upload Resume',
     },
     {
       id: 'applications-active',
       title: 'Active Applications',
-      numValue: 6,
+      numValue: isAarav ? 6 : 0,
       suffix: '',
-      subtitle: '1 in Interview (Razorpay), 1 Offer (Swiggy)',
+      subtitle: isAarav ? '1 in Interview (Razorpay), 1 Offer (Swiggy)' : 'Track jobs across pipeline',
       icon: Kanban,
       iconColor: 'text-amber-500',
-      badge: 'In Pipeline',
+      badge: isAarav ? 'In Pipeline' : '0 in Pipeline',
       badgeVariant: 'outline',
       link: '/applications',
       linkText: 'Open Kanban',
@@ -77,12 +80,12 @@ export function CareerOverviewCards() {
     {
       id: 'saved-opportunities',
       title: 'Saved Opportunities',
-      numValue: 8,
+      numValue: isAarav ? 8 : 0,
       suffix: '',
-      subtitle: '3 high semantic matches',
+      subtitle: isAarav ? '3 high semantic matches' : 'Explore and bookmark jobs',
       icon: Bookmark,
       iconColor: 'text-indigo-400',
-      badge: 'Wishlisted',
+      badge: isAarav ? 'Wishlisted' : '0 Saved',
       badgeVariant: 'outline',
       link: '/jobs',
       linkText: 'Explore Jobs',

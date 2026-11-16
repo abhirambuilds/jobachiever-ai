@@ -1,12 +1,11 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 
 import { AuthLayout } from '@/features/auth/components/AuthLayout';
-import { SocialAuthButtons } from '@/features/auth/components/SocialAuthButtons';
 import { loginSchema } from '@/features/auth/schemas/authSchemas';
 import { authService } from '@/services/authService';
 
@@ -14,12 +13,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { toast } from '@/components/ui/toast';
-import { DemoLaunchCard } from '@/components/demo';
 
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [authStatus, setAuthStatus] = useState('idle'); // 'idle' | 'success' | 'error'
+  const [errorMessage, setErrorMessage] = useState('');
+  const [shakeCount, setShakeCount] = useState(0);
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     register,
@@ -29,22 +32,38 @@ export function LoginPage() {
   } = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
+      email: location.state?.email || '',
       password: '',
       rememberMe: false,
     },
     mode: 'onTouched',
   });
 
+  useEffect(() => {
+    if (location.state?.email) {
+      setValue('email', location.state.email, { shouldValidate: true });
+    }
+  }, [location.state?.email, setValue]);
+
   const onSubmit = async (data) => {
     setIsLoading(true);
+    setAuthStatus('idle');
+    setErrorMessage('');
+
     try {
       const response = await authService.login(data);
+      setAuthStatus('success');
       toast.success(response.message || 'Login successful!');
-      // Navigate to career command center dashboard
-      navigate('/dashboard');
+      // Brief pause to allow the user to view the success verification animation
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 700);
     } catch (err) {
-      toast.error(err.message || 'Login failed. Please verify your credentials.');
+      setAuthStatus('error');
+      setShakeCount((prev) => prev + 1);
+      const msg = err.message || 'Invalid email or password. Please verify your credentials.';
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -56,12 +75,24 @@ export function LoginPage() {
       subtitle="Access your verified credentials, active applications, and tailored resume studio."
     >
       <motion.div
+        key={shakeCount}
         initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        animate={
+          authStatus === 'error'
+            ? { x: [-12, 12, -8, 8, -4, 4, 0], opacity: 1, y: 0 }
+            : { opacity: 1, y: 0 }
+        }
+        transition={{ duration: 0.4 }}
       >
-        <DemoLaunchCard className="mb-4" />
-        <Card className="border-border/80 bg-card/80 shadow-2xl backdrop-blur-xl">
+        <Card
+          className={`border bg-card/85 shadow-2xl backdrop-blur-xl transition-all duration-300 ${
+            authStatus === 'success'
+              ? 'border-emerald-500/60 shadow-emerald-500/10 ring-2 ring-emerald-500/20'
+              : authStatus === 'error'
+              ? 'border-destructive/60 shadow-destructive/10'
+              : 'border-border/80'
+          }`}
+        >
           <CardHeader className="space-y-1.5 pb-4">
             <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
               Sign In
@@ -72,6 +103,29 @@ export function LoginPage() {
           </CardHeader>
 
           <CardContent className="space-y-4">
+            {/* Visual Feedback Alerts */}
+            {authStatus === 'error' && errorMessage && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex items-center gap-2.5 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive"
+              >
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{errorMessage}</span>
+              </motion.div>
+            )}
+
+            {authStatus === 'success' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex items-center gap-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 text-xs text-emerald-400 font-medium"
+              >
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                <span>Credentials verified! Preparing your career workspace...</span>
+              </motion.div>
+            )}
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
               {/* Email */}
               <Input
@@ -105,24 +159,6 @@ export function LoginPage() {
                 </div>
               </div>
 
-              {/* Reviewer / Evaluator Demo Credentials Auto-Fill */}
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground bg-muted/40 px-3 py-2 rounded-xl border border-border/60">
-                <span className="flex items-center gap-1.5 font-medium text-foreground">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>Reviewer Account:</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setValue('email', 'aarav.dev@jobachiever.ai', { shouldValidate: true });
-                    setValue('password', 'Password123!', { shouldValidate: true });
-                  }}
-                  className="font-mono text-primary hover:underline font-semibold text-[11px]"
-                >
-                  aarav.dev@jobachiever.ai (Auto-fill)
-                </button>
-              </div>
-
               {/* Remember Me & Forgot Password Row */}
               <div className="flex items-center justify-between text-xs pt-1">
                 <label className="flex items-center gap-2 text-muted-foreground cursor-pointer select-none">
@@ -145,19 +181,25 @@ export function LoginPage() {
               {/* Submit */}
               <Button
                 type="submit"
-                variant="ai"
+                variant={authStatus === 'success' ? 'success' : 'ai'}
                 size="lg"
                 isLoading={isLoading}
                 loadingText="Verifying Credentials..."
                 className="w-full gap-2 font-semibold shadow-glow-sm"
               >
-                <span>Sign In</span>
-                <ArrowRight className="h-4 w-4" />
+                {authStatus === 'success' ? (
+                  <>
+                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                    <span>Verified! Launching...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </Button>
             </form>
-
-            {/* Social Auth Option */}
-            <SocialAuthButtons action="Sign in" />
           </CardContent>
 
           <CardFooter className="pt-2 border-t border-border/50 text-center text-xs text-muted-foreground justify-center">

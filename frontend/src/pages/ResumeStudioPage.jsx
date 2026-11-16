@@ -13,7 +13,7 @@ import { JobTailorModal } from '../features/studio/components/job/JobTailorModal
 import { StudioVersionModal } from '../features/studio/components/versions/StudioVersionModal';
 
 function ResumeStudioContent() {
-  const { activeMobileTab, setActiveMobileTab } = useResumeStudio();
+  const { activeMobileTab, setActiveMobileTab, showDesignPanel } = useResumeStudio();
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-background">
@@ -76,11 +76,11 @@ function ResumeStudioContent() {
           <CenterPreviewPanel />
         </div>
 
-        {/* Right Panel: Design & Templates */}
+        {/* Right Panel: Design & Templates (Collapsible on Desktop) */}
         <div
           className={`${
             activeMobileTab === 'right' ? 'flex' : 'hidden'
-          } lg:flex h-full shrink-0`}
+          } ${showDesignPanel ? 'lg:flex' : 'lg:hidden'} h-full shrink-0 transition-all border-l border-border z-10 shadow-lg`}
         >
           <RightDesignPanel />
         </div>

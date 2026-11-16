@@ -17,7 +17,7 @@ export function WelcomeBanner() {
     : 'Candidate';
 
   const primaryTrack =
-    profile.careerTracks.find((t) => t.isPrimary) || profile.careerTracks[0];
+    profile.careerTracks?.find((t) => t.isPrimary) || profile.careerTracks?.[0];
 
   const getGreeting = () => {
     const hour = new Date().getHours();

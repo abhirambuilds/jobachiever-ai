@@ -1,4 +1,5 @@
 import { WelcomeBanner } from '@/features/dashboard/components/WelcomeBanner';
+import { ResumeActivationBanner } from '@/features/dashboard/components/ResumeActivationBanner';
 import { CareerOverviewCards } from '@/features/dashboard/components/CareerOverviewCards';
 import { QuickActionGrid } from '@/features/dashboard/components/QuickActionGrid';
 import { CareerTrackSummary } from '@/features/dashboard/components/CareerTrackSummary';
@@ -11,6 +12,9 @@ export function DashboardPage() {
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       {/* Personalized Welcome Banner */}
       <WelcomeBanner />
+
+      {/* Single Source of Truth Resume Activation & Multi-Persona Switcher */}
+      <ResumeActivationBanner />
 
       {/* High-Level Career Metric Cards */}
       <CareerOverviewCards />

@@ -5,7 +5,7 @@ import {
   Compass,
   Target,
   UserCheck,
-  GraduationCap,
+  Bot,
   ArrowRight,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -58,13 +58,13 @@ const actions = [
     badge: 'Source of Truth',
   },
   {
-    id: 'mock-interview',
-    title: 'Practice Interviews',
-    description: 'Rehearse STAR behavioral questions and deep-dive technical queries.',
-    icon: GraduationCap,
-    color: 'from-rose-500/20 to-red-500/10 text-rose-400 border-rose-500/30',
-    link: '/interviews',
-    badge: 'Interactive Mock',
+    id: 'ai-copilot',
+    title: 'AI Career Copilot',
+    description: 'Ask anything about jobs, market salaries, resume tips, or interview preparation.',
+    icon: Bot,
+    color: 'from-violet-500/20 to-purple-500/10 text-violet-400 border-violet-500/30',
+    link: '/copilot',
+    badge: 'Groq Realtime',
   },
 ];
 

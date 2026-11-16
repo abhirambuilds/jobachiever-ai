@@ -176,7 +176,7 @@ export function ProfilePage({ initialTab = 'master' }) {
                   </span>
                   <p className="text-[11px] leading-relaxed">
                     Update a project or job milestone once, and it instantly syncs across all your
-                    targeted tracks, cover letters, and web portfolios.
+                    targeted tracks, tailored ATS resumes, and matching pipelines.
                   </p>
                 </div>
 

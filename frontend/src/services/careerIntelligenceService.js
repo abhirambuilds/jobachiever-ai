@@ -323,10 +323,215 @@ export const careerIntelligenceService = {
 };
 
 // -----------------------------------------------------------------------------
-// Offline Simulation Helpers
+// Offline Simulation Helpers & Multi-Resume Scenario Adaptation
 // -----------------------------------------------------------------------------
 
+export function getActiveResumeScenario() {
+  if (typeof localStorage === 'undefined') return 'BACKEND';
+  try {
+    const activeResumeRaw = localStorage.getItem('jobachiever_active_resume') || '';
+    const rLower = (typeof activeResumeRaw === 'string' ? activeResumeRaw : JSON.stringify(activeResumeRaw)).toLowerCase();
+    if (rLower.includes('rohan') || rLower.includes('frontend') || rLower.includes('react')) return 'FRONTEND';
+    if (rLower.includes('vikram') || rLower.includes('ai') || rLower.includes('data') || rLower.includes('ml')) return 'AI_ML';
+    if (rLower.includes('ananya') || rLower.includes('backend') || rLower.includes('cloud')) return 'BACKEND';
+
+    const rawUser = localStorage.getItem('jobachiever_user');
+    const user = rawUser ? JSON.parse(rawUser) : null;
+    if (user) {
+      const userResumesKey = `jobachiever_user_resumes_${user.id || user.email}`;
+      const resumes = JSON.parse(localStorage.getItem(userResumesKey) || '[]');
+      if (resumes.length > 0) {
+        const topName = (resumes[0].name || resumes[0].title || '').toLowerCase();
+        if (topName.includes('rohan') || topName.includes('frontend') || topName.includes('react')) return 'FRONTEND';
+        if (topName.includes('vikram') || topName.includes('ai') || topName.includes('data') || topName.includes('ml')) return 'AI_ML';
+        if (topName.includes('ananya') || topName.includes('backend') || topName.includes('cloud')) return 'BACKEND';
+      }
+    }
+
+    const draft = localStorage.getItem('jobachiever_profile_draft') || '';
+    const dLower = draft.toLowerCase();
+    if (dLower.includes('rohan') || dLower.includes('frontend')) return 'FRONTEND';
+    if (dLower.includes('vikram') || dLower.includes('data science') || dLower.includes('pytorch')) return 'AI_ML';
+  } catch {
+    // fallback
+  }
+  return 'BACKEND';
+}
+
 function simulateSkillGapAnalysis(targetRole, trackId) {
+  const scenario = getActiveResumeScenario();
+
+  if (scenario === 'FRONTEND') {
+    const demonstrated = [
+      {
+        canonicalName: 'React 19',
+        category: 'TECHNICAL',
+        classification: 'STRONG',
+        evidenceStatus: 'CONFIRMED',
+        priorityScore: 95,
+        priorityLevel: 'HIGH',
+        importanceRationale: 'Primary web application UI framework with Concurrent React and Server Components',
+        requiredForRoles: [targetRole || 'Senior Frontend Engineer'],
+        prerequisites: [],
+        candidateEvidence: ['Confirmed profile skill: React 19', 'Production usage in checkout micro-frontends'],
+      },
+      {
+        canonicalName: 'TypeScript',
+        category: 'TECHNICAL',
+        classification: 'STRONG',
+        evidenceStatus: 'CONFIRMED',
+        priorityScore: 92,
+        priorityLevel: 'HIGH',
+        importanceRationale: 'Type-safe enterprise architectural foundations',
+        requiredForRoles: [targetRole || 'Senior Frontend Engineer'],
+        prerequisites: ['JavaScript'],
+        candidateEvidence: ['Extensively used across Swiggy consumer web applications'],
+      },
+    ];
+
+    const developing = [
+      {
+        canonicalName: 'Zustand & React Query',
+        category: 'TECHNICAL',
+        classification: 'DEVELOPING',
+        evidenceStatus: 'EVIDENCED',
+        priorityScore: 82,
+        priorityLevel: 'HIGH',
+        importanceRationale: 'Client-side async state caching and UI reactivity',
+        requiredForRoles: [targetRole || 'Senior Frontend Engineer'],
+        prerequisites: [],
+        candidateEvidence: ['Used in product filter workflows'],
+      },
+    ];
+
+    const missing = [
+      {
+        canonicalName: 'Core Web Vitals & Web Workers',
+        category: 'TECHNICAL',
+        classification: 'MISSING_EVIDENCE',
+        evidenceStatus: 'MISSING',
+        priorityScore: 94,
+        priorityLevel: 'CRITICAL',
+        importanceRationale: 'Sub-second LCP, INP, and off-main-thread computation at massive user scale',
+        requiredForRoles: [targetRole || 'Senior Frontend Engineer'],
+        prerequisites: ['Browser Rendering Engine'],
+        candidateEvidence: ['No production benchmark evidence in current profile'],
+      },
+      {
+        canonicalName: 'Module Federation (Micro-Frontends)',
+        category: 'TECHNICAL',
+        classification: 'MISSING_EVIDENCE',
+        evidenceStatus: 'MISSING',
+        priorityScore: 88,
+        priorityLevel: 'HIGH',
+        importanceRationale: 'Independent multi-team deployments without monolithic build bottlenecks',
+        requiredForRoles: [targetRole || 'Senior Frontend Engineer'],
+        prerequisites: ['Webpack 5 / Vite'],
+        candidateEvidence: ['Theoretical familiarity reported, need hands-on production repository'],
+      },
+    ];
+
+    return {
+      id: 'sim-gap-' + Date.now(),
+      careerTrackId: trackId,
+      targetRole: targetRole || 'Senior Frontend & Web Architect',
+      provider: 'GROQ',
+      model: 'openai/gpt-oss-120b',
+      summary: 'Demonstrated exceptional mastery in React 19 and TypeScript. Critical expansion areas center on Core Web Vitals performance budgets and Module Federation architecture.',
+      demonstratedSkills: demonstrated,
+      developingSkills: developing,
+      missingEvidenceSkills: missing,
+      criticalPriorities: [missing[0]],
+      allEvaluatedSkills: [...demonstrated, ...developing, ...missing],
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  if (scenario === 'AI_ML') {
+    const demonstrated = [
+      {
+        canonicalName: 'PyTorch & Python',
+        category: 'TECHNICAL',
+        classification: 'STRONG',
+        evidenceStatus: 'CONFIRMED',
+        priorityScore: 96,
+        priorityLevel: 'HIGH',
+        importanceRationale: 'Foundational framework for deep neural networks, embeddings, and model training',
+        requiredForRoles: [targetRole || 'Lead AI/ML Systems Engineer'],
+        prerequisites: [],
+        candidateEvidence: ['Evidenced across RAG pipelines and custom transformer fine-tuning at CRED'],
+      },
+      {
+        canonicalName: 'Retrieval-Augmented Generation (RAG)',
+        category: 'TECHNICAL',
+        classification: 'STRONG',
+        evidenceStatus: 'CONFIRMED',
+        priorityScore: 94,
+        priorityLevel: 'HIGH',
+        importanceRationale: 'Production LLM applications with hybrid semantic retrieval and contextual grounding',
+        requiredForRoles: [targetRole || 'Lead AI/ML Systems Engineer'],
+        prerequisites: ['Vector Embeddings'],
+        candidateEvidence: ['Deployed sub-50ms pgvector semantic query platform'],
+      },
+    ];
+
+    const developing = [
+      {
+        canonicalName: 'FastAPI & Docker',
+        category: 'TECHNICAL',
+        classification: 'DEVELOPING',
+        evidenceStatus: 'EVIDENCED',
+        priorityScore: 85,
+        priorityLevel: 'HIGH',
+        importanceRationale: 'Serving low-latency inference endpoints with asynchronous worker pools',
+        requiredForRoles: [targetRole || 'Lead AI/ML Systems Engineer'],
+        prerequisites: [],
+        candidateEvidence: ['Model wrapper microservice deployed on AWS'],
+      },
+    ];
+
+    const missing = [
+      {
+        canonicalName: 'LLM Quantization & AWQ/GGUF',
+        category: 'TECHNICAL',
+        classification: 'MISSING_EVIDENCE',
+        evidenceStatus: 'MISSING',
+        priorityScore: 95,
+        priorityLevel: 'CRITICAL',
+        importanceRationale: 'Cost-efficient 4-bit/8-bit deployment reducing VRAM consumption by 70% in production',
+        requiredForRoles: [targetRole || 'Lead AI/ML Systems Engineer'],
+        prerequisites: ['CUDA'],
+        candidateEvidence: ['No verifiable quantized inference serving benchmark in profile'],
+      },
+      {
+        canonicalName: 'LangGraph Multi-Agent Orchestration',
+        category: 'TECHNICAL',
+        classification: 'MISSING_EVIDENCE',
+        evidenceStatus: 'MISSING',
+        priorityScore: 90,
+        priorityLevel: 'HIGH',
+        importanceRationale: 'Cyclic state machines and multi-agent coordination for autonomous enterprise tasks',
+        requiredForRoles: [targetRole || 'Lead AI/ML Systems Engineer'],
+        prerequisites: ['LangChain'],
+        candidateEvidence: ['Currently using sequential chains, needs state-machine graph execution'],
+      },
+    ];
+
+    return {
+      id: 'sim-gap-' + Date.now(),
+      careerTrackId: trackId,
+      targetRole: targetRole || 'Lead AI/ML & LLM Systems Engineer',
+      provider: 'GROQ',
+      model: 'openai/gpt-oss-120b',
+      summary: 'High-caliber GenAI and RAG foundations. Key technical frontiers focus on 4-bit LLM quantization and LangGraph multi-agent state machines.',
+      demonstratedSkills: demonstrated,
+      developingSkills: developing,
+      missingEvidenceSkills: missing,
+      criticalPriorities: [missing[0]],
+      allEvaluatedSkills: [...demonstrated, ...developing, ...missing],
+      createdAt: new Date().toISOString(),
+    };
+  }
   const demonstrated = [
     {
       canonicalName: 'Java',
@@ -582,6 +787,58 @@ function simulateLearningRoadmap(targetRole, trackId) {
 }
 
 function simulateProjectRecommendations(targetRole, trackId) {
+  const scenario = getActiveResumeScenario();
+
+  if (scenario === 'FRONTEND') {
+    return {
+      careerTrackId: trackId,
+      targetRole: targetRole || 'Senior Frontend Architect',
+      provider: 'GROQ',
+      model: 'openai/gpt-oss-120b',
+      projects: [
+        {
+          title: 'PulseUI Enterprise Design System with WAI-ARIA & Zero-Runtime CSS',
+          description: 'Production-ready headless component system supporting micro-frontends with sub-100ms first input delay.',
+          targetMissingSkills: ['Module Federation', 'Core Web Vitals', 'Web Workers'],
+          architectureOverview: 'Turborepo monorepo with Vite build pipeline, Tailwind CSS design tokens, and Module Federation runtime integration.',
+          keyDeliverables: [
+            'Accessible combobox and modal dialogs with 100% keyboard and screen-reader compliance',
+            'Automated bundle size budgets enforcing <15KB gzipped per component',
+            'Module federation remote container published to private CDN',
+            'Playwright visual regression testing suite integrated with GitHub Actions',
+          ],
+          estimatedDifficulty: 'ADVANCED',
+          portfolioImpact: 'Provides definitive proof of design system architecture and web performance engineering matching Staff Frontend benchmarks.',
+        },
+      ],
+    };
+  }
+
+  if (scenario === 'AI_ML') {
+    return {
+      careerTrackId: trackId,
+      targetRole: targetRole || 'Lead AI/ML Systems Engineer',
+      provider: 'GROQ',
+      model: 'openai/gpt-oss-120b',
+      projects: [
+        {
+          title: 'OmniSearch Neural Vector Engine with Hybrid Re-ranking & Guardrails',
+          description: 'Sub-50ms hybrid dense/sparse vector retrieval system with hallucination mitigations and semantic caching.',
+          targetMissingSkills: ['LLM Quantization', 'LangGraph', 'pgvector'],
+          architectureOverview: 'FastAPI microservice with PyTorch embeddings, pgvector HNSW indexing, and Redis semantic cache layer.',
+          keyDeliverables: [
+            'Hybrid BM25 + dense embedding re-ranker achieving 0.94 Mean Reciprocal Rank',
+            'LangGraph state-machine router for complex multi-hop question answering',
+            '4-bit AWQ quantized model serving engine running on vLLM',
+            'Automated RAGAS evaluation harness tracking context precision and answer faithfulness',
+          ],
+          estimatedDifficulty: 'ADVANCED',
+          portfolioImpact: 'Demonstrates enterprise-grade generative AI orchestration, vector database mastery, and quantifiable model evaluation.',
+        },
+      ],
+    };
+  }
+
   return {
     careerTrackId: trackId,
     targetRole,

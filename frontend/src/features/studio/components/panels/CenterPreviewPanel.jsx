@@ -12,12 +12,14 @@ import {
   Sparkles,
   Wand2,
   Loader2,
+  Palette,
 } from 'lucide-react';
 import { useResumeStudio } from '../../context/ResumeStudioContext';
 import { ResumeRenderer } from '../ResumeRenderer';
 import { SimulatedResultBadge } from '@/components/demo';
 import { isDemoMode } from '@/demo/demoConfig';
 import { generateWritingAssistance } from '@/services/resumeStudioService';
+import { groqService } from '@/services/groqService';
 import { toast } from '@/components/ui/toast';
 import { Badge } from '@/components/ui/badge';
 
@@ -36,6 +38,8 @@ export function CenterPreviewPanel() {
     exportAsJson,
     versions,
     updateSectionData,
+    showDesignPanel,
+    setShowDesignPanel,
   } = useResumeStudio();
 
   const [promptText, setPromptText] = useState('');
@@ -48,29 +52,131 @@ export function CenterPreviewPanel() {
 
     setIsPrompting(true);
     try {
-      const summarySec = resume.sections?.find((s) => s.type === 'summary');
-      const currentSummary = summarySec?.data?.summaryText || '';
-
-      const res = await generateWritingAssistance({
-        action: 'IMPROVE_SUMMARY',
-        sourceText: currentSummary || `${resume.title || 'Candidate Resume'}. Targeted focus: ${query}`,
-        context: {
-          section: 'summary',
-          user_instruction: query,
-        },
-        writingMode: 'PROFESSIONAL',
-        provider: 'GROQ',
-      });
-
-      const suggestion = res.suggestions?.[0]?.suggestedText || res.suggestions?.[0]?.suggested_text;
-      if (suggestion) {
-        if (summarySec) {
-          updateSectionData(summarySec.id, { summaryText: suggestion });
+      // 1. Direct heuristic: change/update name
+      const nameMatch = query.match(/(?:change|set|update) (?:my )?name to ([\w\s.'-]+)/i);
+      if (nameMatch) {
+        const newName = nameMatch[1].trim();
+        const personalSec = resume.sections?.find(
+          (s) => s.type === 'personal' || s.type === 'personal_info' || s.id === 'sec-personal'
+        );
+        if (personalSec) {
+          updateSectionData(personalSec.id, {
+            ...personalSec.data,
+            fullName: newName,
+          });
         }
+        toast.success(`Candidate name updated to "${newName}"!`);
+        setPromptText('');
+        setIsPrompting(false);
+        return;
+      }
+
+      // 2. Direct heuristic: add skills
+      const skillsMatch = query.match(/(?:add|include) ([\w\s,+#/.-]+) to skills/i);
+      if (skillsMatch) {
+        const newSkillsStr = skillsMatch[1].trim();
+        const newSkills = newSkillsStr.split(/[,+]/).map((s) => s.trim()).filter(Boolean);
+        const skillsSec = resume.sections?.find((s) => s.type === 'skills');
+        if (skillsSec) {
+          const currentCategories = skillsSec.data?.categories || [];
+          if (currentCategories.length > 0) {
+            const updated = [...currentCategories];
+            updated[0] = {
+              ...updated[0],
+              skills: [...new Set([...(updated[0].skills || []), ...newSkills])],
+            };
+            updateSectionData(skillsSec.id, { ...skillsSec.data, categories: updated });
+          } else {
+            updateSectionData(skillsSec.id, {
+              ...skillsSec.data,
+              items: [...new Set([...(skillsSec.data?.items || []), ...newSkills])],
+            });
+          }
+        }
+        toast.success(`Added ${newSkills.join(', ')} to technical skills!`);
+        setPromptText('');
+        setIsPrompting(false);
+        return;
+      }
+
+      // 3. Live Groq AI Prompt Editing
+      const aiResponse = await groqService.chat([
+        {
+          role: 'system',
+          content: `You are an expert ATS Resume Editor for JobAchiever AI.
+The user wants to modify their resume with this instruction: "${query}".
+Return a strictly valid JSON object matching this schema:
+{
+  "name": string (null if not changing name),
+  "headline": string (null if not changing title/headline),
+  "summaryText": string (null if not changing or enhancing summary),
+  "addedSkills": string[] (empty array if not adding skills),
+  "message": string (concise explanation of what was updated)
+}
+Do not use markdown code block fencing. Return raw JSON only.`
+        },
+        { role: 'user', content: query }
+      ]);
+
+      let parsed = null;
+      try {
+        parsed = JSON.parse(aiResponse.replace(/```json/gi, '').replace(/```/g, '').trim());
+      } catch {}
+
+      if (parsed) {
+        let applied = false;
+        if (parsed.name || parsed.headline) {
+          const personalSec = resume.sections?.find(
+            (s) => s.type === 'personal' || s.type === 'personal_info' || s.id === 'sec-personal'
+          );
+          if (personalSec) {
+            updateSectionData(personalSec.id, {
+              ...personalSec.data,
+              ...(parsed.name ? { fullName: parsed.name } : {}),
+              ...(parsed.headline ? { headline: parsed.headline } : {}),
+            });
+            applied = true;
+          }
+        }
+
+        if (parsed.summaryText) {
+          const summarySec = resume.sections?.find((s) => s.type === 'summary');
+          if (summarySec) {
+            updateSectionData(summarySec.id, { summaryText: parsed.summaryText });
+            applied = true;
+          }
+        }
+
+        if (parsed.addedSkills && parsed.addedSkills.length > 0) {
+          const skillsSec = resume.sections?.find((s) => s.type === 'skills');
+          if (skillsSec) {
+            const currentCategories = skillsSec.data?.categories || [];
+            if (currentCategories.length > 0) {
+              const updated = [...currentCategories];
+              updated[0] = {
+                ...updated[0],
+                skills: [...new Set([...(updated[0].skills || []), ...parsed.addedSkills])],
+              };
+              updateSectionData(skillsSec.id, { ...skillsSec.data, categories: updated });
+            }
+            applied = true;
+          }
+        }
+
+        if (applied) {
+          toast.success(parsed.message || 'Resume modified live with Groq AI!');
+          setPromptText('');
+          return;
+        }
+      }
+
+      // 4. Default fallback: apply to summary
+      const summarySec = resume.sections?.find((s) => s.type === 'summary');
+      if (summarySec) {
+        const fallbackText = `${summarySec.data?.summaryText || ''} Specialized focus: ${query}.`;
+        updateSectionData(summarySec.id, { summaryText: fallbackText });
         toast.success('Resume updated live with Groq AI!');
         setPromptText('');
-      } else {
-        toast.info('AI analyzed request. Check the Writing Assistant for options.');
       }
     } catch (err) {
       toast.error(err.message || 'AI request could not be completed.');
@@ -144,6 +250,20 @@ export function CenterPreviewPanel() {
 
         {/* Right: Studio Action Buttons */}
         <div className="flex items-center gap-2">
+          {/* Templates & Design Drawer Toggle */}
+          <button
+            onClick={() => setShowDesignPanel(!showDesignPanel)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
+              showDesignPanel
+                ? 'bg-primary text-primary-foreground border-primary shadow-xs'
+                : 'bg-muted hover:bg-muted/80 text-foreground border-border'
+            }`}
+            title="Toggle ATS Templates, Fonts & Palette Studio"
+          >
+            <Palette className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Templates & Design</span>
+          </button>
+
           {/* Job Tailoring Shortcut */}
           <button
             onClick={() => setTailorModalOpen(true)}
@@ -167,17 +287,6 @@ export function CenterPreviewPanel() {
             </span>
           </button>
 
-          {/* Save Version Button */}
-          <button
-            onClick={() => saveCurrentVersion('Manual snapshot')}
-            disabled={isSaving}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border transition-colors"
-            title="Save new version snapshot"
-          >
-            <Save className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Save Version</span>
-          </button>
-
           {/* Print / Export Vector PDF */}
           <button
             onClick={handlePrint}
@@ -187,41 +296,32 @@ export function CenterPreviewPanel() {
             <Printer className="w-3.5 h-3.5" />
             <span>Export PDF</span>
           </button>
-
-          {/* Export JSON Schema */}
-          <button
-            onClick={exportAsJson}
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg border border-border transition-colors"
-            title="Download JSON data schema"
-          >
-            <FileCode className="w-3.5 h-3.5" />
-          </button>
         </div>
       </div>
 
       {/* Floating Interactive Groq Prompt Bar */}
-      <div className="px-4 py-2 bg-background/80 backdrop-blur-md border-b border-border/60 shrink-0">
-        <form onSubmit={handlePromptSubmit} className="max-w-3xl mx-auto flex items-center gap-2 bg-card/90 px-3 py-1.5 rounded-xl border border-primary/40 shadow-sm focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/30 transition-all">
-          <div className="flex items-center gap-1.5 text-primary text-xs font-semibold shrink-0">
-            <Sparkles className="w-3.5 h-3.5 animate-pulse text-indigo-500" />
-            <span className="hidden sm:inline">AI Prompt (Groq):</span>
+      <div className="px-4 py-2.5 bg-card/40 backdrop-blur-md border-b border-border/60 shrink-0">
+        <form onSubmit={handlePromptSubmit} className="max-w-4xl mx-auto flex items-center gap-2 bg-card px-3.5 py-2 rounded-xl border border-primary/40 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+          <div className="flex items-center gap-1.5 text-primary text-xs font-bold shrink-0">
+            <Sparkles className="w-4 h-4 text-indigo-500 animate-pulse" />
+            <span className="hidden sm:inline">AI Resume Copilot:</span>
           </div>
           <input
             type="text"
             value={promptText}
             onChange={(e) => setPromptText(e.target.value)}
-            placeholder="Type any prompt: e.g. Enhance summary for Senior Backend Engineer with Kafka and microservices..."
+            placeholder='Type prompt: e.g. "Change name to Abhiram Reddy" or "Add Kubernetes and Kafka to skills"'
             className="flex-1 bg-transparent border-0 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
           <button
             type="submit"
             disabled={isPrompting || !promptText.trim()}
-            className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 transition-colors shrink-0"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 transition-colors shrink-0 shadow-xs"
           >
             {isPrompting ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Generating...</span>
+                <span>Updating Resume...</span>
               </>
             ) : (
               <>
@@ -231,6 +331,32 @@ export function CenterPreviewPanel() {
             )}
           </button>
         </form>
+
+        {/* Quick Suggestion Chips */}
+        <div className="max-w-4xl mx-auto mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
+          <span className="font-semibold text-foreground/80">Try:</span>
+          <button
+            type="button"
+            onClick={() => setPromptText('Change name to Abhiram Reddy')}
+            className="px-2 py-0.5 rounded-full bg-muted/60 hover:bg-muted text-foreground/90 border border-border/60 transition-colors"
+          >
+            "Change name to Abhiram Reddy"
+          </button>
+          <button
+            type="button"
+            onClick={() => setPromptText('Add Kubernetes and Apache Kafka to skills')}
+            className="px-2 py-0.5 rounded-full bg-muted/60 hover:bg-muted text-foreground/90 border border-border/60 transition-colors"
+          >
+            "Add Kubernetes & Kafka"
+          </button>
+          <button
+            type="button"
+            onClick={() => setPromptText('Enhance summary for Senior Distributed Systems Engineer')}
+            className="px-2 py-0.5 rounded-full bg-muted/60 hover:bg-muted text-foreground/90 border border-border/60 transition-colors"
+          >
+            "Enhance executive summary"
+          </button>
+        </div>
       </div>
 
       {/* 2. Paper Canvas Workspace */}

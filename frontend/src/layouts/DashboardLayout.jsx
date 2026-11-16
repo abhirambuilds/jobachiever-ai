@@ -25,6 +25,7 @@ import {
   LogOut,
   Zap,
   RotateCcw,
+  MessageSquareCode,
 } from 'lucide-react';
 
 import { useProfile } from '@/hooks/useProfile';
@@ -49,6 +50,7 @@ import {
 import { Toaster, toast } from '@/components/ui/toast';
 import { DemoTourGuide } from '@/components/demo';
 import { demoService } from '@/demo/demoService';
+import { FloatingCopilotWidget } from '@/features/copilot/FloatingCopilotWidget';
 
 const navItems = [
   { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
@@ -61,10 +63,8 @@ const navItems = [
   { label: 'Job Discovery', path: '/jobs', icon: Compass },
   { label: 'Job Matching', path: '/job-matcher', icon: Target },
   { label: 'Applications', path: '/applications', icon: Kanban },
-  { label: 'Cover Letters', path: '/cover-letters', icon: FileSignature, upcoming: true },
-  { label: 'Portfolio', path: '/portfolio', icon: Globe, upcoming: true },
-  { label: 'Interview Prep', path: '/interviews', icon: GraduationCap, upcoming: true },
   { label: 'Career Intelligence', path: '/career-assistant', icon: Bot },
+  { label: 'AI Career Copilot', path: '/copilot', icon: MessageSquareCode, badge: 'Groq' },
   { label: 'Settings', path: '/settings/ai', icon: Settings },
 ];
 
@@ -519,6 +519,7 @@ export function DashboardLayout() {
         </div>
       </div>
       <DemoTourGuide />
+      <FloatingCopilotWidget />
       </div>
       <Toaster position="top-right" richColors closeButton />
     </TooltipProvider>

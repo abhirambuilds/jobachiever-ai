@@ -17,60 +17,25 @@ export const dashboardService = {
    * Target endpoint: GET /api/v1/dashboard/recent-activity
    */
   async getRecentActivity() {
-    if (isDemoMode()) {
+    const rawUser = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_user') : null;
+    const user = rawUser ? JSON.parse(rawUser) : null;
+    const isAarav = user?.email?.toLowerCase().includes('aarav') || isDemoMode();
+
+    if (isAarav) {
       return demoService.getDashboardActivities();
     }
-    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    await new Promise((resolve) => setTimeout(resolve, 150));
     return [
       {
-        id: 'act-1',
-        type: 'resume_analyzed',
-        title: 'Master Resume Analyzed',
-        description: 'ATS structural score calculated at 94%. Zero formatting flaws detected.',
-        timestamp: '2 hours ago',
-        icon: 'FileSearch',
-        badge: 'Score: 94%',
-        badgeVariant: 'success',
-      },
-      {
-        id: 'act-2',
+        id: 'act-new-1',
         type: 'profile_updated',
-        title: 'Master Profile Updated',
-        description: 'Added 2 new skills in Databases category: PostgreSQL & pgvector.',
-        timestamp: '5 hours ago',
+        title: 'Master Account Initialized',
+        description: 'Master Career Profile workspace created and synchronized with PostgreSQL database.',
+        timestamp: 'Just now',
         icon: 'UserCheck',
-        badge: 'Verified',
+        badge: 'Active',
         badgeVariant: 'outline',
-      },
-      {
-        id: 'act-3',
-        type: 'job_saved',
-        title: 'Opportunity Bookmarked',
-        description: 'Saved "Senior Platform Engineer" at Razorpay (Bengaluru, KA).',
-        timestamp: '1 day ago',
-        icon: 'Bookmark',
-        badge: 'Wishlisted',
-        badgeVariant: 'secondary',
-      },
-      {
-        id: 'act-4',
-        type: 'cover_letter_generated',
-        title: 'Tailored Cover Letter Drafted',
-        description: 'Drafted role-specific letter aligned with Backend Developer track.',
-        timestamp: '2 days ago',
-        icon: 'FileText',
-        badge: 'Draft Ready',
-        badgeVariant: 'ai',
-      },
-      {
-        id: 'act-5',
-        type: 'application_moved',
-        title: 'Application Stage Advanced',
-        description: 'Cloud Infrastructure Engineer role moved to "Technical Screen".',
-        timestamp: '3 days ago',
-        icon: 'TrendingUp',
-        badge: 'Interview',
-        badgeVariant: 'primary',
       },
     ];
   },
@@ -153,13 +118,13 @@ export const dashboardService = {
       return [
         {
           id: 'demo-ins-3',
-          category: 'Active Interview Prep',
+          category: 'AI Career Advisory',
           title: 'Technical Screen Scheduled: Stripe Core Platform',
-          description: 'Practice STAR behavioral and Java 21 concurrency questions before your interview on Thursday.',
-          actionLabel: 'Inspect Match Insights',
-          actionRoute: '/job-match',
-          badge: '91% Match',
-          badgeVariant: 'success',
+          description: 'Ask AI Copilot for deep-dive questions and Java 21 concurrency review before your interview.',
+          actionLabel: 'Open AI Copilot',
+          actionRoute: '/copilot',
+          badge: 'Copilot Ready',
+          badgeVariant: 'ai',
         },
         {
           id: 'demo-ins-1',
@@ -209,14 +174,14 @@ export const dashboardService = {
       },
       {
         id: 'ins-3',
-        category: 'Interview Preparation',
-        title: 'Practice STAR Behavioral Responses for System Outages',
+        category: 'AI Career Advisory',
+        title: 'Engage AI Copilot for Technical & Behavioral Preparation',
         description:
-          'Your active interviews are approaching technical and architecture screening stages. Practice 3 common incident response scenarios.',
-        actionLabel: 'Start Mock Rehearsal',
-        actionRoute: '/interviews',
-        badge: 'Interview Prep',
-        badgeVariant: 'default',
+          'Get real-time answers, STAR method frameworks, and salary negotiation insights powered by Groq LPUs.',
+        actionLabel: 'Launch Copilot',
+        actionRoute: '/copilot',
+        badge: 'Copilot Active',
+        badgeVariant: 'ai',
       },
     ];
   },

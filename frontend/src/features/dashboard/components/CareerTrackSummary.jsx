@@ -31,8 +31,27 @@ export function CareerTrackSummary() {
       </CardHeader>
 
       <CardContent className="p-5 space-y-3.5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          {tracks.map((track) => {
+        {tracks.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border/80 p-8 text-center space-y-3 bg-muted/10">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Layers className="h-5 w-5" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-foreground">No Career Tracks Configured Yet</h4>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                Define your target role (e.g. Full-Stack Engineer, Backend Developer) to anchor AI matching, gap analysis, and tailored resumes.
+              </p>
+            </div>
+            <Link to="/career-tracks">
+              <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                <Plus className="h-3.5 w-3.5 text-primary" />
+                <span>Create Your First Career Track</span>
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            {tracks.map((track) => {
             const isPrimary = track.isPrimary;
             const mappedSkills = track.skills || track.relevantSkills || [];
 
@@ -102,20 +121,6 @@ export function CareerTrackSummary() {
             );
           })}
         </div>
-
-        {tracks.length === 0 && (
-          <div className="p-6 text-center border border-dashed border-border/70 rounded-xl space-y-2">
-            <Layers className="h-8 w-8 text-muted-foreground mx-auto" />
-            <p className="text-sm font-semibold text-foreground">No Career Tracks Configured</p>
-            <p className="text-xs text-muted-foreground">
-              Define your first career persona in the Master Career Profile.
-            </p>
-            <Link to="/profile">
-              <Button size="sm" variant="ai" className="mt-2 text-xs">
-                Create First Track
-              </Button>
-            </Link>
-          </div>
         )}
       </CardContent>
     </Card>

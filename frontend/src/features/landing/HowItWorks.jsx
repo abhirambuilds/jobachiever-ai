@@ -27,16 +27,16 @@ const steps = [
     title: 'Prepare With AI',
     headline: 'Analyze job descriptions & generate tailored applications',
     description:
-      'Deconstruct job descriptions down to core skills. Calculate your explainable compatibility score (0-100%) and generate targeted ATS resumes and tailored cover letters grounded strictly in truth.',
+      'Deconstruct job descriptions down to core skills. Calculate your explainable compatibility score (0-100%) and generate targeted ATS resumes with real-time prompt editing grounded strictly in truth.',
     icon: Sparkles,
     tag: 'Zero Fabrication',
   },
   {
     step: '04',
     title: 'Track Your Progress',
-    headline: 'Organize applications & prepare for interviews',
+    headline: 'Organize applications & leverage AI advisory',
     description:
-      'Track every application stage on an interactive Kanban board. Access role-specific interview question banks, simulate behavioral rounds using the STAR method, and evaluate offers.',
+      'Track every application stage on an interactive Kanban board. Use the AI Career Copilot for continuous advice, strategic roadmap planning, and salary insights.',
     icon: Trophy,
     tag: 'Offer Readiness',
   },

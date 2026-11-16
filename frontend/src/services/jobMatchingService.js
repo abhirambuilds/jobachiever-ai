@@ -13,6 +13,7 @@
 
 import { isDemoMode } from '@/demo/demoConfig';
 import { demoService } from '@/demo/demoService';
+import { groqService } from '@/services/groqService';
 
 export const API_BASE_URL =
   (typeof import.meta !== 'undefined' &&
@@ -869,8 +870,27 @@ export const jobMatchingService = {
     ];
 
     for (const step of steps) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 80));
       onProgress(step.progress, step.message);
+    }
+
+    try {
+      const resumeText = resume?.rawText || resume?.summary || `${resume?.name || 'Candidate'} with skills in Java, React, Cloud, Distributed Systems`;
+      const jdText = jobDetails?.text || jobDetails?.rawDescription || `${jobDetails?.title || 'Engineer'} at ${jobDetails?.company || 'Tech Leader'}`;
+      const groqMatch = await groqService.matchResumeToJob(resumeText, jdText);
+      if (groqMatch && groqMatch.overallMatch) {
+        const base = buildSimulatedMatchAnalysis(resume, jobDetails);
+        base.scores.overall = groqMatch.overallMatch;
+        base.scores.skills = groqMatch.skillsMatch || base.scores.skills;
+        base.scores.experience = groqMatch.experienceMatch || base.scores.experience;
+        base.executiveSummary = `${groqMatch.verdict}: ${groqMatch.seniorityAssessment || base.executiveSummary}`;
+        base.provider = 'GROQ';
+        base.model = 'openai/gpt-oss-120b';
+        onProgress(100, 'Hybrid Groq matching complete!');
+        return base;
+      }
+    } catch {
+      // fallback
     }
 
     return buildSimulatedMatchAnalysis(resume, jobDetails);

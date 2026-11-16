@@ -57,6 +57,7 @@ export function ResumeStudioProvider({ children }) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState('center'); // 'left' | 'center' | 'right'
+  const [showDesignPanel, setShowDesignPanel] = useState(false); // Collapsible design drawer on desktop
 
   // Modal dialog states
   const [editingSection, setEditingSection] = useState(null);
@@ -376,6 +377,8 @@ export function ResumeStudioProvider({ children }) {
     handlePrint,
     exportAsJson,
     tracks,
+    showDesignPanel,
+    setShowDesignPanel,
   };
 
   return (

@@ -7,6 +7,38 @@ import { careerTrackService } from '@/services/careerTrackService';
 const STORAGE_KEY = 'jobachiever_profile_draft';
 const DEMO_STORAGE_KEY = 'jobachiever_demo_profile_draft';
 
+export const EMPTY_PROFILE = {
+  personalInfo: {
+    fullName: '',
+    headline: '',
+    email: '',
+    phone: '',
+    city: '',
+    country: 'India',
+    linkedinUrl: '',
+    githubUrl: '',
+    portfolioUrl: '',
+    websiteUrl: '',
+    summary: '',
+  },
+  education: [],
+  experience: [],
+  skills: [],
+  projects: [],
+  certifications: [],
+  achievements: [],
+  careerTracks: [],
+  careerPreferences: {
+    targetRoles: [],
+    targetLocations: [],
+    minBaseSalary: 0,
+    targetCtc: 0,
+    currency: 'INR',
+    workplaceType: 'HYBRID',
+    careerGoals: '',
+  },
+};
+
 const DEFAULT_PROFILE = DEMO_PROFILE;
 
 function getInitialProfile() {
@@ -21,7 +53,33 @@ function getInitialProfile() {
     }
     return DEMO_PROFILE;
   }
+
   try {
+    const rawUser = localStorage.getItem('jobachiever_user');
+    const user = rawUser ? JSON.parse(rawUser) : null;
+    const isAarav = user?.email?.toLowerCase().includes('aarav');
+
+    if (user) {
+      const userKey = `${STORAGE_KEY}_${user.id || user.email}`;
+      const saved = localStorage.getItem(userKey);
+      if (saved) return JSON.parse(saved);
+
+      if (isAarav) {
+        return DEMO_PROFILE;
+      }
+
+      // Return clean empty profile for new candidate account
+      const fullName = (user.name || `${user.firstName || ''} ${user.lastName || ''}`).trim();
+      return {
+        ...EMPTY_PROFILE,
+        personalInfo: {
+          ...EMPTY_PROFILE.personalInfo,
+          fullName: fullName || 'New User',
+          email: user.email || '',
+        },
+      };
+    }
+
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       return JSON.parse(saved);
@@ -41,8 +99,16 @@ export function ProfileProvider({ children }) {
   // Load from real database if user is authenticated with a valid JWT
   useEffect(() => {
     const fetchDbProfile = async () => {
+      const rawUser = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_user') : null;
+      const user = rawUser ? JSON.parse(rawUser) : null;
+      if (!user && !isDemoMode()) {
+        return;
+      }
+
       try {
         const res = await profileService.getProfile();
+        const isAarav = user?.email?.toLowerCase().includes('aarav') || isDemoMode();
+
         if (res?.source === 'database' && res.data) {
           const d = res.data;
           setProfile((prev) => ({
@@ -50,23 +116,23 @@ export function ProfileProvider({ children }) {
             personalInfo: {
               ...prev.personalInfo,
               fullName: d.personalInfo?.fullName || `${d.firstName || ''} ${d.lastName || ''}`.trim() || prev.personalInfo.fullName,
-              headline: d.headline || d.personalInfo?.headline || prev.personalInfo.headline,
+              headline: d.headline || d.personalInfo?.headline || (isAarav ? prev.personalInfo.headline : ''),
               email: d.email || prev.personalInfo.email,
-              phone: d.phoneNumber || d.personalInfo?.phone || prev.personalInfo.phone,
-              city: d.currentLocation || d.personalInfo?.city || prev.personalInfo.city,
-              country: d.country || d.personalInfo?.country || prev.personalInfo.country,
-              linkedinUrl: d.linkedinUrl || d.personalInfo?.linkedinUrl || prev.personalInfo.linkedinUrl,
-              githubUrl: d.githubUrl || d.personalInfo?.githubUrl || prev.personalInfo.githubUrl,
-              portfolioUrl: d.portfolioUrl || d.personalInfo?.portfolioUrl || prev.personalInfo.portfolioUrl,
-              websiteUrl: d.websiteUrl || d.personalInfo?.websiteUrl || prev.personalInfo.websiteUrl,
-              summary: d.summary || d.personalInfo?.summary || prev.personalInfo.summary,
+              phone: d.phoneNumber || d.personalInfo?.phone || (isAarav ? prev.personalInfo.phone : ''),
+              city: d.currentLocation || d.personalInfo?.city || (isAarav ? prev.personalInfo.city : ''),
+              country: d.country || d.personalInfo?.country || 'India',
+              linkedinUrl: d.linkedinUrl || d.personalInfo?.linkedinUrl || (isAarav ? prev.personalInfo.linkedinUrl : ''),
+              githubUrl: d.githubUrl || d.personalInfo?.githubUrl || (isAarav ? prev.personalInfo.githubUrl : ''),
+              portfolioUrl: d.portfolioUrl || d.personalInfo?.portfolioUrl || (isAarav ? prev.personalInfo.portfolioUrl : ''),
+              websiteUrl: d.websiteUrl || d.personalInfo?.websiteUrl || (isAarav ? prev.personalInfo.websiteUrl : ''),
+              summary: d.summary || d.personalInfo?.summary || (isAarav ? prev.personalInfo.summary : ''),
             },
-            skills: d.skills && d.skills.length > 0 ? d.skills : prev.skills,
-            experience: d.experiences && d.experiences.length > 0 ? d.experiences : (d.experience && d.experience.length > 0 ? d.experience : prev.experience),
-            education: d.educations && d.educations.length > 0 ? d.educations : (d.education && d.education.length > 0 ? d.education : prev.education),
-            projects: d.projects && d.projects.length > 0 ? d.projects : prev.projects,
-            certifications: d.certifications && d.certifications.length > 0 ? d.certifications : prev.certifications,
-            achievements: d.achievements && d.achievements.length > 0 ? d.achievements : prev.achievements,
+            skills: d.skills && d.skills.length > 0 ? d.skills : (isAarav ? prev.skills : []),
+            experience: d.experiences && d.experiences.length > 0 ? d.experiences : (d.experience && d.experience.length > 0 ? d.experience : (isAarav ? prev.experience : [])),
+            education: d.educations && d.educations.length > 0 ? d.educations : (d.education && d.education.length > 0 ? d.education : (isAarav ? prev.education : [])),
+            projects: d.projects && d.projects.length > 0 ? d.projects : (isAarav ? prev.projects : []),
+            certifications: d.certifications && d.certifications.length > 0 ? d.certifications : (isAarav ? prev.certifications : []),
+            achievements: d.achievements && d.achievements.length > 0 ? d.achievements : (isAarav ? prev.achievements : []),
           }));
         }
       } catch (e) {
@@ -75,6 +141,10 @@ export function ProfileProvider({ children }) {
 
       try {
         const tracks = await careerTrackService.listTracks();
+        const rawUser = localStorage.getItem('jobachiever_user');
+        const user = rawUser ? JSON.parse(rawUser) : null;
+        const isAarav = user?.email?.toLowerCase().includes('aarav') || isDemoMode();
+
         if (tracks && tracks.length > 0) {
           setProfile((prev) => ({
             ...prev,
@@ -90,6 +160,11 @@ export function ProfileProvider({ children }) {
               isPrimary: !!t.isPrimary,
             })),
           }));
+        } else if (!isAarav) {
+          setProfile((prev) => ({
+            ...prev,
+            careerTracks: [],
+          }));
         }
       } catch (e) {
         // ignore
@@ -104,7 +179,13 @@ export function ProfileProvider({ children }) {
   // Persist draft in localStorage and debounce sync to PostgreSQL database
   useEffect(() => {
     try {
-      const currentKey = isDemoMode() ? DEMO_STORAGE_KEY : STORAGE_KEY;
+      const rawUser = localStorage.getItem('jobachiever_user');
+      const user = rawUser ? JSON.parse(rawUser) : null;
+      const currentKey = isDemoMode()
+        ? DEMO_STORAGE_KEY
+        : user?.id || user?.email
+        ? `${STORAGE_KEY}_${user.id || user.email}`
+        : STORAGE_KEY;
       localStorage.setItem(currentKey, JSON.stringify(profile));
     } catch {
       // ignore write errors
