@@ -10,6 +10,9 @@
  * and best practices, and do NOT guarantee shortlisting or hiring probability.
  */
 
+import { isDemoMode } from '@/demo/demoConfig';
+import { demoService } from '@/demo/demoService';
+
 export const AI_SERVICE_API_BASE =
   (typeof import.meta !== 'undefined' &&
     (import.meta.env?.VITE_AI_SERVICE_BASE_URL || import.meta.env?.VITE_API_BASE_URL)) ||
@@ -672,6 +675,16 @@ export const resumeAnalysisService = {
    * Target endpoint: POST /api/v1/resumes/{resumeId}/analyze
    */
   async analyzeResume(resume, config = {}, onProgress = () => {}) {
+    if (isDemoMode()) {
+      onProgress(25, 'Loading demo document structure (Alex Morgan)...');
+      await new Promise((r) => setTimeout(r, 120));
+      onProgress(60, 'Evaluating ATS readability and STAR metric coverage...');
+      await new Promise((r) => setTimeout(r, 120));
+      onProgress(90, 'Synthesizing explainable rubric report...');
+      const demoResult = await demoService.getResumeAnalysis(resume.id || resume.documentId);
+      onProgress(100, 'Demo analysis complete!');
+      return demoResult;
+    }
     onProgress(15, 'Preparing document and resolving AI provider preferences...');
     const token = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_jwt_token') : null;
     const resumeId = resume.id || resume.documentId;

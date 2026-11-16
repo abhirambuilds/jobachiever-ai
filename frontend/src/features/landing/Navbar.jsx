@@ -4,6 +4,7 @@ import { Sparkles, Menu, X, ArrowRight, Layers, UserCheck, LayoutDashboard } fro
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { DemoLaunchCard } from '@/components/demo';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -114,6 +115,8 @@ export function Navbar() {
 
           <ThemeToggle className="h-9 w-9" />
 
+          <DemoLaunchCard variant="button" className="hidden md:inline-flex" />
+
           <Link to="/login" className="hidden sm:inline-block">
             <Button variant="ghost" size="sm" className="text-sm">
               Sign In
@@ -193,17 +196,20 @@ export function Navbar() {
               <Layers className="h-4 w-4" />
               <span>Design System Showcase</span>
             </Link>
-            <div className="pt-2 border-t border-border/50 flex gap-2">
-              <Link to="/login" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="outline" size="sm" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/register" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="ai" size="sm" className="w-full">
-                  Get Started
-                </Button>
-              </Link>
+            <div className="pt-2 border-t border-border/50 flex flex-col gap-2">
+              <DemoLaunchCard variant="button" className="w-full justify-center" />
+              <div className="flex gap-2">
+                <Link to="/login" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="outline" size="sm" className="w-full">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/register" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="ai" size="sm" className="w-full">
+                    Get Started
+                  </Button>
+                </Link>
+              </div>
             </div>
           </nav>
         </div>

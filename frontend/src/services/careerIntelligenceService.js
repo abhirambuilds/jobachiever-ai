@@ -5,6 +5,9 @@
  * Milestone Progress Tracking, and Portfolio Project Recommendations.
  */
 
+import { isDemoMode } from '@/demo/demoConfig';
+import { demoService } from '@/demo/demoService';
+
 export const CAREER_API_BASE =
   (typeof import.meta !== 'undefined' &&
     (import.meta.env?.VITE_API_BASE_URL || import.meta.env?.VITE_AI_SERVICE_BASE_URL)) ||
@@ -26,6 +29,9 @@ export const careerIntelligenceService = {
    * POST /api/v1/career/skill-gaps
    */
   async analyzeSkillGaps(params = {}) {
+    if (isDemoMode()) {
+      return demoService.getSkillGaps(params.careerTrackId || params.trackId);
+    }
     const url = `${CAREER_API_BASE}/career/skill-gaps`;
     const payload = {
       careerTrackId: params.careerTrackId || params.trackId,
@@ -63,6 +69,9 @@ export const careerIntelligenceService = {
    * GET /api/v1/career/skill-gaps?trackId={trackId}
    */
   async getLatestSkillGaps(trackId) {
+    if (isDemoMode()) {
+      return demoService.getSkillGaps(trackId);
+    }
     if (!trackId) return null;
     const url = `${CAREER_API_BASE}/career/skill-gaps?trackId=${encodeURIComponent(trackId)}`;
 
@@ -146,6 +155,9 @@ export const careerIntelligenceService = {
    * POST /api/v1/career/roadmaps
    */
   async generateRoadmap(params = {}) {
+    if (isDemoMode()) {
+      return demoService.getRoadmap(params.careerTrackId || params.trackId);
+    }
     const url = `${CAREER_API_BASE}/career/roadmaps`;
     const payload = {
       careerTrackId: params.careerTrackId || params.trackId,
@@ -182,6 +194,9 @@ export const careerIntelligenceService = {
    * GET /api/v1/career/roadmaps?trackId={trackId}
    */
   async getActiveRoadmap(trackId) {
+    if (isDemoMode()) {
+      return demoService.getRoadmap(trackId);
+    }
     if (!trackId) return null;
     const url = `${CAREER_API_BASE}/career/roadmaps?trackId=${encodeURIComponent(trackId)}`;
 
@@ -225,6 +240,9 @@ export const careerIntelligenceService = {
    * PATCH /api/v1/career/milestones/{milestoneId}
    */
   async updateMilestone(milestoneId, updates = {}) {
+    if (isDemoMode()) {
+      return demoService.updateMilestoneStatus(milestoneId, updates.status || 'IN_PROGRESS');
+    }
     const url = `${CAREER_API_BASE}/career/milestones/${encodeURIComponent(milestoneId)}`;
 
     try {
@@ -259,6 +277,9 @@ export const careerIntelligenceService = {
    * POST /api/v1/career/projects?trackId={trackId}
    */
   async recommendProjects(trackId) {
+    if (isDemoMode()) {
+      return { projects: await demoService.getProjectBlueprints() };
+    }
     if (!trackId) return null;
     const url = `${CAREER_API_BASE}/career/projects?trackId=${encodeURIComponent(trackId)}`;
 
@@ -286,6 +307,9 @@ export const careerIntelligenceService = {
    * GET /api/v1/career/dashboard-summary
    */
   async getDashboardSummary() {
+    if (isDemoMode()) {
+      return demoService.getDashboardSummary();
+    }
     const url = `${CAREER_API_BASE}/career/dashboard-summary`;
 
     try {

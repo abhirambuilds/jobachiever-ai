@@ -11,6 +11,9 @@
  * not probabilities of selection or guarantees of an interview.
  */
 
+import { isDemoMode } from '@/demo/demoConfig';
+import { demoService } from '@/demo/demoService';
+
 export const API_BASE_URL =
   (typeof import.meta !== 'undefined' &&
     (import.meta.env?.VITE_AI_SERVICE_BASE_URL || import.meta.env?.VITE_API_BASE_URL)) ||
@@ -827,6 +830,17 @@ export const jobMatchingService = {
    * Perform intelligent matching between a resume and a job description
    */
   async matchResumeToJob(resume, jobDetails, onProgress = () => {}) {
+    if (isDemoMode()) {
+      onProgress(25, 'Matching verified candidate competencies (Alex Morgan)...');
+      await new Promise((r) => setTimeout(r, 120));
+      onProgress(60, 'Evaluating mandatory and preferred skill alignment...');
+      await new Promise((r) => setTimeout(r, 120));
+      onProgress(90, 'Generating explainable evidence mapping & gap recommendations...');
+      const demoMatch = await demoService.getJobMatch(resume?.id, jobDetails?.id || jobDetails?.jobId);
+      onProgress(100, 'Match evaluation complete!');
+      return demoMatch;
+    }
+
     const isRealResumeId = resume?.id && typeof resume.id === 'string' && resume.id.length === 36;
     const hasJobCriteria = jobDetails?.jobId || jobDetails?.jobAnalysisId || (jobDetails?.text && jobDetails.text.length >= 50) || (jobDetails?.rawDescription && jobDetails.rawDescription.length >= 50);
 

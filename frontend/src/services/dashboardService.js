@@ -6,6 +6,9 @@
  * and AI insights. Clearly marked as development simulation.
  */
 
+import { isDemoMode } from '@/demo/demoConfig';
+import { demoService } from '@/demo/demoService';
+
 export const DASHBOARD_API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 export const dashboardService = {
@@ -14,6 +17,9 @@ export const dashboardService = {
    * Target endpoint: GET /api/v1/dashboard/recent-activity
    */
   async getRecentActivity() {
+    if (isDemoMode()) {
+      return demoService.getDashboardActivities();
+    }
     await new Promise((resolve) => setTimeout(resolve, 200));
     return [
       {
@@ -74,6 +80,23 @@ export const dashboardService = {
    * Target endpoint: GET /api/v1/dashboard/recommended-jobs
    */
   async getRecommendedJobs() {
+    if (isDemoMode()) {
+      const demoJobs = await demoService.getJobs();
+      return demoJobs.map((j) => ({
+        id: j.id,
+        title: j.title,
+        company: j.company,
+        location: j.location,
+        workMode: j.workMode,
+        employmentType: j.employmentType,
+        salaryRange: j.salaryRange,
+        matchScore: j.matchScore,
+        requiredSkills: j.requiredSkills,
+        matchedSkillsCount: j.matchedSkillsCount,
+        totalSkillsCount: j.totalSkillsCount,
+        postedAgo: j.postedAgo,
+      }));
+    }
     await new Promise((resolve) => setTimeout(resolve, 200));
     return [
       {
@@ -126,6 +149,40 @@ export const dashboardService = {
    * Target endpoint: GET /api/v1/dashboard/ai-insights
    */
   async getAiInsights() {
+    if (isDemoMode()) {
+      return [
+        {
+          id: 'demo-ins-1',
+          category: 'Skill Gap Strategy',
+          title: 'Critical Gap for Stripe Backend Engineer: Kubernetes',
+          description: 'Address container orchestration to maximize tier-1 backend hiring compatibility. Follow your active Minikube learning roadmap.',
+          actionLabel: 'View Skill Gap Strategy',
+          actionRoute: '/career-assistant',
+          badge: '2 Gaps',
+          badgeVariant: 'warning',
+        },
+        {
+          id: 'demo-ins-2',
+          category: 'Learning Roadmap',
+          title: 'Target Roadmap Progress: 45% Complete',
+          description: '2 of 4 milestones completed. Next: Kafka Consumer Lag Telemetry & Rebalance Handling.',
+          actionLabel: 'Open Learning Roadmap',
+          actionRoute: '/career-assistant',
+          badge: '45% Complete',
+          badgeVariant: 'ai',
+        },
+        {
+          id: 'demo-ins-3',
+          category: 'Active Interview Prep',
+          title: 'Technical Screen Scheduled: Stripe Core Platform',
+          description: 'Practice STAR behavioral and Java 21 concurrency questions before your interview on Thursday.',
+          actionLabel: 'Inspect Match Insights',
+          actionRoute: '/job-match',
+          badge: '91% Match',
+          badgeVariant: 'success',
+        },
+      ];
+    }
     await new Promise((resolve) => setTimeout(resolve, 200));
     return [
       {

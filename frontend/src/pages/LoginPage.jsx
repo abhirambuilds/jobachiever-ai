@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { toast } from '@/components/ui/toast';
+import { DemoLaunchCard } from '@/components/demo';
 
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -58,6 +59,7 @@ export function LoginPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
+        <DemoLaunchCard className="mb-4" />
         <Card className="border-border/80 bg-card/80 shadow-2xl backdrop-blur-xl">
           <CardHeader className="space-y-1.5 pb-4">
             <CardTitle className="text-2xl font-bold tracking-tight text-foreground">

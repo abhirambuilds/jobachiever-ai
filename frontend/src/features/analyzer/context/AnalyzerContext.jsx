@@ -9,13 +9,15 @@ import { useDocuments } from '@/hooks/useDocuments';
 import { useProfile } from '@/hooks/useProfile';
 import { useAiPreferences } from '@/hooks/useAiPreferences';
 import { toast } from '@/components/ui/toast';
+import { isDemoMode } from '@/demo/demoConfig';
 
 const AnalyzerContext = createContext(null);
 
 export function AnalyzerProvider({ children }) {
   const { documents } = useDocuments();
   const { profile } = useProfile();
-  const { hasConsent, selectedProvider } = useAiPreferences();
+  const { hasConsent: rawConsent, selectedProvider } = useAiPreferences();
+  const hasConsent = isDemoMode() ? true : rawConsent;
 
   // Find initial primary resume or first available document
   const initialResume = useMemo(() => {

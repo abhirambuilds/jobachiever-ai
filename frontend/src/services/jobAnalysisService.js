@@ -6,6 +6,8 @@
  * Coordinates with the FastAPI microservice for anti-fabrication structured extraction.
  */
 
+import { isDemoMode } from '@/demo/demoConfig';
+
 export const API_BASE_URL =
   (typeof import.meta !== 'undefined' &&
     (import.meta.env?.VITE_AI_SERVICE_BASE_URL || import.meta.env?.VITE_API_BASE_URL)) ||
@@ -113,6 +115,60 @@ export const jobAnalysisService = {
     }
     if (jobDescription.length > 50000) {
       throw new Error('Job description exceeds maximum limit of 50,000 characters.');
+    }
+
+    if (isDemoMode()) {
+      onProgress(30, 'Dispatching to demo decomposition pipeline...');
+      await new Promise((r) => setTimeout(r, 120));
+      onProgress(75, 'Extracting structured role overview, skills, and qualifications...');
+      await new Promise((r) => setTimeout(r, 120));
+      onProgress(100, 'Demo analysis complete!');
+      return normalizeBackendJobAnalysis({
+        id: 'demo-job-ana-001',
+        jobId: 'job-demo-stripe',
+        provider: 'GROQ',
+        model: 'llama-3.3-70b-versatile',
+        jobTitle: overrides.jobTitle || 'Backend Software Engineer — Core Platform',
+        companyName: overrides.companyName || 'Stripe',
+        report: {
+          jobOverview: {
+            jobTitle: overrides.jobTitle || 'Backend Software Engineer — Core Platform',
+            companyName: overrides.companyName || 'Stripe',
+            roleCategory: 'BACKEND_DEVELOPMENT',
+            seniority: 'ENTRY_TO_MID',
+            employmentType: 'FULL_TIME',
+            workArrangement: 'HYBRID',
+            location: 'San Francisco, CA / Remote',
+            experienceRange: { minimumYears: 0, maximumYears: 3, rawRequirement: '0–3 years backend development' },
+          },
+          technicalSkills: {
+            required: [
+              { name: 'Java 21', category: 'Languages', importance: 'MANDATORY' },
+              { name: 'Spring Boot 3', category: 'Frameworks', importance: 'MANDATORY' },
+              { name: 'PostgreSQL', category: 'Databases', importance: 'MANDATORY' },
+              { name: 'REST APIs', category: 'Architecture', importance: 'MANDATORY' },
+            ],
+            preferred: [
+              { name: 'Apache Kafka', category: 'Streaming', importance: 'PREFERRED' },
+              { name: 'Docker', category: 'DevOps', importance: 'PREFERRED' },
+              { name: 'Redis', category: 'Databases', importance: 'PREFERRED' },
+              { name: 'Kubernetes', category: 'DevOps', importance: 'PREFERRED' },
+            ],
+            mentioned: [],
+          },
+          qualifications: {
+            responsibilities: [
+              'Build high-availability RESTful APIs in Java 21 and Spring Boot 3.',
+              'Design and optimize PostgreSQL database schemas and transaction isolation.',
+              'Implement unit and integration testing suites to guarantee 99.99% service reliability.',
+              'Collaborate across cross-functional engineering teams to uphold microservice boundaries.',
+            ],
+            educationalRequirements: ['B.S. in Computer Science, Software Engineering, or equivalent practical experience.'],
+            certifications: ['AWS Cloud Practitioner certification is a bonus.'],
+          },
+          cultureSignals: ['High precision & zero-fabrication', 'Collaborative engineering culture'],
+        },
+      });
     }
 
     onProgress(20, 'Dispatching text to Job Description Analyzer...');

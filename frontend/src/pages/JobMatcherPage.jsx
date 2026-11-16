@@ -19,6 +19,8 @@ import { SavedJobAnalysesModal } from '@/features/matcher/components/history/Sav
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { SimulatedResultBadge } from '@/components/demo';
+import { isDemoMode } from '@/demo/demoConfig';
 
 function JobMatcherContent() {
   const {
@@ -41,13 +43,16 @@ function JobMatcherContent() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-5">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Badge variant="ai" dot className="text-xs">
               Explainable Compatibility Engine
             </Badge>
             <span className="text-xs text-muted-foreground font-mono">
               FastAPI Semantic Matching Ready
             </span>
+            {(isDemoMode() || currentMatch?.isSimulatedDemo) && (
+              <SimulatedResultBadge />
+            )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
             Job Description Analyzer &amp; Resume Matcher

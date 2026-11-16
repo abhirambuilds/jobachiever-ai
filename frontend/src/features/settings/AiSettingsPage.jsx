@@ -26,6 +26,7 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { toast } from '@/components/ui/toast';
+import { isDemoMode } from '@/demo/demoConfig';
 
 export function AiSettingsPage() {
   const {
@@ -214,6 +215,23 @@ export function AiSettingsPage() {
           </div>
         )}
       </div>
+
+      {/* Demo Mode Notice */}
+      {isDemoMode() && (
+        <div
+          role="region"
+          aria-label="Demo Mode Settings Information"
+          className="flex items-start gap-3 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs sm:text-sm"
+        >
+          <Sparkles className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-semibold text-amber-200">Interactive Demo Mode Active</p>
+            <p className="text-amber-300/80 leading-relaxed text-xs">
+              Live Groq and Gemini API keys are optional during presentation mode. Precomputed, fact-preserving demonstration simulations are enabled for candidate persona Alex Morgan.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Inline Feedback Banner */}
       {formFeedback && (

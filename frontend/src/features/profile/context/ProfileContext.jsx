@@ -1,6 +1,32 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { isDemoMode } from '@/demo/demoConfig';
+import { DEMO_PROFILE } from '@/demo/demoProfile';
 
 const STORAGE_KEY = 'jobachiever_profile_draft';
+const DEMO_STORAGE_KEY = 'jobachiever_demo_profile_draft';
+
+function getInitialProfile() {
+  if (isDemoMode()) {
+    try {
+      const savedDemo = localStorage.getItem(DEMO_STORAGE_KEY);
+      if (savedDemo) {
+        return JSON.parse(savedDemo);
+      }
+    } catch {
+      // ignore
+    }
+    return DEMO_PROFILE;
+  }
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch {
+    // localStorage may fail in restricted modes
+  }
+  return DEFAULT_PROFILE;
+}
 
 const DEFAULT_PROFILE = {
   personalInfo: {
@@ -258,26 +284,30 @@ const DEFAULT_PROFILE = {
 const ProfileContext = createContext(null);
 
 export function ProfileProvider({ children }) {
-  const [profile, setProfile] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        return JSON.parse(saved);
-      }
-    } catch {
-      // localStorage may fail in restricted modes
-    }
-    return DEFAULT_PROFILE;
-  });
+  const [profile, setProfile] = useState(getInitialProfile);
 
-  // Persist non-sensitive draft profile data in localStorage
+  // Persist non-sensitive draft profile data in localStorage (isolated by demo mode)
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+      const currentKey = isDemoMode() ? DEMO_STORAGE_KEY : STORAGE_KEY;
+      localStorage.setItem(currentKey, JSON.stringify(profile));
     } catch {
       // ignore write errors
     }
   }, [profile]);
+
+  // Synchronize on demo state reset or mode toggle
+  useEffect(() => {
+    const handleResetOrChange = () => {
+      setProfile(getInitialProfile());
+    };
+    window.addEventListener('jobachiever:demo-state-reset', handleResetOrChange);
+    window.addEventListener('jobachiever:demo-state-changed', handleResetOrChange);
+    return () => {
+      window.removeEventListener('jobachiever:demo-state-reset', handleResetOrChange);
+      window.removeEventListener('jobachiever:demo-state-changed', handleResetOrChange);
+    };
+  }, []);
 
   // Section Update Methods
   const updatePersonalInfo = (info) => {

@@ -46,6 +46,7 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip';
 import { Toaster, toast } from '@/components/ui/toast';
+import { DemoModeBanner } from '@/components/demo';
 
 const navItems = [
   { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
@@ -124,7 +125,9 @@ export function DashboardLayout() {
 
   return (
     <TooltipProvider delayDuration={150}>
-      <div className="flex h-screen overflow-hidden bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
+      <div className="flex flex-col h-screen overflow-hidden bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
+        <DemoModeBanner />
+        <div className="flex flex-1 overflow-hidden">
         {/* =========================================================================
             DESKTOP SIDEBAR
             ========================================================================= */}
@@ -497,6 +500,7 @@ export function DashboardLayout() {
             <Outlet />
           </main>
         </div>
+      </div>
       </div>
       <Toaster position="top-right" richColors closeButton />
     </TooltipProvider>

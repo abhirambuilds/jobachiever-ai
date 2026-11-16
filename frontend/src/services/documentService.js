@@ -6,6 +6,9 @@
  * simulation with realistic resume records, track associations, and version histories.
  */
 
+import { isDemoMode } from '@/demo/demoConfig';
+import { demoService } from '@/demo/demoService';
+
 export const RESUME_API_BASE =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) ||
   'http://localhost:8080/api/v1';
@@ -293,6 +296,9 @@ export const documentService = {
    * Target endpoint: GET /api/v1/resumes
    */
   async getDocuments() {
+    if (isDemoMode()) {
+      return demoService.getResumes();
+    }
     try {
       const token = localStorage.getItem('jobachiever_jwt_token');
       if (token) {

@@ -60,6 +60,26 @@ export function DocumentProvider({ children }) {
     };
   }, []);
 
+  // Listen for demo mode changes and resets
+  useEffect(() => {
+    let isMounted = true;
+    const reloadDocs = () => {
+      documentService.getDocuments().then((docs) => {
+        if (isMounted && docs && docs.length > 0) {
+          setDocuments(docs);
+        }
+      });
+    };
+
+    window.addEventListener('jobachiever:demo-state-reset', reloadDocs);
+    window.addEventListener('jobachiever:demo-state-changed', reloadDocs);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('jobachiever:demo-state-reset', reloadDocs);
+      window.removeEventListener('jobachiever:demo-state-changed', reloadDocs);
+    };
+  }, []);
+
   // Career tracks available from Master Career Profile
   const availableTracks = useMemo(() => {
     return profile?.careerTracks || [

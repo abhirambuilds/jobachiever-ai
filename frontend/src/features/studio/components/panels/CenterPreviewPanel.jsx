@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { useResumeStudio } from '../../context/ResumeStudioContext';
 import { ResumeRenderer } from '../ResumeRenderer';
+import { SimulatedResultBadge } from '@/components/demo';
+import { isDemoMode } from '@/demo/demoConfig';
 
 export function CenterPreviewPanel() {
   const {
@@ -72,6 +74,7 @@ export function CenterPreviewPanel() {
 
         {/* Center: Save Status Indicator */}
         <div className="hidden md:flex items-center gap-2 text-xs">
+          {isDemoMode() && <SimulatedResultBadge size="sm" />}
           {isSaving ? (
             <span className="flex items-center gap-1.5 text-muted-foreground">
               <Clock className="w-3.5 h-3.5 animate-spin text-primary" />

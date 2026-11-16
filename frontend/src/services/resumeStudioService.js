@@ -7,6 +7,8 @@
  * Prepares for Spring Boot 3.x document persistence and FastAPI AI generation.
  */
 
+import { isDemoMode, simulateDelay } from '@/demo/demoConfig';
+
 export const RESUME_STUDIO_API_BASE =
   (typeof import.meta !== 'undefined' &&
     (import.meta.env?.VITE_AI_SERVICE_BASE_URL || import.meta.env?.VITE_API_BASE_URL)) ||
@@ -514,12 +516,6 @@ export function generateLocalFallbackAssistance(requestBody) {
  * Dispatches text enhancement, rewriting, and tailoring requests to the backend Spring Boot / FastAPI pipeline.
  */
 export async function generateWritingAssistance(payload = {}) {
-  const token = typeof localStorage !== 'undefined'
-    ? (localStorage.getItem('jobachiever_jwt_token') || localStorage.getItem('token'))
-    : null;
-
-  const url = `${RESUME_STUDIO_API_BASE}/studio/generate`;
-
   const requestBody = {
     action: payload.action || 'IMPROVE_BULLET',
     source_text: payload.sourceText || payload.source_text || '',
@@ -533,6 +529,17 @@ export async function generateWritingAssistance(payload = {}) {
     resume_id: payload.resumeId || payload.resume_id || null,
     job_id: payload.jobId || payload.job_id || null,
   };
+
+  if (isDemoMode()) {
+    await simulateDelay(220);
+    return generateLocalFallbackAssistance(requestBody);
+  }
+
+  const token = typeof localStorage !== 'undefined'
+    ? (localStorage.getItem('jobachiever_jwt_token') || localStorage.getItem('token'))
+    : null;
+
+  const url = `${RESUME_STUDIO_API_BASE}/studio/generate`;
 
   try {
     const response = await fetch(url, {
