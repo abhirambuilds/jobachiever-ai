@@ -84,9 +84,9 @@ I have full contextual awareness of your skills, career tracks, and target roles
 
     try {
       // Build conversation context
-      const candidateContext = `Candidate Name: ${profile?.personalInfo?.fullName || 'Job Seeker'}.
-Current Skills: ${(profile?.skills || []).slice(0, 10).join(', ')}.
-Target Career Track: ${profile?.careerTracks?.[0]?.name || 'Software Engineer'}.
+      const candidateContext = `Candidate Name: ${profile?.personalInfo?.fullName || 'K. Abhiram Reddy'}.
+Current Skills: ${(profile?.skills || []).slice(0, 10).map((s) => (typeof s === 'string' ? s : s?.name || '')).filter(Boolean).join(', ')}.
+Target Career Track: ${profile?.careerTracks?.[0]?.name || 'Backend Software Engineer'}.
 Target Market: India (Bengaluru, Hyderabad, Pune, Gurgaon).`;
 
       const systemPrompt = `You are JobAchiever AI Career Copilot, an elite career strategist, technical recruiter, and staff engineer.

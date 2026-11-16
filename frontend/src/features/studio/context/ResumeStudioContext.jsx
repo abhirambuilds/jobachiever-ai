@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useInRouterContext, useLocation } from 'react-router-dom';
 import { useProfile } from '../../profile/context/ProfileContext';
+import { toast } from '@/components/ui/toast';
 import {
   buildResumeFromProfile,
   DEFAULT_DESIGN_SETTINGS,
@@ -79,24 +80,101 @@ export function ResumeStudioProvider({ children }) {
   const [versionModalOpen, setVersionModalOpen] = useState(false);
 
   const handleAutoTailor = useCallback((jobData) => {
-    const { title, company, skills } = jobData;
+    const { title, company, skills } = jobData || {};
+    const companyLower = (company || '').toLowerCase();
+    const candidateName = profile?.personalInfo?.fullName || 'K. Abhiram Reddy';
+
     setResume((prev) => {
       const updated = JSON.parse(JSON.stringify(prev));
-      updated.title = `${profile.personalInfo?.fullName || 'Candidate'} — ${title || 'Target Role'} ATS Resume`;
+      updated.title = `${candidateName} — ${title || 'Target Role'} (${company || 'Tailored'}) ATS Resume`;
+      updated.targetJobTitle = title;
+      updated.targetCompany = company;
       updated.designSettings = {
         ...updated.designSettings,
         template: 'ats_professional',
+        spacing: 'compact',
+        margins: 'standard',
       };
+
+      // 1. Update Personal Headline
+      const personalSec = updated.sections?.find((s) => s.type === 'personal' || s.type === 'personal_info');
+      if (personalSec) {
+        if (companyLower.includes('stripe') || title?.toLowerCase().includes('backend') || title?.toLowerCase().includes('platform')) {
+          personalSec.data.headline = 'Senior Backend & Distributed Systems Engineer | High-Throughput Financial Platforms';
+        } else if (companyLower.includes('databricks') || title?.toLowerCase().includes('data') || title?.toLowerCase().includes('infra')) {
+          personalSec.data.headline = 'Distributed Infrastructure & Cloud Systems Engineer | High-Volume Streaming & Vector Search';
+        } else if (companyLower.includes('vercel') || title?.toLowerCase().includes('full') || title?.toLowerCase().includes('front')) {
+          personalSec.data.headline = 'Full-Stack Cloud & Platform Engineer | Distributed Microservices & Edge Architectures';
+        } else {
+          personalSec.data.headline = `${title || 'Software Engineer'} | Distributed Systems & Cloud Platforms`;
+        }
+      }
+
+      // 2. Update Professional Summary
       const summarySec = updated.sections?.find((s) => s.type === 'summary');
       if (summarySec) {
-        summarySec.data = {
-          ...summarySec.data,
-          summaryText: `Results-driven ${title || 'Software Engineer'} specializing in ${skills?.slice(0, 4).join(', ') || 'backend microservices and cloud architecture'}. Proven capability designing high-throughput platforms with strong testing and operational reliability at ${company || 'top technology firms'}.`,
-        };
+        if (companyLower.includes('stripe')) {
+          summarySec.data = {
+            summaryText: `Results-driven Backend Systems Engineer with proven expertise building scalable, fault-tolerant transaction infrastructure using Java 21, Spring Boot 3, and PostgreSQL. Architected idempotent payment processing services handling 3,000+ operations/minute, reducing p99 API latency by 42%. Deep understanding of distributed transactions, ACID consistency, Redis distributed locks, and containerized deployment for high-availability financial platforms.`,
+          };
+        } else if (companyLower.includes('databricks')) {
+          summarySec.data = {
+            summaryText: `High-impact Systems & Backend Engineer specializing in high-throughput data processing pipelines, Apache Kafka event streaming, and pgvector semantic retrieval. Track record designing resilient distributed services with sub-20ms query latency, partition pruning, and automated observability. Strong computer science foundation from SRM (CGPA 9.48/10) with published Gold honors in Java and AWS certification.`,
+          };
+        } else if (companyLower.includes('vercel')) {
+          summarySec.data = {
+            summaryText: `Innovative Full-Stack & Cloud Platform Engineer combining modern React 18 frontend architectures with robust Java 21/Spring Boot microservices. Delivered commercial SaaS deliverables across 10+ client engagements and architected the SRM Secure Exam platform serving 3,000+ simultaneous students with 99.95% uptime. Passionate about developer tooling, sub-second edge performance, and zero-downtime CI/CD workflows.`,
+          };
+        } else {
+          summarySec.data = {
+            summaryText: `Accomplished ${title || 'Software Engineer'} specializing in ${skills?.slice(0, 4).join(', ') || 'backend microservices, distributed systems, and cloud infrastructure'}. Proven track record designing high-throughput platforms with strong testing and operational reliability at ${company || 'top engineering firms'}, reducing API response latency by 42% while sustaining 99.95% availability.`,
+          };
+        }
       }
+
+      // 3. Reorder/Highlight Skills
+      const skillsSec = updated.sections?.find((s) => s.type === 'skills');
+      if (skillsSec && skillsSec.data?.categories) {
+        let prioritizedList = ['Java 21', 'Spring Boot 3', 'PostgreSQL', 'Docker', 'AWS', 'REST APIs'];
+        if (companyLower.includes('stripe')) {
+          prioritizedList = ['Java 21', 'Spring Boot 3', 'PostgreSQL', 'Redis Locks', 'Idempotent APIs', 'Kafka', 'Docker', 'AWS'];
+        } else if (companyLower.includes('databricks')) {
+          prioritizedList = ['Java 21', 'Python', 'PostgreSQL', 'pgvector', 'Apache Kafka', 'Distributed Systems', 'Docker', 'Linux'];
+        } else if (companyLower.includes('vercel')) {
+          prioritizedList = ['React 18', 'Tailwind CSS', 'TypeScript', 'Java 21', 'Spring Boot 3', 'REST APIs', 'PostgreSQL', 'Docker'];
+        }
+
+        const categories = skillsSec.data.categories.map((cat, idx) => {
+          if (idx === 0) {
+            return {
+              ...cat,
+              skills: [...new Set([...prioritizedList, ...(cat.skills || [])])],
+            };
+          }
+          return cat;
+        });
+        skillsSec.data.categories = categories;
+      }
+
+      // 4. Prioritize Relevant Projects
+      const projSec = updated.sections?.find((s) => s.type === 'projects');
+      if (projSec && projSec.data?.items) {
+        const items = [...projSec.data.items];
+        if (companyLower.includes('stripe')) {
+          items.sort((a, b) => (b.name?.toLowerCase().includes('transaction') || b.name?.toLowerCase().includes('financial') ? 1 : -1));
+        } else if (companyLower.includes('databricks')) {
+          items.sort((a, b) => (b.name?.toLowerCase().includes('order') || b.name?.toLowerCase().includes('task') ? 1 : -1));
+        } else if (companyLower.includes('vercel')) {
+          items.sort((a, b) => (b.name?.toLowerCase().includes('commerce') || b.name?.toLowerCase().includes('exam') ? 1 : -1));
+        }
+        projSec.data.items = items;
+      }
+
       return updated;
     });
-  }, [profile.personalInfo?.fullName]);
+
+    toast.success(`Tailored ATS single-column resume generated for ${company || 'Target Employer'} — ${title || 'Target Role'}!`);
+  }, [profile?.personalInfo?.fullName]);
 
   // Auto-sync to localStorage
   useEffect(() => {

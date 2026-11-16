@@ -38,47 +38,14 @@ export function JobDiscoveryPage() {
   const handleLiveRapidApiSearch = async () => {
     if (!searchQuery.trim()) return;
     setIsSearchingLive(true);
-    const rapidKey =
-      (typeof localStorage !== 'undefined' && localStorage.getItem('jobachiever_rapidapi_key')) ||
-      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_RAPIDAPI_KEY) ||
-      '682c17fad8msh466c6ac0d7090cbp123243jsn1077942d5e34';
-
-    try {
-      const res = await fetch(`https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(searchQuery + ' India')}&page=1&num_pages=1`, {
-        headers: {
-          'X-RapidAPI-Key': rapidKey,
-          'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
-        },
-      });
-      if (res.ok) {
-        const json = await res.json();
-        const items = (json.data || []).map((j, i) => ({
-          id: `rapid-${j.job_id || i}`,
-          company: j.employer_name || 'Tech Enterprise',
-          title: j.job_title || searchQuery,
-          location: `${j.job_city || 'Bengaluru'}, ${j.job_country || 'India'}`,
-          employmentType: j.job_employment_type || 'Full-time',
-          salaryRange: j.job_salary_currency ? `${j.job_salary_currency} Competitive` : '₹20 LPA - ₹35 LPA',
-          postedAgo: 'Live (RapidAPI)',
-          url: j.job_apply_link || 'https://www.linkedin.com/jobs',
-          requiredSkills: [searchQuery, 'Problem Solving', 'System Design'],
-          preferredSkills: ['Cloud Infrastructure', 'Agile'],
-          matchScore: 91,
-          isRapidApi: true,
-        }));
-        if (items.length > 0) {
-          setLiveJobs(items);
-          toast.success(`Found ${items.length} live jobs via RapidAPI JSearch!`);
-          return;
-        }
-      }
-    } catch {
-      // fallback
-    }
-
-    // Dynamic fallback when RapidAPI quota or key is 401/rate-limited
     const qLower = searchQuery.toLowerCase();
-    const city = qLower.includes('hyderabad') ? 'Hyderabad, India' : (qLower.includes('pune') ? 'Pune, India' : 'Bengaluru, India');
+    const city = qLower.includes('hyderabad')
+      ? 'Hyderabad, India'
+      : qLower.includes('pune')
+      ? 'Pune, India'
+      : qLower.includes('chennai')
+      ? 'Chennai, India'
+      : 'Bengaluru, India';
     const isIntern = qLower.includes('intern');
     const roleTitle = isIntern ? 'Software Engineering Intern' : (searchQuery.length > 3 ? searchQuery : 'Senior Software Engineer');
 
@@ -141,6 +108,48 @@ export function JobDiscoveryPage() {
       },
     ];
 
+    try {
+      const rapidKey =
+        (typeof localStorage !== 'undefined' && localStorage.getItem('jobachiever_rapidapi_key')) ||
+        (typeof import.meta !== 'undefined' && import.meta.env?.VITE_RAPIDAPI_KEY) ||
+        '';
+
+      if (rapidKey) {
+        const res = await fetch(`https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(searchQuery + ' India')}&page=1&num_pages=1`, {
+          headers: {
+            'X-RapidAPI-Key': rapidKey,
+            'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
+          },
+        }).catch(() => null);
+
+        if (res && res.ok) {
+          const json = await res.json().catch(() => ({}));
+          const items = (json.data || []).map((j, i) => ({
+            id: `rapid-${j.job_id || i}`,
+            company: j.employer_name || 'Tech Enterprise',
+            title: j.job_title || searchQuery,
+            location: `${j.job_city || 'Bengaluru'}, ${j.job_country || 'India'}`,
+            employmentType: j.job_employment_type || 'Full-time',
+            salaryRange: j.job_salary_currency ? `${j.job_salary_currency} Competitive` : '₹20 LPA - ₹35 LPA',
+            postedAgo: 'Live (RapidAPI)',
+            url: j.job_apply_link || 'https://www.linkedin.com/jobs',
+            requiredSkills: [searchQuery, 'Problem Solving', 'System Design'],
+            preferredSkills: ['Cloud Infrastructure', 'Agile'],
+            matchScore: 91,
+            isRapidApi: true,
+          }));
+          if (items.length > 0) {
+            setLiveJobs(items);
+            toast.success(`Found ${items.length} live jobs via RapidAPI JSearch!`);
+            setIsSearchingLive(false);
+            return;
+          }
+        }
+      }
+    } catch {
+      // fallback
+    }
+
     setLiveJobs(dynamicFallback);
     toast.success(`Found 4 live opportunities matching "${searchQuery}" in ${city}!`);
     setIsSearchingLive(false);
@@ -166,14 +175,26 @@ export function JobDiscoveryPage() {
     }
   };
 
-  const pool = liveJobs.length > 0 ? [...liveJobs, ...DEMO_JOBS] : DEMO_JOBS;
+  const pool = liveJobs.length > 0 ? liveJobs : DEMO_JOBS;
 
   const filteredJobs = pool.filter((job) => {
-    const matchesSearch =
-      searchQuery === '' ||
-      job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.requiredSkills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
+    if (liveJobs.length > 0) {
+      return true; // Already matched to active search!
+    }
+
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) {
+      return (
+        selectedTrack === 'all' ||
+        (selectedTrack === 'frontend' && (job.track === 'frontend' || job.title.toLowerCase().includes('frontend') || job.title.toLowerCase().includes('ui'))) ||
+        (selectedTrack === 'backend' && (job.track === 'backend' || (!job.track && job.title.toLowerCase().includes('backend')))) ||
+        (selectedTrack === 'aiml' && (job.track === 'aiml' || job.title.toLowerCase().includes('ai') || job.title.toLowerCase().includes('data')))
+      );
+    }
+
+    const terms = q.split(/\s+/).filter(Boolean);
+    const blob = `${job.company} ${job.title} ${job.location} ${(job.requiredSkills || []).join(' ')}`.toLowerCase();
+    const matchesSearch = terms.some((term) => blob.includes(term));
 
     const matchesTrack =
       selectedTrack === 'all' ||
@@ -327,7 +348,7 @@ export function JobDiscoveryPage() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Briefcase className="w-3.5 h-3.5 text-muted-foreground/80" />
-                          <span>{job.experienceLevel}</span>
+                          <span>{job.experienceLevel || job.employmentType || '0-3 years'}</span>
                         </span>
                       </div>
                     </div>
@@ -350,24 +371,28 @@ export function JobDiscoveryPage() {
                 <div className="space-y-1.5 pt-2 border-t border-border/50">
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground flex-wrap">
                     <span className="font-semibold text-foreground">Required Skills:</span>
-                    {job.requiredSkills.map((sk) => (
+                    {(job.requiredSkills || []).map((sk, idx) => (
                       <span
-                        key={sk}
+                        key={`${sk}-${idx}`}
                         className="px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 font-medium text-[11px]"
                       >
-                        {sk}
+                        {typeof sk === 'object' ? sk.name || JSON.stringify(sk) : sk}
                       </span>
                     ))}
-                    <span className="text-muted-foreground/60">•</span>
-                    <span className="font-medium text-muted-foreground">Bonus:</span>
-                    {job.preferredSkills.map((sk) => (
-                      <span
-                        key={sk}
-                        className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-[11px]"
-                      >
-                        {sk}
-                      </span>
-                    ))}
+                    {(job.preferredSkills && job.preferredSkills.length > 0) && (
+                      <>
+                        <span className="text-muted-foreground/60">•</span>
+                        <span className="font-medium text-muted-foreground">Bonus:</span>
+                        {job.preferredSkills.map((sk, idx) => (
+                          <span
+                            key={`${sk}-${idx}`}
+                            className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-[11px]"
+                          >
+                            {typeof sk === 'object' ? sk.name || JSON.stringify(sk) : sk}
+                          </span>
+                        ))}
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -422,6 +447,16 @@ export function JobDiscoveryPage() {
             </motion.div>
           ))}
         </AnimatePresence>
+
+        {filteredJobs.length === 0 && (
+          <div className="text-center py-12 border border-dashed border-border/80 rounded-2xl p-8 bg-card/60 backdrop-blur-xs">
+            <Compass className="w-10 h-10 text-muted-foreground/60 mx-auto mb-3 animate-pulse" />
+            <h3 className="text-sm font-bold text-foreground">No matching engineering opportunities found</h3>
+            <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
+              Try adjusting your search query or selecting "All Tracks" to expand your active discovery radius.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -154,6 +154,33 @@ export function validateJdFile(file) {
 export function buildSimulatedMatchAnalysis(resume, jobDetails, _config = {}) {
   const company = jobDetails.company || 'Stripe';
   const title = jobDetails.title || 'Senior Backend Engineer — Core Platform';
+  const companyLower = company.toLowerCase();
+
+  let overallScore = 92;
+  let scoreRating = 'High Compatibility';
+  let scoreSummary =
+    'Strong alignment with core backend architecture (Java 21, Spring Boot 3, PostgreSQL). Verified project evidence demonstrates distributed system capabilities.';
+
+  if (companyLower.includes('stripe')) {
+    overallScore = 94;
+    scoreRating = 'Exceptional Compatibility';
+    scoreSummary =
+      'Direct architectural alignment for Stripe infrastructure: Java 21, Spring Boot 3, and PostgreSQL. Verified project deliverables (Financial Transaction Processing Service & StablePay 2.0) provide concrete evidence for idempotent ledger design and sub-40ms execution.';
+  } else if (companyLower.includes('databricks')) {
+    overallScore = 89;
+    scoreRating = 'High Compatibility';
+    scoreSummary =
+      'Solid match on high-throughput backend services and distributed task processing. Project evidence confirms PostgreSQL vector search (pgvector) and Redis caching. Actionable growth opportunity: Spark Declarative Pipelines.';
+  } else if (companyLower.includes('vercel')) {
+    overallScore = 87;
+    scoreRating = 'High Compatibility';
+    scoreSummary =
+      'Strong full-stack and platform alignment. Demonstrated deliverables across React 18, REST APIs, and the SRM Secure Exam portal (3,000+ simultaneous users). Recommended addition: edge runtime routing.';
+  } else {
+    overallScore = 88 + (Math.abs((company.length * 7 + title.length * 3) % 9));
+    scoreRating = overallScore >= 90 ? 'High Compatibility' : 'Strong Alignment';
+    scoreSummary = `Demonstrated strong core competence matching ${company}'s ${title} requirements. Profile evidence validates foundational engineering competencies with minor actionable optimizations.`;
+  }
 
   return {
     matchId: `match-${Date.now().toString(36)}`,
@@ -176,10 +203,9 @@ export function buildSimulatedMatchAnalysis(resume, jobDetails, _config = {}) {
     },
 
     // Overall Heuristic Compatibility Score (0-100)
-    overallScore: 92,
-    scoreRating: 'High Compatibility',
-    scoreSummary:
-      'Strong alignment with core backend architecture (Java 21, Spring Boot 3, PostgreSQL). Verified project evidence demonstrates distributed system capabilities. Minor gap identified in enterprise Kafka streaming telemetry.',
+    overallScore,
+    scoreRating,
+    scoreSummary,
     disclaimer:
       'This compatibility score is a heuristic alignment estimate comparing your verified profile evidence with extracted job requirements. It is NOT an ATS screening pass guarantee, selection probability, or employer endorsement.',
 

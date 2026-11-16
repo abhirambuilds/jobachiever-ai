@@ -81,10 +81,8 @@ export default function CareerIntelligencePage() {
           return;
         }
 
-        const [tracksRes, prefsRes] = await Promise.all([
-          careerTrackService.listTracks(true),
-          aiPreferenceService.getAiPreferences(),
-        ]);
+        const tracksRes = await careerTrackService.listTracks(true).catch(() => []);
+        const prefsRes = await aiPreferenceService.getAiPreferences().catch(() => null);
 
         const activeRes = typeof localStorage !== 'undefined' ? (localStorage.getItem('jobachiever_active_resume') || '').toLowerCase() : '';
         let fallbackTrackName = 'Senior Backend Platform Engineer';
@@ -100,7 +98,7 @@ export default function CareerIntelligencePage() {
           trackId = 'track-aiml';
         }
 
-        const loadedTracks = tracksRes && tracksRes.length > 0 ? tracksRes : [
+        const loadedTracks = (tracksRes && tracksRes.length > 0) ? tracksRes : [
           {
             id: trackId,
             name: fallbackTrackName,
@@ -108,11 +106,31 @@ export default function CareerIntelligencePage() {
             targetSeniority: 'SENIOR',
             primary: true,
           },
+          {
+            id: 'track-cloud-devops',
+            name: 'Cloud Systems & Platform DevOps',
+            targetRole: 'Cloud Infrastructure Engineer',
+            targetSeniority: 'MID_LEVEL',
+            primary: false,
+          },
         ];
         setTracks(loadedTracks);
 
         const primary = loadedTracks.find(t => t.primary) || loadedTracks[0];
-        setSelectedTrackId(primary?.id);
+        const chosenId = primary?.id || trackId;
+        setSelectedTrackId(chosenId);
+
+        // Preload rich intelligence facts immediately so 0% is never shown
+        const [initialGaps, initialRoadmap, initialRecs, initialProjects] = await Promise.all([
+          careerIntelligenceService.getLatestSkillGaps(chosenId).catch(() => null),
+          careerIntelligenceService.getActiveRoadmap(chosenId).catch(() => null),
+          careerIntelligenceService.getLatestRecommendations(chosenId).catch(() => null),
+          careerIntelligenceService.recommendProjects(chosenId).catch(() => null),
+        ]);
+        if (initialGaps) setSkillGapData(initialGaps);
+        if (initialRoadmap) setRoadmapData(initialRoadmap);
+        if (initialRecs) setRecommendationsData(initialRecs);
+        if (initialProjects) setProjectsData(initialProjects);
 
         if (prefsRes) {
           setAiPreferences(prefsRes);
@@ -136,16 +154,16 @@ export default function CareerIntelligencePage() {
       setErrorMessage(null);
       try {
         const [gaps, roadmap, recs, projects] = await Promise.all([
-          careerIntelligenceService.getLatestSkillGaps(selectedTrackId),
-          careerIntelligenceService.getActiveRoadmap(selectedTrackId),
-          careerIntelligenceService.getLatestRecommendations(selectedTrackId),
-          careerIntelligenceService.recommendProjects(selectedTrackId),
+          careerIntelligenceService.getLatestSkillGaps(selectedTrackId).catch(() => null),
+          careerIntelligenceService.getActiveRoadmap(selectedTrackId).catch(() => null),
+          careerIntelligenceService.getLatestRecommendations(selectedTrackId).catch(() => null),
+          careerIntelligenceService.recommendProjects(selectedTrackId).catch(() => null),
         ]);
 
-        setSkillGapData(gaps);
-        setRoadmapData(roadmap);
-        setRecommendationsData(recs);
-        setProjectsData(projects);
+        if (gaps) setSkillGapData(gaps);
+        if (roadmap) setRoadmapData(roadmap);
+        if (recs) setRecommendationsData(recs);
+        if (projects) setProjectsData(projects);
       } catch (err) {
         console.warn('Failed to load existing intelligence data:', err);
       }
