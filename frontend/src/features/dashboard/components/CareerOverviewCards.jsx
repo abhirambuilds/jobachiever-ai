@@ -11,6 +11,7 @@ import {
 import { useProfile } from '@/hooks/useProfile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { AnimatedCounter } from '@/components/common/AnimatedCounter';
 
 export function CareerOverviewCards() {
   const { profile, calculateCompleteness } = useProfile();
@@ -24,7 +25,8 @@ export function CareerOverviewCards() {
     {
       id: 'profile-completeness',
       title: 'Profile Completeness',
-      value: `${percentage}%`,
+      numValue: percentage,
+      suffix: '%',
       subtitle: 'Verified credentials & experience',
       icon: CheckCircle2,
       iconColor: 'text-emerald-500',
@@ -36,7 +38,8 @@ export function CareerOverviewCards() {
     {
       id: 'career-tracks',
       title: 'Active Career Tracks',
-      value: `${activeTracksCount}`,
+      numValue: activeTracksCount,
+      suffix: '',
       subtitle: primaryTrack ? primaryTrack.name : 'Target Personas',
       icon: Layers,
       iconColor: 'text-primary',
@@ -48,8 +51,9 @@ export function CareerOverviewCards() {
     {
       id: 'resume-health',
       title: 'ATS Resume Score',
-      value: '94%',
-      subtitle: '2 Tailored versions ready',
+      numValue: 94,
+      suffix: '%',
+      subtitle: '3 Tailored versions ready',
       icon: FileCheck2,
       iconColor: 'text-cyan-400',
       badge: 'High Impact',
@@ -60,8 +64,9 @@ export function CareerOverviewCards() {
     {
       id: 'applications-active',
       title: 'Active Applications',
-      value: '5',
-      subtitle: '2 in Technical Screen',
+      numValue: 6,
+      suffix: '',
+      subtitle: '1 in Interview (Stripe), 1 Offer',
       icon: Kanban,
       iconColor: 'text-amber-500',
       badge: 'In Pipeline',
@@ -72,7 +77,8 @@ export function CareerOverviewCards() {
     {
       id: 'saved-opportunities',
       title: 'Saved Opportunities',
-      value: '8',
+      numValue: 8,
+      suffix: '',
       subtitle: '3 high semantic matches',
       icon: Bookmark,
       iconColor: 'text-indigo-400',
@@ -114,7 +120,7 @@ export function CareerOverviewCards() {
                       {card.title}
                     </span>
                     <div className="text-2xl font-bold tracking-tight text-foreground">
-                      {card.value}
+                      <AnimatedCounter value={card.numValue} suffix={card.suffix} />
                     </div>
                     <p className="text-[11px] text-muted-foreground/90 truncate">
                       {card.subtitle}

@@ -5,7 +5,7 @@ import { demoToast } from './DemoToast';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-export function DemoLaunchCard({ className = '', variant = 'card' }) {
+export function DemoLaunchCard({ className = '', variant = 'card', label = 'Explore Interactive Demo' }) {
   const navigate = useNavigate();
 
   const handleLaunch = () => {
@@ -24,7 +24,7 @@ export function DemoLaunchCard({ className = '', variant = 'card' }) {
         className={`gap-2 border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 dark:text-amber-400 font-semibold shadow-sm ${className}`}
       >
         <Sparkles className="h-4 w-4" />
-        <span>Launch Interactive Demo</span>
+        <span>{label}</span>
       </Button>
     );
   }
@@ -65,7 +65,7 @@ export function DemoLaunchCard({ className = '', variant = 'card' }) {
           onClick={handleLaunch}
           className="shrink-0 gap-2 font-semibold shadow-glow-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
         >
-          <span>Enter Demo Mode</span>
+          <span>Explore Interactive Demo</span>
           <ArrowRight className="h-4 w-4" />
         </Button>
       </div>

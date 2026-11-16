@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Sparkles, RotateCcw, LogOut, Info } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Sparkles, RotateCcw, LogOut, Info, Compass, LayoutDashboard } from 'lucide-react';
 import { isDemoMode, disableDemoMode } from '@/demo/demoConfig';
 import { demoService } from '@/demo/demoService';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ export function DemoModeBanner() {
   const [active, setActive] = useState(() => isDemoMode());
   const [isResetting, setIsResetting] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleStateChange = (e) => {
@@ -73,7 +74,33 @@ export function DemoModeBanner() {
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {location.pathname !== '/dashboard' && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/dashboard')}
+              className="h-7 text-xs px-2 gap-1 text-muted-foreground hover:text-foreground"
+              title="Return to Dashboard"
+            >
+              <LayoutDashboard className="h-3 w-3 text-primary" />
+              <span className="hidden sm:inline">Dashboard</span>
+            </Button>
+          )}
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => window.dispatchEvent(new CustomEvent('jobachiever:start-demo-tour'))}
+            className="h-7 text-xs px-2.5 gap-1.5 border-primary/40 bg-primary/10 hover:bg-primary/20 text-primary font-semibold shadow-xs"
+            title="Start or resume guided product walkthrough"
+          >
+            <Compass className="h-3 w-3" />
+            <span>Guided Tour</span>
+          </Button>
+
           <Button
             type="button"
             variant="outline"

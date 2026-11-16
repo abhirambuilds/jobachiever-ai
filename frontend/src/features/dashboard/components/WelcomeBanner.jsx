@@ -4,6 +4,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { AnimatedCounter } from '@/components/common/AnimatedCounter';
 import { SimulatedResultBadge } from '@/components/demo';
 import { isDemoMode } from '@/demo/demoConfig';
 
@@ -53,7 +54,7 @@ export function WelcomeBanner() {
 
             <p className="text-sm text-muted-foreground leading-relaxed">
               Ready to move closer to your next opportunity? Your Master Career Profile is currently
-              at <span className="font-semibold text-foreground">{percentage}% completeness</span>,
+              at <span className="font-semibold text-foreground"><AnimatedCounter value={percentage} suffix="%" /> completeness</span>,
               anchoring all tailored resumes and matching pipelines.
             </p>
           </div>

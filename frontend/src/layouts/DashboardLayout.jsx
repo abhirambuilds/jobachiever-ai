@@ -46,7 +46,7 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip';
 import { Toaster, toast } from '@/components/ui/toast';
-import { DemoModeBanner } from '@/components/demo';
+import { DemoModeBanner, DemoTourGuide } from '@/components/demo';
 
 const navItems = [
   { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
@@ -501,6 +501,7 @@ export function DashboardLayout() {
           </main>
         </div>
       </div>
+      <DemoTourGuide />
       </div>
       <Toaster position="top-right" richColors closeButton />
     </TooltipProvider>

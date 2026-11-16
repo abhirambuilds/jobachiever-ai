@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { AnimatedCounter } from '@/components/common/AnimatedCounter';
 import { SimulatedResultBadge } from '@/components/demo';
 import { isDemoMode } from '@/demo/demoConfig';
 import { demoService } from '@/demo/demoService';
@@ -192,7 +193,9 @@ export function ApplicationTrackerPage() {
             Active Applications
           </p>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-foreground">{activeCount}</span>
+            <span className="text-2xl font-black text-foreground">
+              <AnimatedCounter value={activeCount} />
+            </span>
             <span className="text-xs text-muted-foreground">in pipeline</span>
           </div>
         </Card>
@@ -203,7 +206,7 @@ export function ApplicationTrackerPage() {
           </p>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
-              {interviewingCount}
+              <AnimatedCounter value={interviewingCount} />
             </span>
             <span className="text-xs text-muted-foreground">advancing</span>
           </div>
@@ -215,7 +218,7 @@ export function ApplicationTrackerPage() {
           </p>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
-              {offerCount}
+              <AnimatedCounter value={offerCount} />
             </span>
             <span className="text-xs text-muted-foreground">decisions pending</span>
           </div>
@@ -226,7 +229,9 @@ export function ApplicationTrackerPage() {
             Avg Compatibility
           </p>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-foreground">{avgMatch}%</span>
+            <span className="text-2xl font-black text-foreground">
+              <AnimatedCounter value={avgMatch} suffix="%" />
+            </span>
             <span className="text-xs text-emerald-500 font-medium">ATS-aligned</span>
           </div>
         </Card>

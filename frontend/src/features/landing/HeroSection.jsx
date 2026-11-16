@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { enableDemoMode } from '@/demo/demoConfig';
 
 export function HeroSection() {
   const navigate = useNavigate();
@@ -67,6 +68,18 @@ export function HeroSection() {
             >
               <span>Start Your Career Journey</span>
               <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => {
+                enableDemoMode();
+                navigate('/dashboard');
+              }}
+              className="gap-2 border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 dark:text-amber-400 font-semibold shadow-sm text-base"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>Explore Interactive Demo</span>
             </Button>
             <Button
               variant="outline"

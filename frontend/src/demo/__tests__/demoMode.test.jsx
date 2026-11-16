@@ -22,6 +22,7 @@ import { DemoModeBanner } from '@/components/demo/DemoModeBanner';
 import { SimulatedResultBadge } from '@/components/demo/SimulatedResultBadge';
 import { DemoLoadingIndicator } from '@/components/demo/DemoLoadingIndicator';
 import { DemoLaunchCard } from '@/components/demo/DemoLaunchCard';
+import { DemoTourGuide, TOUR_STEPS } from '@/components/demo/DemoTourGuide';
 import { ProfileProvider } from '@/features/profile/context/ProfileContext';
 import { WelcomeBanner } from '@/features/dashboard/components/WelcomeBanner';
 
@@ -242,7 +243,7 @@ describe('Emergency Demo Presentation Mode', () => {
       expect(screen.getByText(/Alex Morgan/i)).toBeInTheDocument();
       expect(screen.getByText(/No API Keys Required/i)).toBeInTheDocument();
 
-      const enterButton = screen.getByRole('button', { name: /Enter Demo Mode/i });
+      const enterButton = screen.getByRole('button', { name: /Explore Interactive Demo|Enter Demo Mode/i });
       fireEvent.click(enterButton);
       expect(isDemoMode()).toBe(true);
     });
@@ -377,6 +378,55 @@ describe('Emergency Demo Presentation Mode', () => {
       expect(del.success).toBe(true);
       const afterDel = await demoService.getApplications();
       expect(afterDel.find((a) => a.id === added.id)).toBeUndefined();
+    });
+  });
+
+  describe('9. Guided Product Walkthrough (Demo Tour)', () => {
+    it('defines all 9 sequential tour steps with routes and explanations', () => {
+      expect(TOUR_STEPS.length).toBe(9);
+
+      const expectedRoutes = [
+        '/dashboard',
+        '/profile',
+        '/resumes',
+        '/resume-analyzer',
+        '/jd-analyzer',
+        '/job-matcher',
+        '/resume-studio',
+        '/career-assistant',
+        '/settings/ai',
+      ];
+
+      TOUR_STEPS.forEach((step, idx) => {
+        expect(step.step).toBe(idx + 1);
+        expect(step.route).toBe(expectedRoutes[idx]);
+        expect(step.title).toBeDefined();
+        expect(step.description).toBeDefined();
+        expect(step.takeaway).toBeDefined();
+      });
+    });
+
+    it('renders DemoTourGuide only when demo mode is active', () => {
+      // Inactive
+      disableDemoMode();
+      const { rerender } = render(
+        <BrowserRouter>
+          <DemoTourGuide />
+        </BrowserRouter>
+      );
+      expect(screen.queryByText(/Step 1 of 9/i)).not.toBeInTheDocument();
+
+      // Active
+      enableDemoMode();
+      rerender(
+        <BrowserRouter>
+          <DemoTourGuide />
+        </BrowserRouter>
+      );
+      expect(screen.getByText(/Step 1 of 9/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Career Command Center/i).length).toBeGreaterThan(0);
+      expect(screen.getByText(/Skip Tour/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Next/i })).toBeInTheDocument();
     });
   });
 });
