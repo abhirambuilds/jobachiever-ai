@@ -5,7 +5,7 @@ import { toast } from '@/components/ui/toast';
  */
 export const demoToast = {
   launched() {
-    toast.success('Welcome back, Alex!', {
+    toast.success('Welcome back, Aarav!', {
       description: 'Your Career Command Center is up to date.',
     });
   },

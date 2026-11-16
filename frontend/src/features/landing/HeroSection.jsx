@@ -63,31 +63,22 @@ export function HeroSection() {
             <Button
               variant="ai"
               size="lg"
-              onClick={() => navigate('/register')}
-              className="gap-2 px-8 text-base shadow-glow-sm"
+              onClick={() => {
+                enableDemoMode();
+                navigate('/dashboard');
+              }}
+              className="gap-2.5 px-8 text-base shadow-glow-md font-semibold h-12"
             >
-              <span>Start Your Career Journey</span>
+              <span>Explore Live Platform</span>
               <ArrowRight className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
               size="lg"
-              onClick={() => {
-                enableDemoMode();
-                navigate('/dashboard');
-              }}
-              className="gap-2 border-primary/30 bg-primary/5 hover:bg-primary/15 text-foreground font-semibold shadow-xs text-base"
-            >
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span>Explore Interactive Demo</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
               onClick={scrollToFeatures}
-              className="text-base border-border/80"
+              className="text-base border-border/80 bg-card/50 hover:bg-card h-12 px-6"
             >
-              Explore Features
+              Platform Capabilities
             </Button>
           </div>
 
@@ -142,12 +133,12 @@ export function HeroSection() {
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
-                          JD
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-primary/20 to-indigo-500/20 text-primary font-bold text-sm border border-primary/30">
+                          AS
                         </div>
                         <div>
-                          <div className="text-sm font-semibold text-foreground">John Doe</div>
-                          <div className="text-xs text-muted-foreground">Master Career Graph</div>
+                          <div className="text-sm font-semibold text-foreground">Aarav Sharma</div>
+                          <div className="text-xs text-muted-foreground">IIT Bombay • SDE-2 at Razorpay</div>
                         </div>
                       </div>
                       <Badge variant="success" dot className="text-[10px]">
@@ -161,7 +152,7 @@ export function HeroSection() {
                         <Badge variant="outline" className="text-[9px]">Track 1 of 3</Badge>
                       </div>
                       <p className="text-muted-foreground text-[11px]">
-                        Full-Stack & Cloud Architecture
+                        Senior Backend & Distributed Systems
                       </p>
                     </div>
 
@@ -171,11 +162,11 @@ export function HeroSection() {
                         <span className="font-semibold text-foreground">18 Skills</span>
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-foreground">React</span>
-                        <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-foreground">Spring Boot</span>
-                        <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-foreground">Python</span>
+                        <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-foreground">Java 21</span>
+                        <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-foreground">Spring Boot 3</span>
+                        <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-foreground">Apache Kafka</span>
                         <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-foreground">PostgreSQL</span>
-                        <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-foreground">Docker</span>
+                        <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-foreground">Redis</span>
                       </div>
                     </div>
                   </CardContent>
@@ -189,11 +180,11 @@ export function HeroSection() {
                         <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
                         <span>AI Inference Provider</span>
                       </span>
-                      <span className="text-[10px] text-muted-foreground">User Managed</span>
+                      <span className="text-[10px] text-muted-foreground">Ultra-Fast LPU</span>
                     </div>
                     <div className="flex items-center justify-between rounded-lg border border-border/50 bg-card p-2 text-xs">
-                      <span className="font-medium text-foreground">Groq Cloud (Llama 3.3)</span>
-                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                      <span className="font-medium text-foreground">Groq Cloud (Llama 3.3 70B)</span>
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                     </div>
                   </CardContent>
                 </Card>
@@ -213,7 +204,7 @@ export function HeroSection() {
                           <Badge variant="outline" className="text-[10px]">Deterministic</Badge>
                         </div>
                         <h4 className="text-base font-bold text-foreground mt-0.5">
-                          Target: Senior Full-Stack Engineer — Cloud Platforms
+                          Target: Lead Backend Engineer — Core Payments (Razorpay)
                         </h4>
                       </div>
                       <div className="flex items-center gap-2 self-start sm:self-auto">

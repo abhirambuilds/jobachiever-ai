@@ -33,7 +33,7 @@ export const TOUR_STEPS = [
     icon: LayoutDashboard,
     headline: 'Unified Career Readiness & Command Overview',
     description:
-      'Welcome to Alex Morgan’s career command center. Observe unified readiness metrics, 94% ATS resume compatibility, active tracks (Backend Software Engineer & Cloud Systems), and live interview scheduling with Stripe.',
+      'Welcome to Aarav Sharma’s career command center. Observe unified readiness metrics, 94% ATS resume compatibility, active tracks (Senior Backend Software Engineer & Cloud Systems), and live interview scheduling with Razorpay.',
     takeaway: 'Zero fragmentation: Profile metrics, resume scores, and application pipeline stay synchronized.',
   },
   {
@@ -45,7 +45,7 @@ export const TOUR_STEPS = [
     icon: UserCheck,
     headline: 'Single Source of Factual Career Truth',
     description:
-      'Inspect verified academic credentials (San Jose State University, 3.85 GPA), technical proficiencies (Java 21, Spring Boot 3, Postgres), and career milestones with strict zero-fabrication guarantees.',
+      'Inspect verified academic credentials (Indian Institute of Technology Bombay, 9.2 CGPA), technical proficiencies (Java 21, Spring Boot 3, Kafka, Postgres), and career milestones with strict zero-fabrication guarantees.',
     takeaway: 'Human-in-the-loop: Every skill and achievement requires verification before entering generation pipelines.',
   },
   {
@@ -57,7 +57,7 @@ export const TOUR_STEPS = [
     icon: FileText,
     headline: 'Multi-Persona Document Management',
     description:
-      'Examine 3 targeted resumes with instant vector-accurate HTML previews: Alex’s Master Backend Resume (94% ATS), Full Stack variant (91%), and AI/ML Systems variant (89%).',
+      'Examine 3 targeted resumes with instant vector-accurate HTML previews: Aarav’s Master Backend Resume (94% ATS), Full Stack variant (91%), and AI/ML Systems variant (90%).',
     takeaway: 'Live document operations: Try renaming, setting primary, or uploading resumes directly.',
   },
   {
@@ -82,7 +82,7 @@ export const TOUR_STEPS = [
     headline: 'Automated Expectation Decomposition',
     description:
       'Deconstruct real-world job postings into mandatory vs. preferred technical skills, soft skills, and employer signals without manual copy-pasting.',
-    takeaway: 'Pre-loaded presets: Try loading the Stripe Core Platform or Databricks AI Systems job posting.',
+    takeaway: 'Pre-loaded presets: Try loading the Razorpay Core Payments or Swiggy Distributed Logistics job posting.',
   },
   {
     step: 6,
@@ -93,7 +93,7 @@ export const TOUR_STEPS = [
     icon: Target,
     headline: 'Explainable Compatibility Scoring',
     description:
-      'Compare Alex Morgan’s Master Resume against Stripe’s Core Platform role. The engine scores a 91% overall match with 100% mandatory skills coverage and highlights the Kubernetes gap.',
+      'Compare Aarav Sharma’s Master Resume against Razorpay’s Core Payments role. The engine scores a 94% overall match with 100% mandatory skills coverage and highlights the consensus protocol gap.',
     takeaway: 'Absolute truthfulness: Gaps are flagged transparently with learning compensation advice.',
   },
   {
@@ -117,7 +117,7 @@ export const TOUR_STEPS = [
     icon: Bot,
     headline: 'Formula-Weighted Skill Gap Strategy',
     description:
-      'View prioritized missing skills (Kubernetes, Kafka) and track learning milestones on a phased roadmap. Check off milestones to observe reactive progress calculations.',
+      'View prioritized missing skills (Kubernetes, Raft Consensus) and track learning milestones on a phased roadmap. Check off milestones to observe reactive progress calculations.',
     takeaway: 'Deterministic curriculum: Learning roadmaps directly bridge the diagnosed candidate gaps.',
   },
   {
@@ -127,10 +127,10 @@ export const TOUR_STEPS = [
     title: 'AI Provider Settings & Transparency',
     badge: 'Step 9 of 9',
     icon: Settings,
-    headline: 'Manual Provider Choice & Privacy Safeguards',
+    headline: 'High-Throughput Groq LPU Engine',
     description:
-      'Inspect user-controlled provider selection between Groq (Llama 3.3 70B) and Google Gemini (Gemini 2.0 Flash) with explicit external processing consent management.',
-    takeaway: 'Architectural sovereignty: Users own their provider selection and privacy boundaries.',
+      'Inspect production-grade Groq LPU inference (Llama 3.3 70B) powering real-time resume analysis and matching at sub-second speeds.',
+    takeaway: 'Architectural sovereignty: Enterprise Groq LPU engine delivers instant, privacy-conscious processing.',
   },
 ];
 

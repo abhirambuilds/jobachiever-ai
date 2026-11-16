@@ -50,7 +50,7 @@ export function DemoLaunchCard({ className = '', variant = 'card', label = 'Expl
           </div>
 
           <h3 className="text-sm sm:text-base font-bold text-foreground">
-            Sign In as <span className="text-primary">Alex Morgan</span> (Backend Software Engineer)
+            Sign In as <span className="text-primary">Aarav Sharma</span> (Senior Backend Engineer • Bengaluru)
           </h3>
 
           <p className="text-xs text-muted-foreground max-w-xl leading-relaxed">

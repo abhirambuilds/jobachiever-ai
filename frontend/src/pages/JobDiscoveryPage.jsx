@@ -32,7 +32,7 @@ export function JobDiscoveryPage() {
         company: job.company,
         role: job.title,
         careerTrackId: 'track-demo-backend',
-        careerTrackName: 'Backend Software Engineer',
+        careerTrackName: 'Senior Backend Software Engineer',
         stage: 'SAVED',
         salary: job.salaryRange,
         location: job.location,

@@ -169,7 +169,7 @@ class DemoService {
     const extension = file.name.split('.').pop().toLowerCase();
     const newDoc = {
       id: `demo-res-${Date.now().toString(36)}`,
-      ownerId: 'usr-demo-alex-morgan',
+      ownerId: 'usr-demo-aarav-sharma',
       name: cleanName,
       originalFilename: file.name,
       mimeType: file.type || 'application/pdf',
@@ -177,7 +177,7 @@ class DemoService {
       fileSize: file.size || 500000,
       storageKey: `storage/resumes/${file.name}`,
       careerTrackId: metadata.careerTrackId || 'track-demo-backend',
-      careerTrackName: metadata.careerTrackName || 'Backend Software Engineer',
+      careerTrackName: metadata.careerTrackName || 'Senior Backend Software Engineer',
       version: 1,
       processingStatus: 'processed',
       uploadedAt: new Date().toISOString(),
@@ -188,9 +188,9 @@ class DemoService {
         typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function' && file instanceof Blob
           ? URL.createObjectURL(file)
           : null,
-      extractedText: `ALEX MORGAN\nUploaded document: ${file.name}\nParsed sections: Summary, Experience, Education, Technical Skills.`,
+      extractedText: `AARAV SHARMA\nUploaded document: ${file.name}\nParsed sections: Summary, Experience, Education, Technical Skills.`,
       sections: {
-        personalInfo: { fullName: 'Alex Morgan', email: 'alex.morgan@demo.jobachiever.ai' },
+        personalInfo: { fullName: 'Aarav Sharma', email: 'aarav.sharma@jobachiever.ai' },
         skills: ['Java 21', 'Spring Boot 3', 'PostgreSQL', 'Docker'],
       },
       versions: [
@@ -309,16 +309,16 @@ class DemoService {
   // JOB DESCRIPTION ANALYZER
   // ==========================================
 
-  async getJobAnalysis(jobId = 'job-demo-stripe') {
+  async getJobAnalysis(jobId = 'job-demo-razorpay') {
     await simulateDelay(350);
-    if (jobId === 'job-demo-stripe' || !jobId) {
+    if (jobId === 'job-demo-razorpay' || jobId === 'job-demo-stripe' || !jobId) {
       return { ...DEMO_JOB_ANALYSIS_STRIPE };
     }
     return {
       ...DEMO_JOB_ANALYSIS_STRIPE,
       jobId,
-      roleTitle: 'Junior Cloud Infrastructure Engineer',
-      company: 'Datadog',
+      roleTitle: 'Senior SDE-2 — Distributed Logistics',
+      company: 'Swiggy',
       isSimulatedDemo: true,
     };
   }
@@ -327,7 +327,7 @@ class DemoService {
   // RESUME–JOB MATCHING
   // ==========================================
 
-  async getJobMatch(resumeId = 'demo-res-1', jobId = 'job-demo-stripe') {
+  async getJobMatch(resumeId = 'demo-res-1', jobId = 'job-demo-razorpay') {
     await simulateDelay(400);
     return {
       ...DEMO_JOB_MATCH_ALEX_STRIPE,

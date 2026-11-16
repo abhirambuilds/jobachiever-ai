@@ -1,19 +1,19 @@
 /**
- * Consistent Phased Learning Roadmap for Alex Morgan
+ * Consistent Phased Learning Roadmap for Aarav Sharma (Indian Product Ecosystem)
  */
 
 export const DEMO_ROADMAP = {
-  id: 'demo-roadmap-alex-001',
+  id: 'demo-roadmap-aarav-001',
   careerTrackId: 'track-demo-backend',
-  targetRole: 'Backend Software Engineer',
-  title: 'Backend Software Engineer Strategic Advancement Roadmap',
+  targetRole: 'Senior Backend Software Engineer',
+  title: 'Senior Backend & Distributed Systems Advancement Roadmap',
   description:
-    'Tailored 3-phase progression path addressing the exact skill gaps identified for competitive tier-1 backend engineering roles (Stripe, Datadog).',
+    'Tailored 3-phase progression path addressing the exact skill gaps identified for Staff / Principal Backend roles at tier-1 Indian tech unicorns (Razorpay, CRED, Swiggy, PhonePe).',
   status: 'IN_PROGRESS',
   provider: 'GROQ',
   model: 'llama-3.3-70b-versatile',
   isSimulatedDemo: true,
-  progressPercentage: 45,
+  progressPercentage: 50,
   totalMilestones: 4,
   completedMilestones: 2,
   inProgressMilestones: 1,
@@ -21,12 +21,12 @@ export const DEMO_ROADMAP = {
   phases: [
     {
       phaseNumber: 1,
-      name: 'Phase 1: Container Orchestration & Local Kubernetes',
+      name: 'Phase 1: Multi-Region Kubernetes & Service Mesh',
       description: 'Solidify container infrastructure, local cluster provisioning, and declarative manifests.',
       milestones: [
         {
           id: 'demo-m-101',
-          roadmapId: 'demo-roadmap-alex-001',
+          roadmapId: 'demo-roadmap-aarav-001',
           phaseNumber: 1,
           title: 'Docker Multi-Stage Builds & Distroless Base Images',
           description: 'Package Spring Boot 3 applications using optimized distroless base images with non-root security context.',
@@ -43,7 +43,7 @@ export const DEMO_ROADMAP = {
         },
         {
           id: 'demo-m-102',
-          roadmapId: 'demo-roadmap-alex-001',
+          roadmapId: 'demo-roadmap-aarav-001',
           phaseNumber: 1,
           title: 'Local Minikube Cluster Deployment & Helm Packaging',
           description: 'Deploy Order Processing microservices to a local Minikube cluster using Helm charts with Ingress routing.',
@@ -62,12 +62,12 @@ export const DEMO_ROADMAP = {
     },
     {
       phaseNumber: 2,
-      name: 'Phase 2: Event Streaming & Message Queue Architecture',
-      description: 'Master Apache Kafka partition semantics, consumer lag observability, and transactional event handling.',
+      name: 'Phase 2: High-Velocity Kafka Streaming & Financial Reconciliation',
+      description: 'Master Apache Kafka partition semantics, consumer lag observability, and transactional event handling for UPI scale.',
       milestones: [
         {
           id: 'demo-m-201',
-          roadmapId: 'demo-roadmap-alex-001',
+          roadmapId: 'demo-roadmap-aarav-001',
           phaseNumber: 2,
           title: 'Kafka Consumer Lag Telemetry & Rebalance Handling',
           description: 'Instrument consumer groups with Prometheus metrics to measure and mitigate lag during burst traffic.',
@@ -87,14 +87,14 @@ export const DEMO_ROADMAP = {
     {
       phaseNumber: 3,
       name: 'Phase 3: Database High Availability & Sharding',
-      description: 'Design distributed PostgreSQL topologies with read replicas, connection pooling, and optimistic locking.',
+      description: 'Design distributed PostgreSQL topologies with read replicas, connection pooling, and optimistic locking for 50M+ records.',
       milestones: [
         {
           id: 'demo-m-301',
-          roadmapId: 'demo-roadmap-alex-001',
+          roadmapId: 'demo-roadmap-aarav-001',
           phaseNumber: 3,
           title: 'PostgreSQL Connection Pool Optimization with HikariCP',
-          description: 'Tune connection pool parameters under 500 concurrent client simulations to prevent thread starvation.',
+          description: 'Tune connection pool parameters under 500 concurrent client simulations to prevent thread starvation during flash sales.',
           priority: 'HIGH',
           status: 'NOT_STARTED',
           relatedSkills: ['PostgreSQL', 'HikariCP'],

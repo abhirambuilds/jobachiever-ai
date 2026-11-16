@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Menu, X, ArrowRight, Layers, UserCheck, LayoutDashboard } from 'lucide-react';
+import { Sparkles, Menu, X, ArrowRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DemoLaunchCard } from '@/components/demo';
+import { enableDemoMode } from '@/demo/demoConfig';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -91,34 +91,11 @@ export function Navbar() {
         </nav>
 
         {/* Right CTA Actions */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Link to="/dashboard" className="hidden xl:inline-flex">
-            <Button variant="ghost" size="sm" className="gap-1 text-xs text-muted-foreground hover:text-foreground">
-              <LayoutDashboard className="h-3.5 w-3.5 text-primary" />
-              <span>Dashboard</span>
-            </Button>
-          </Link>
-
-          <Link to="/profile" className="hidden xl:inline-flex">
-            <Button variant="ghost" size="sm" className="gap-1 text-xs text-muted-foreground hover:text-foreground">
-              <UserCheck className="h-3.5 w-3.5 text-primary" />
-              <span>Master Profile</span>
-            </Button>
-          </Link>
-
-          <Link to="/showcase" className="hidden sm:inline-flex">
-            <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-foreground">
-              <Layers className="h-3.5 w-3.5" />
-              <span>UI System</span>
-            </Button>
-          </Link>
-
+        <div className="flex items-center gap-3">
           <ThemeToggle className="h-9 w-9" />
 
-          <DemoLaunchCard variant="button" className="hidden md:inline-flex" />
-
           <Link to="/login" className="hidden sm:inline-block">
-            <Button variant="ghost" size="sm" className="text-sm">
+            <Button variant="ghost" size="sm" className="text-sm font-medium text-muted-foreground hover:text-foreground">
               Sign In
             </Button>
           </Link>
@@ -126,10 +103,13 @@ export function Navbar() {
           <Button
             variant="ai"
             size="sm"
-            onClick={() => navigate('/register')}
-            className="gap-1.5 font-semibold"
+            onClick={() => {
+              enableDemoMode();
+              navigate('/dashboard');
+            }}
+            className="gap-1.5 font-semibold shadow-glow-sm"
           >
-            <span>Get Started</span>
+            <span>Launch Platform</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Button>
 
@@ -180,36 +160,25 @@ export function Navbar() {
             >
               <span>Why JobAchiever</span>
             </button>
-            <Link
-              to="/dashboard"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-accent"
-            >
-              <LayoutDashboard className="h-4 w-4 text-primary" />
-              <span>Career Dashboard</span>
-            </Link>
-            <Link
-              to="/showcase"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent"
-            >
-              <Layers className="h-4 w-4" />
-              <span>Design System Showcase</span>
-            </Link>
             <div className="pt-2 border-t border-border/50 flex flex-col gap-2">
-              <DemoLaunchCard variant="button" className="w-full justify-center" />
-              <div className="flex gap-2">
-                <Link to="/login" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/register" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="ai" size="sm" className="w-full">
-                    Get Started
-                  </Button>
-                </Link>
-              </div>
+              <Button
+                variant="ai"
+                size="sm"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  enableDemoMode();
+                  navigate('/dashboard');
+                }}
+                className="w-full gap-1.5 font-semibold shadow-glow-sm"
+              >
+                <span>Launch Platform</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+              <Link to="/login" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="outline" size="sm" className="w-full">
+                  Sign In
+                </Button>
+              </Link>
             </div>
           </nav>
         </div>

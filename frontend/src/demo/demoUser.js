@@ -1,17 +1,17 @@
 /**
- * Consistent Fictional Demo User: Alex Morgan
- * Entry-level Backend Software Engineer.
+ * Candidate Persona: Aarav Sharma
+ * Senior Backend & Distributed Systems Engineer (Bengaluru, Karnataka, India).
  */
 
 export const DEMO_USER = {
-  id: 'usr-demo-alex-morgan',
-  name: 'Alex Morgan',
-  email: 'alex.morgan@demo.jobachiever.ai',
+  id: 'usr-demo-aarav-sharma',
+  name: 'Aarav Sharma',
+  email: 'aarav.sharma@jobachiever.ai',
   role: 'ROLE_USER',
   status: 'ACTIVE',
   emailVerified: true,
   avatarUrl: null,
   createdAt: '2026-10-15T08:00:00Z',
-  targetRole: 'Backend Software Engineer',
-  careerTrack: 'Backend Software Engineer',
+  targetRole: 'Senior Backend Software Engineer',
+  careerTrack: 'Senior Backend Software Engineer',
 };

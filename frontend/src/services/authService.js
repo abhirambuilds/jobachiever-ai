@@ -44,8 +44,8 @@ export const authService = {
       success: true,
       message: 'Login successful. Welcome back!',
       user: {
-        email: credentials.email || 'alex.morgan@demo.jobachiever.ai',
-        name: 'Alex Morgan',
+        email: credentials.email || 'aarav.sharma@jobachiever.ai',
+        name: 'Aarav Sharma',
       },
     };
   },

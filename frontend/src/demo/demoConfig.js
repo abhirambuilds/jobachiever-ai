@@ -24,9 +24,9 @@ export const DEMO_CONFIG = {
   minDelayMs: 200,
   maxDelayMs: 450,
   // Demo persona information
-  personaName: 'Alex Morgan',
-  personaRole: 'Software Engineering Candidate (Backend)',
-  personaEmail: 'alex.morgan@demo.jobachiever.ai',
+  personaName: 'Aarav Sharma',
+  personaRole: 'Senior Backend Engineer (Bengaluru)',
+  personaEmail: 'aarav.sharma@jobachiever.ai',
 };
 
 /**

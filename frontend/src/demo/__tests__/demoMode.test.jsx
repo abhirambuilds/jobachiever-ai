@@ -60,14 +60,14 @@ describe('Emergency Demo Presentation Mode', () => {
     });
   });
 
-  describe('2. Consistency of Demo Data & Persona (Alex Morgan)', () => {
-    it('defines consistent fictional candidate Alex Morgan', () => {
-      expect(DEMO_USER.name).toBe('Alex Morgan');
-      expect(DEMO_USER.email).toBe('alex.morgan@demo.jobachiever.ai');
-      expect(DEMO_PROFILE.personalInfo.fullName).toBe('Alex Morgan');
-      expect(DEMO_PROFILE.education[0].institution).toBe('San Jose State University');
-      expect(DEMO_PROFILE.education[0].degree).toBe('B.S.');
-      expect(DEMO_PROFILE.education[0].gpa).toBe('3.85 / 4.0');
+  describe('2. Consistency of Demo Data & Persona (Aarav Sharma)', () => {
+    it('defines consistent fictional candidate Aarav Sharma', () => {
+      expect(DEMO_USER.name).toBe('Aarav Sharma');
+      expect(DEMO_USER.email).toBe('aarav.sharma@jobachiever.ai');
+      expect(DEMO_PROFILE.personalInfo.fullName).toBe('Aarav Sharma');
+      expect(DEMO_PROFILE.education[0].institution).toContain('IIT');
+      expect(DEMO_PROFILE.education[0].degree).toBe('B.Tech');
+      expect(DEMO_PROFILE.education[0].gpa).toBe('9.2 / 10.0');
     });
 
     it('ensures cross-module skill consistency between profile, resume, match, and roadmap', () => {
@@ -75,30 +75,30 @@ describe('Emergency Demo Presentation Mode', () => {
       expect(profileSkills).toContain('Java 21 LTS');
       expect(profileSkills).toContain('Spring Boot 3');
       expect(profileSkills).toContain('PostgreSQL & SQL');
-      expect(profileSkills).toContain('REST APIs');
+      expect(profileSkills).toContain('Apache Kafka');
 
       // Primary resume matches ATS score 94%
       const primaryResume = DEMO_RESUMES.find((r) => r.isPrimary);
       expect(primaryResume).toBeDefined();
       expect(primaryResume.atsScore).toBe(94);
-      expect(primaryResume.extractedText).toContain('ALEX MORGAN');
+      expect(primaryResume.extractedText).toContain('AARAV SHARMA');
 
-      // Stripe job description requires Java 21 and Spring Boot 3
-      const stripeJob = DEMO_JOBS.find((j) => j.company === 'Stripe');
-      expect(stripeJob).toBeDefined();
-      expect(stripeJob.requiredSkills).toContain('Java 21');
-      expect(stripeJob.requiredSkills).toContain('Spring Boot 3');
+      // Razorpay job description requires Java 21 and Spring Boot 3
+      const razorpayJob = DEMO_JOBS.find((j) => j.company === 'Razorpay');
+      expect(razorpayJob).toBeDefined();
+      expect(razorpayJob.requiredSkills).toContain('Java 21');
+      expect(razorpayJob.requiredSkills).toContain('Spring Boot 3');
 
       // Precomputed resume analysis reflects 94 overall score
       expect(DEMO_RESUME_ANALYSIS_ALEX.overallScore).toBe(94);
       expect(DEMO_RESUME_ANALYSIS_ALEX.isSimulatedDemo).toBe(true);
 
-      // Precomputed job decomposition aligns with Stripe requirements
-      expect(DEMO_JOB_ANALYSIS_STRIPE.company).toBe('Stripe');
+      // Precomputed job decomposition aligns with Razorpay requirements
+      expect(DEMO_JOB_ANALYSIS_STRIPE.company).toBe('Razorpay');
       expect(DEMO_JOB_ANALYSIS_STRIPE.requiredTechnicalSkills.map((s) => s.name)).toContain('Java 21');
 
-      // Explainable match achieves 91% with 100% mandatory skills
-      expect(DEMO_JOB_MATCH_ALEX_STRIPE.overallScore).toBe(91);
+      // Explainable match achieves 94% with 100% mandatory skills
+      expect(DEMO_JOB_MATCH_ALEX_STRIPE.overallScore).toBe(94);
       const reqSkillsScore = DEMO_JOB_MATCH_ALEX_STRIPE.categoryScores.find(
         (c) => c.id === 'technical_skills'
       );
@@ -127,7 +127,7 @@ describe('Emergency Demo Presentation Mode', () => {
 
       enableDemoMode();
       const demoProf = await demoService.getProfile();
-      expect(demoProf.personalInfo.fullName).toBe('Alex Morgan');
+      expect(demoProf.personalInfo.fullName).toBe('Aarav Sharma');
 
       // Mutate demo profile
       const modified = {
@@ -167,7 +167,7 @@ describe('Emergency Demo Presentation Mode', () => {
       enableDemoMode();
 
       const user = await demoService.getUser();
-      expect(user.name).toBe('Alex Morgan');
+      expect(user.name).toBe('Aarav Sharma');
 
       const resumes = await demoService.getResumes();
       expect(resumes.length).toBeGreaterThanOrEqual(2);
@@ -179,8 +179,8 @@ describe('Emergency Demo Presentation Mode', () => {
       expect(analysis.overallScore).toBe(94);
       expect(analysis.isSimulatedDemo).toBe(true);
 
-      const match = await demoService.getJobMatch('demo-res-1', 'job-demo-stripe');
-      expect(match.overallScore).toBe(91);
+      const match = await demoService.getJobMatch('demo-res-1', 'job-demo-razorpay');
+      expect(match.overallScore).toBe(94);
       expect(match.isSimulatedDemo).toBe(true);
     });
 
@@ -210,7 +210,7 @@ describe('Emergency Demo Presentation Mode', () => {
         </BrowserRouter>
       );
       expect(screen.getByText(/Interactive Demo Mode/i)).toBeInTheDocument();
-      expect(screen.getByText(/Alex Morgan/i)).toBeInTheDocument();
+      expect(screen.getByText(/Aarav Sharma/i)).toBeInTheDocument();
       expect(screen.getByText(/Reset Demo State/i)).toBeInTheDocument();
       expect(screen.getByText(/Exit Demo/i)).toBeInTheDocument();
     });
@@ -240,7 +240,7 @@ describe('Emergency Demo Presentation Mode', () => {
       );
 
       expect(screen.getByText(/Sign In as/i)).toBeInTheDocument();
-      expect(screen.getByText(/Alex Morgan/i)).toBeInTheDocument();
+      expect(screen.getByText(/Aarav Sharma/i)).toBeInTheDocument();
       expect(screen.getByText(/Verified Candidate Account/i)).toBeInTheDocument();
 
       const enterButton = screen.getByRole('button', { name: /Explore Interactive Demo|Enter Demo Mode/i });
@@ -250,7 +250,7 @@ describe('Emergency Demo Presentation Mode', () => {
   });
 
   describe('6. Integration with Contexts (Profile & Dashboard)', () => {
-    it('renders Jane Doe in normal mode and Alex Morgan in Demo Mode', () => {
+    it('renders Jane Doe in normal mode and Aarav Sharma in Demo Mode', () => {
       // 1. Normal mode
       disableDemoMode();
       const { unmount } = render(
@@ -272,8 +272,8 @@ describe('Emergency Demo Presentation Mode', () => {
           </ProfileProvider>
         </BrowserRouter>
       );
-      expect(screen.getByText('Alex')).toBeInTheDocument();
-      expect(screen.getByText(/Backend Software Engineer/)).toBeInTheDocument();
+      expect(screen.getByText('Aarav')).toBeInTheDocument();
+      expect(screen.getByText(/Senior Backend & Distributed Systems/)).toBeInTheDocument();
     });
   });
 
@@ -289,14 +289,14 @@ describe('Emergency Demo Presentation Mode', () => {
 
       const fullStackRes = DEMO_RESUMES.find((r) => r.id === 'demo-res-2');
       expect(fullStackRes).toBeDefined();
-      expect(fullStackRes.name).toContain('Full Stack Developer');
+      expect(fullStackRes.name).toContain('Full Stack');
       expect(fullStackRes.atsScore).toBe(91);
       expect(fullStackRes.isPrimary).toBe(false);
 
       const aimlRes = DEMO_RESUMES.find((r) => r.id === 'demo-res-3');
       expect(aimlRes).toBeDefined();
       expect(aimlRes.name).toContain('AI / ML');
-      expect(aimlRes.atsScore).toBe(89);
+      expect(aimlRes.atsScore).toBe(90);
       expect(aimlRes.isPrimary).toBe(false);
     });
 
@@ -304,8 +304,8 @@ describe('Emergency Demo Presentation Mode', () => {
       enableDemoMode();
 
       // 1. Rename
-      const renamed = await demoService.renameResume('demo-res-2', 'Alex Morgan — Senior Full Stack');
-      expect(renamed.name).toBe('Alex Morgan — Senior Full Stack');
+      const renamed = await demoService.renameResume('demo-res-2', 'Aarav Sharma — Senior Full Stack');
+      expect(renamed.name).toBe('Aarav Sharma — Senior Full Stack');
 
       // 2. Set primary
       const updatedPrimary = await demoService.setPrimaryResume('demo-res-2');
@@ -315,10 +315,10 @@ describe('Emergency Demo Presentation Mode', () => {
       expect(oldPrimary.isPrimary).toBe(false);
 
       // 3. Upload new resume
-      const mockFile = new File(['mock content'], 'alex_devops.pdf', { type: 'application/pdf' });
+      const mockFile = new File(['mock content'], 'aarav_devops.pdf', { type: 'application/pdf' });
       const uploaded = await demoService.uploadResume(mockFile, { careerTrackId: 'track-demo-cloud' });
       expect(uploaded.id).toBeDefined();
-      expect(uploaded.name).toContain('alex devops');
+      expect(uploaded.name).toContain('aarav devops');
 
       // 4. Delete uploaded resume
       const deleteResult = await demoService.deleteResume(uploaded.id);

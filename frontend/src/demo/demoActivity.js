@@ -1,5 +1,5 @@
 /**
- * Consistent Recent Dashboard Activity for Alex Morgan
+ * Consistent Recent Dashboard Activity for Aarav Sharma (Indian Product Ecosystem)
  */
 
 export const DEMO_ACTIVITIES = [
@@ -7,7 +7,7 @@ export const DEMO_ACTIVITIES = [
     id: 'demo-act-1',
     type: 'resume_analyzed',
     title: 'Master Resume Analyzed',
-    description: 'ATS structural score calculated at 94%. Flawless single-column formatting & quantified STAR metrics.',
+    description: 'ATS structural score calculated at 94%. Verified single-column formatting & quantified UPI metrics.',
     timestamp: '1 hour ago',
     icon: 'FileSearch',
     badge: 'Score: 94%',
@@ -16,11 +16,11 @@ export const DEMO_ACTIVITIES = [
   {
     id: 'demo-act-2',
     type: 'job_matched',
-    title: 'Stripe Core Platform Job Matched',
-    description: 'Calculated 91% explainable compatibility match. 100% mandatory skills verified (Java 21, Spring Boot 3).',
+    title: 'Razorpay Core Payments Job Matched',
+    description: 'Calculated 94% explainable compatibility match. 100% mandatory skills verified (Java 21, Spring Boot 3, Kafka).',
     timestamp: '3 hours ago',
     icon: 'Target',
-    badge: '91% Match',
+    badge: '94% Match',
     badgeVariant: 'ai',
   },
   {
@@ -37,7 +37,7 @@ export const DEMO_ACTIVITIES = [
     id: 'demo-act-4',
     type: 'application_advanced',
     title: 'Application Stage Advanced',
-    description: 'Stripe Backend SWE application advanced to "Technical Screen" stage.',
+    description: 'Razorpay Lead Backend application advanced to "System Design Round" stage.',
     timestamp: '2 days ago',
     icon: 'TrendingUp',
     badge: 'Interview',
@@ -47,7 +47,7 @@ export const DEMO_ACTIVITIES = [
     id: 'demo-act-5',
     type: 'profile_updated',
     title: 'Master Profile Synchronized',
-    description: 'Verified 8 core technical skills and 2 distributed systems projects.',
+    description: 'Verified IIT Bombay degree, Razorpay SDE-2 tenure, and UPI Settlement Engine.',
     timestamp: '3 days ago',
     icon: 'UserCheck',
     badge: 'Verified',

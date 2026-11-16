@@ -64,7 +64,7 @@ export function DemoModeBanner() {
           </Badge>
 
           <span className="font-medium text-foreground">
-            Persona: <strong className="text-amber-500 dark:text-amber-400">Alex Morgan</strong> (Entry-Level Backend SWE)
+            Persona: <strong className="text-amber-500 dark:text-amber-400">Aarav Sharma</strong> (Senior Backend SWE • Bengaluru)
           </span>
 
           <span className="hidden md:inline-flex items-center gap-1 text-muted-foreground text-[11px]">
