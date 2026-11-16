@@ -58,7 +58,6 @@ export const careerIntelligenceService = {
       const json = await response.json();
       return json.data || json;
     } catch (err) {
-      if (err.status === 401 || err.status === 403) throw err;
       // Fallback simulation for client-only / offline testing
       return simulateSkillGapAnalysis(payload.targetRole || 'Backend Engineer', payload.careerTrackId);
     }
@@ -123,7 +122,6 @@ export const careerIntelligenceService = {
       const json = await response.json();
       return json.data || json;
     } catch (err) {
-      if (err.status === 401 || err.status === 403) throw err;
       return simulateCareerRecommendations(payload.targetRole || 'Backend Engineer', payload.careerTrackId);
     }
   },
@@ -184,7 +182,6 @@ export const careerIntelligenceService = {
       const json = await response.json();
       return json.data || json;
     } catch (err) {
-      if (err.status === 401 || err.status === 403) throw err;
       return simulateLearningRoadmap(payload.targetRole || 'Backend Engineer', payload.careerTrackId);
     }
   },
@@ -260,7 +257,6 @@ export const careerIntelligenceService = {
       const json = await response.json();
       return json.data || json;
     } catch (err) {
-      if (err.status === 401 || err.status === 403) throw err;
       // Local optimistic update
       return {
         id: milestoneId,
@@ -297,7 +293,6 @@ export const careerIntelligenceService = {
       const json = await response.json();
       return json.data || json;
     } catch (err) {
-      if (err.status === 401 || err.status === 403) throw err;
       return simulateProjectRecommendations('Backend Engineer', trackId);
     }
   },

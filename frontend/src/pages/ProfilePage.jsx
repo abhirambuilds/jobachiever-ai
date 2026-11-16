@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   User,
   Layers,
@@ -30,6 +30,12 @@ export function ProfilePage({ initialTab = 'master' }) {
   const { profile, calculateCompleteness, resetToDemo } = useProfile();
   const { percentage, checks, missingSections } = calculateCompleteness();
   const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   const handleReset = () => {
     resetToDemo();

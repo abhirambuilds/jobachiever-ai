@@ -53,6 +53,7 @@ export function AppRoutes() {
 
         {/* Core Career Architecture Suite */}
         <Route path="/tracks" element={<ProfilePage initialTab="tracks" />} />
+        <Route path="/career-tracks" element={<ProfilePage initialTab="tracks" />} />
         <Route path="/resumes" element={<ResumeLibraryPage />} />
         <Route path="/resume-studio" element={<ResumeStudioPage />} />
         <Route path="/studio" element={<ResumeStudioPage />} />

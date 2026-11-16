@@ -15,6 +15,7 @@ import {
   HelpCircle,
   FileText,
   Key,
+  Sparkles,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -141,6 +142,27 @@ export function JobAnalysisResultView({ analysis, rawText }) {
               >
                 {copiedKeywords ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
                 <span>{copiedKeywords ? 'Keywords Copied!' : 'Copy Keywords'}</span>
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  navigate('/resume-studio', {
+                    state: {
+                      autoTailorJob: {
+                        title: jobOverview.title,
+                        company: jobOverview.companyName,
+                        skills: technicalSkills?.map((s) => s.name) || [],
+                        description: rawText || summary,
+                      },
+                    },
+                  });
+                }}
+                className="text-xs gap-1.5 font-semibold bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-emerald-500/30"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Create Tailored ATS Resume</span>
               </Button>
 
               <Button

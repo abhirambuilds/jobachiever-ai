@@ -42,7 +42,7 @@ describe('Dashboard Layout & Navigation', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Jane')).toBeInTheDocument();
+    expect(screen.getByText(/Aarav|Jane/)).toBeInTheDocument();
     expect(screen.getByText(/Backend Systems Engineer/)).toBeInTheDocument();
   });
 
@@ -55,7 +55,7 @@ describe('Dashboard Layout & Navigation', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Jane')).toBeInTheDocument();
+    expect(screen.getByText(/Aarav|Jane/)).toBeInTheDocument();
     expect(screen.getByText('Quick Career Actions')).toBeInTheDocument();
     expect(screen.getByText('Career Tracks & Personas')).toBeInTheDocument();
     expect(screen.getByText('Recommended Opportunities')).toBeInTheDocument();

@@ -208,7 +208,7 @@ export const DEMO_PROFILE = {
   careerTracks: [
     {
       id: 'track-demo-backend',
-      name: 'Senior Backend & Distributed Systems',
+      name: 'Backend Systems Engineer',
       targetRole: 'Senior Backend Software Engineer',
       description:
         'Primary track focused on resilient distributed APIs, high-throughput payment switches, event streaming with Kafka, and Kubernetes deployment.',
@@ -240,6 +240,24 @@ export const DEMO_PROFILE = {
       targetIndustries: 'Developer Tooling, Enterprise SaaS',
       careerObjectives: 'Automate multi-region failover and maintain 99.99% service uptime.',
       preferredOpportunities: 'Senior Platform and Infrastructure Engineering roles',
+      isPrimary: false,
+    },
+    {
+      id: 'track-demo-fullstack',
+      name: 'Full-Stack Product Engineer',
+      targetRole: 'Full-Stack Developer',
+      description:
+        'Product engineering track combining modern React/Tailwind frontends with Spring Boot and distributed APIs.',
+      relevantSkills: [
+        'React 18',
+        'Java 21 LTS',
+        'Spring Boot 3',
+        'PostgreSQL & SQL',
+        'Docker & Kubernetes',
+      ],
+      targetIndustries: 'Commercial SaaS, Enterprise Software',
+      careerObjectives: 'Deliver polished, user-delighting SaaS products from concept to scale.',
+      preferredOpportunities: 'Product-focused engineering teams',
       isPrimary: false,
     },
   ],

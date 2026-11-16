@@ -1,9 +1,13 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { isDemoMode } from '@/demo/demoConfig';
 import { DEMO_PROFILE } from '@/demo/demoProfile';
+import { profileService } from '@/services/profileService';
+import { careerTrackService } from '@/services/careerTrackService';
 
 const STORAGE_KEY = 'jobachiever_profile_draft';
 const DEMO_STORAGE_KEY = 'jobachiever_demo_profile_draft';
+
+const DEFAULT_PROFILE = DEMO_PROFILE;
 
 function getInitialProfile() {
   if (isDemoMode()) {
@@ -28,265 +32,76 @@ function getInitialProfile() {
   return DEFAULT_PROFILE;
 }
 
-const DEFAULT_PROFILE = {
-  personalInfo: {
-    fullName: 'Jane Doe',
-    headline: 'Senior Full-Stack Engineer & Cloud Systems Architect',
-    email: 'jane.doe@example.com',
-    phone: '+1 (555) 234-5678',
-    country: 'United States',
-    city: 'San Francisco, CA',
-    linkedinUrl: 'https://linkedin.com/in/janedoe',
-    githubUrl: 'https://github.com/janedoe',
-    websiteUrl: 'https://janedoe.dev',
-    summary:
-      'Passionate full-stack engineer with 4+ years of hands-on experience designing high-throughput backend services in Java/Spring Boot and responsive web apps in React. Experienced in distributed PostgreSQL architectures and AI inference integration.',
-  },
-  education: [
-    {
-      id: 'edu-1',
-      institution: 'University of California, Berkeley',
-      degree: 'B.S.',
-      fieldOfStudy: 'Computer Science & Engineering',
-      startDate: '2019-09',
-      graduationDate: '2023-05',
-      isCurrent: false,
-      gpa: '3.88 / 4.0',
-      coursework: 'Distributed Systems, Operating Systems, Database Internals, Algorithms, Machine Learning',
-    },
-  ],
-  skills: [
-    {
-      id: 'skill-1',
-      name: 'Java 21 LTS',
-      category: 'Programming Languages',
-      proficiency: 'Expert',
-      yearsOfExperience: '4',
-      evidence: 'Core services in Spring Boot enterprise projects',
-    },
-    {
-      id: 'skill-2',
-      name: 'Spring Boot 3',
-      category: 'Backend Development',
-      proficiency: 'Expert',
-      yearsOfExperience: '4',
-      evidence: 'Architected microservices handling high concurrency',
-    },
-    {
-      id: 'skill-3',
-      name: 'React 18',
-      category: 'Frontend Development',
-      proficiency: 'Advanced',
-      yearsOfExperience: '3',
-      evidence: 'Production SaaS user interfaces with Tailwind CSS and Radix UI',
-    },
-    {
-      id: 'skill-4',
-      name: 'PostgreSQL & pgvector',
-      category: 'Databases',
-      proficiency: 'Advanced',
-      yearsOfExperience: '3',
-      evidence: 'Optimized HNSW vector indexing and relational schema migrations',
-    },
-    {
-      id: 'skill-5',
-      name: 'Python 3.11',
-      category: 'Programming Languages',
-      proficiency: 'Advanced',
-      yearsOfExperience: '3',
-      evidence: 'FastAPI microservices and automated parsing pipelines',
-    },
-    {
-      id: 'skill-6',
-      name: 'Docker & Compose',
-      category: 'Cloud and DevOps',
-      proficiency: 'Advanced',
-      yearsOfExperience: '3',
-      evidence: 'Containerized multi-tier monorepos for staging and production',
-    },
-    {
-      id: 'skill-7',
-      name: 'REST & gRPC APIs',
-      category: 'Backend Development',
-      proficiency: 'Expert',
-      yearsOfExperience: '4',
-      evidence: 'Designed strict DTO isolation and versioned REST endpoints',
-    },
-    {
-      id: 'skill-8',
-      name: 'Data Structures & Algorithms',
-      category: 'Core Computer Science',
-      proficiency: 'Advanced',
-      yearsOfExperience: '4',
-      evidence: 'Sub-linear search performance and memory optimization',
-    },
-  ],
-  experience: [
-    {
-      id: 'exp-1',
-      company: 'Apex Cloud Solutions',
-      jobTitle: 'Senior Full-Stack Engineer',
-      employmentType: 'Full-time',
-      location: 'San Francisco, CA (Hybrid)',
-      startDate: '2023-06',
-      endDate: '',
-      isCurrent: true,
-      responsibilities:
-        'Led architecture for cloud-native microservices processing 2.5M daily events. Guided junior engineers in code review and test-driven development.',
-      achievements:
-        'Decreased 99th-percentile API response latency by 38% via PostgreSQL indexing and connection pool tuning. Built responsive dashboard in React.',
-      technologies: 'Java, Spring Boot, React, PostgreSQL, Docker, AWS',
-    },
-    {
-      id: 'exp-2',
-      company: 'Nexis Tech Labs',
-      jobTitle: 'Software Engineering Intern',
-      employmentType: 'Internship',
-      location: 'San Jose, CA',
-      startDate: '2022-05',
-      endDate: '2022-08',
-      isCurrent: false,
-      responsibilities:
-        'Developed internal diagnostic dashboard and automated continuous integration pipelines with GitHub Actions.',
-      achievements:
-        'Migrated 14 legacy endpoints to Spring Boot 3 with comprehensive JUnit and Mockito test coverage.',
-      technologies: 'Java, Spring Boot, JUnit, Docker, Git',
-    },
-  ],
-  projects: [
-    {
-      id: 'proj-1',
-      name: 'VectorDB Query Engine',
-      description:
-        'A high-performance semantic search service integrating pgvector with FastAPI for rapid document similarity scoring.',
-      problemSolved:
-        'Eliminated costly external SaaS vector database subscriptions by running optimized on-premise embeddings with HNSW indexing.',
-      technologies: 'Python, FastAPI, PostgreSQL, pgvector, Docker',
-      githubUrl: 'https://github.com/janedoe/vectordb-engine',
-      liveDemoUrl: 'https://vectordb.janedoe.dev',
-      role: 'Sole Architect & Lead Developer',
-      keyAchievements: 'Achieved sub-50ms latency across 500,000 document vector queries.',
-      startDate: '2023-01',
-      endDate: '2023-04',
-    },
-    {
-      id: 'proj-2',
-      name: 'CloudMetrics Observability Suite',
-      description:
-        'Real-time metrics aggregator and visual dashboard monitoring distributed service health.',
-      problemSolved:
-        'Provided granular latency attribution across multi-tier Spring Boot and React applications.',
-      technologies: 'React, Tailwind CSS, Spring Boot, WebSockets',
-      githubUrl: 'https://github.com/janedoe/cloudmetrics-suite',
-      liveDemoUrl: 'https://metrics.janedoe.dev',
-      role: 'Full-Stack Developer',
-      keyAchievements: 'Adopted by 3 internal engineering teams to debug release bottlenecks.',
-      startDate: '2023-08',
-      endDate: '2023-11',
-    },
-  ],
-  certifications: [
-    {
-      id: 'cert-1',
-      name: 'AWS Certified Solutions Architect – Associate',
-      issuingOrg: 'Amazon Web Services',
-      issueDate: '2023-07',
-      expirationDate: '2026-07',
-      credentialUrl: 'https://aws.amazon.com/verification',
-    },
-    {
-      id: 'cert-2',
-      name: 'Spring Certified Professional',
-      issuingOrg: 'VMware Tanzu',
-      issueDate: '2022-11',
-      expirationDate: '',
-      credentialUrl: 'https://vmware.com/credentials',
-    },
-  ],
-  achievements: [
-    {
-      id: 'ach-1',
-      title: 'First Place – CalHacks Hackathon',
-      description:
-        'Built an accessible AI career advisory tool within 36 hours competing against 400+ collegiate developer teams.',
-      issuingOrg: 'UC Berkeley CalHacks',
-      date: '2022-10',
-    },
-  ],
-  careerPreferences: {
-    targetRoles: ['Backend Developer', 'Full Stack Developer', 'Solutions Architect'],
-    employmentTypes: ['Full-time'],
-    workArrangement: 'Hybrid',
-    preferredLocations: 'San Francisco Bay Area, Seattle, Remote',
-    preferredCountries: 'United States',
-    expectedSalary: '$140,000 - $175,000',
-    careerGoals:
-      'Lead backend platform architecture for scalable cloud systems, deepen expertise in LLM embedding pipelines, and mentor emerging engineers.',
-  },
-  careerTracks: [
-    {
-      id: 'track-1',
-      name: 'Backend Systems Engineer',
-      targetRole: 'Senior Backend Engineer',
-      description:
-        'Specialized track prioritizing high-concurrency microservices, Spring Boot, distributed databases, and fault tolerance.',
-      relevantSkills: [
-        'Java 21 LTS',
-        'Spring Boot 3',
-        'PostgreSQL & pgvector',
-        'Docker & Compose',
-        'REST & gRPC APIs',
-        'Data Structures & Algorithms',
-      ],
-      targetIndustries: 'Cloud Infrastructure, Developer Tooling, Fintech',
-      careerObjectives: 'Architect resilient event-driven systems with sub-50ms p99 latency.',
-      preferredOpportunities: 'Mid-to-Senior Individual Contributor roles',
-      isPrimary: true,
-    },
-    {
-      id: 'track-2',
-      name: 'Full-Stack Product Engineer',
-      targetRole: 'Full-Stack Developer',
-      description:
-        'End-to-end product engineering track combining modern React/Tailwind frontends with Spring Boot and Node.js APIs.',
-      relevantSkills: [
-        'React 18',
-        'Java 21 LTS',
-        'Spring Boot 3',
-        'PostgreSQL & pgvector',
-        'Docker & Compose',
-      ],
-      targetIndustries: 'Commercial SaaS, Enterprise Software',
-      careerObjectives: 'Deliver polished, user-delighting SaaS products from concept to scale.',
-      preferredOpportunities: 'Product-focused engineering teams',
-      isPrimary: false,
-    },
-    {
-      id: 'track-3',
-      name: 'AI & Vector Solutions Engineer',
-      targetRole: 'AI / ML Solutions Engineer',
-      description:
-        'Applied AI track focusing on semantic search, pgvector database indexing, and structured inference services.',
-      relevantSkills: [
-        'Python 3.11',
-        'PostgreSQL & pgvector',
-        'Docker & Compose',
-        'REST & gRPC APIs',
-      ],
-      targetIndustries: 'Applied AI, Intelligent Search, Enterprise Analytics',
-      careerObjectives: 'Implement grounded AI workflows without hallucinations.',
-      preferredOpportunities: 'Applied AI and Infrastructure teams',
-      isPrimary: false,
-    },
-  ],
-};
-
 const ProfileContext = createContext(null);
 
 export function ProfileProvider({ children }) {
   const [profile, setProfile] = useState(getInitialProfile);
+  const syncTimeoutRef = useRef(null);
 
-  // Persist non-sensitive draft profile data in localStorage (isolated by demo mode)
+  // Load from real database if user is authenticated with a valid JWT
+  useEffect(() => {
+    const fetchDbProfile = async () => {
+      try {
+        const res = await profileService.getProfile();
+        if (res?.source === 'database' && res.data) {
+          const d = res.data;
+          setProfile((prev) => ({
+            ...prev,
+            personalInfo: {
+              ...prev.personalInfo,
+              fullName: d.personalInfo?.fullName || `${d.firstName || ''} ${d.lastName || ''}`.trim() || prev.personalInfo.fullName,
+              headline: d.headline || d.personalInfo?.headline || prev.personalInfo.headline,
+              email: d.email || prev.personalInfo.email,
+              phone: d.phoneNumber || d.personalInfo?.phone || prev.personalInfo.phone,
+              city: d.currentLocation || d.personalInfo?.city || prev.personalInfo.city,
+              country: d.country || d.personalInfo?.country || prev.personalInfo.country,
+              linkedinUrl: d.linkedinUrl || d.personalInfo?.linkedinUrl || prev.personalInfo.linkedinUrl,
+              githubUrl: d.githubUrl || d.personalInfo?.githubUrl || prev.personalInfo.githubUrl,
+              portfolioUrl: d.portfolioUrl || d.personalInfo?.portfolioUrl || prev.personalInfo.portfolioUrl,
+              websiteUrl: d.websiteUrl || d.personalInfo?.websiteUrl || prev.personalInfo.websiteUrl,
+              summary: d.summary || d.personalInfo?.summary || prev.personalInfo.summary,
+            },
+            skills: d.skills && d.skills.length > 0 ? d.skills : prev.skills,
+            experience: d.experiences && d.experiences.length > 0 ? d.experiences : (d.experience && d.experience.length > 0 ? d.experience : prev.experience),
+            education: d.educations && d.educations.length > 0 ? d.educations : (d.education && d.education.length > 0 ? d.education : prev.education),
+            projects: d.projects && d.projects.length > 0 ? d.projects : prev.projects,
+            certifications: d.certifications && d.certifications.length > 0 ? d.certifications : prev.certifications,
+            achievements: d.achievements && d.achievements.length > 0 ? d.achievements : prev.achievements,
+          }));
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      try {
+        const tracks = await careerTrackService.listTracks();
+        if (tracks && tracks.length > 0) {
+          setProfile((prev) => ({
+            ...prev,
+            careerTracks: tracks.map((t) => ({
+              id: t.id,
+              name: t.name,
+              targetRole: t.targetRole,
+              description: t.description,
+              relevantSkills: t.requiredSkills || t.relevantSkills || [],
+              targetIndustries: Array.isArray(t.industries) ? t.industries.join(', ') : (t.industries || ''),
+              careerObjectives: t.careerGoals || '',
+              preferredOpportunities: '',
+              isPrimary: !!t.isPrimary,
+            })),
+          }));
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    fetchDbProfile();
+    window.addEventListener('jobachiever:auth-changed', fetchDbProfile);
+    return () => window.removeEventListener('jobachiever:auth-changed', fetchDbProfile);
+  }, []);
+
+  // Persist draft in localStorage and debounce sync to PostgreSQL database
   useEffect(() => {
     try {
       const currentKey = isDemoMode() ? DEMO_STORAGE_KEY : STORAGE_KEY;
@@ -294,6 +109,40 @@ export function ProfileProvider({ children }) {
     } catch {
       // ignore write errors
     }
+
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
+    syncTimeoutRef.current = setTimeout(() => {
+      const token = typeof localStorage !== 'undefined' ? localStorage.getItem('jobachiever_jwt_token') : null;
+      if (token && token !== 'demo-valid-bearer-token') {
+        profileService.updateProfile({
+          personalInfo: {
+            fullName: profile.personalInfo.fullName,
+            headline: profile.personalInfo.headline,
+            phone: profile.personalInfo.phone,
+            country: profile.personalInfo.country,
+            location: profile.personalInfo.city,
+            linkedinUrl: profile.personalInfo.linkedinUrl,
+            githubUrl: profile.personalInfo.githubUrl,
+            portfolioUrl: profile.personalInfo.portfolioUrl,
+            websiteUrl: profile.personalInfo.websiteUrl,
+            summary: profile.personalInfo.summary,
+          },
+          skills: (profile.skills || []).map((s) => ({
+            name: s.name,
+            category: s.category || 'TECHNICAL',
+            proficiency: (s.proficiency || 'INTERMEDIATE').toUpperCase(),
+            yearsOfExperience: parseFloat(s.yearsOfExperience) || 1.0,
+            evidence: s.evidence || '',
+          })),
+        }).catch(() => {});
+      }
+    }, 1500);
+
+    return () => {
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    };
   }, [profile]);
 
   // Synchronize on demo state reset or mode toggle
@@ -456,6 +305,23 @@ export function ProfileProvider({ children }) {
       }
       return { ...prev, careerTracks: [...updatedTracks, newTrack] };
     });
+
+    careerTrackService.createTrack({
+      name: newTrack.name,
+      targetRole: newTrack.targetRole,
+      description: newTrack.description,
+      requiredSkills: newTrack.relevantSkills,
+      industries: typeof newTrack.targetIndustries === 'string' ? newTrack.targetIndustries.split(',').map((s) => s.trim()) : newTrack.targetIndustries,
+      careerGoals: newTrack.careerObjectives,
+      isPrimary: newTrack.isPrimary,
+    }).then((created) => {
+      if (created?.id) {
+        setProfile((prev) => ({
+          ...prev,
+          careerTracks: prev.careerTracks.map((t) => (t.id === newTrack.id ? { ...t, id: created.id } : t)),
+        }));
+      }
+    }).catch(() => {});
   };
 
   const updateCareerTrack = (id, updated) => {
@@ -466,6 +332,10 @@ export function ProfileProvider({ children }) {
       }
       return { ...prev, careerTracks: tracks };
     });
+
+    if (id && !id.startsWith('track-')) {
+      careerTrackService.updateTrack(id, updated).catch(() => {});
+    }
   };
 
   const removeCareerTrack = (id) => {
@@ -476,6 +346,10 @@ export function ProfileProvider({ children }) {
       }
       return { ...prev, careerTracks: remaining };
     });
+
+    if (id && !id.startsWith('track-demo') && !id.startsWith('track-1') && !id.startsWith('track-2')) {
+      careerTrackService.deleteTrack(id).catch(() => {});
+    }
   };
 
   const setPrimaryCareerTrack = (id) => {

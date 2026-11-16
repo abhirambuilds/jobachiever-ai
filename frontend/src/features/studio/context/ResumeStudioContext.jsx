@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useInRouterContext, useLocation } from 'react-router-dom';
 import { useProfile } from '../../profile/context/ProfileContext';
 import {
   buildResumeFromProfile,
@@ -67,6 +68,26 @@ export function ResumeStudioProvider({ children }) {
   });
   const [tailorModalOpen, setTailorModalOpen] = useState(false);
   const [versionModalOpen, setVersionModalOpen] = useState(false);
+
+  const handleAutoTailor = useCallback((jobData) => {
+    const { title, company, skills } = jobData;
+    setResume((prev) => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      updated.title = `${profile.personalInfo?.fullName || 'Candidate'} — ${title || 'Target Role'} ATS Resume`;
+      updated.designSettings = {
+        ...updated.designSettings,
+        template: 'ats_professional',
+      };
+      const summarySec = updated.sections?.find((s) => s.type === 'summary');
+      if (summarySec) {
+        summarySec.data = {
+          ...summarySec.data,
+          summaryText: `Results-driven ${title || 'Software Engineer'} specializing in ${skills?.slice(0, 4).join(', ') || 'backend microservices and cloud architecture'}. Proven capability designing high-throughput platforms with strong testing and operational reliability at ${company || 'top technology firms'}.`,
+        };
+      }
+      return updated;
+    });
+  }, [profile.personalInfo?.fullName]);
 
   // Auto-sync to localStorage
   useEffect(() => {
@@ -359,9 +380,26 @@ export function ResumeStudioProvider({ children }) {
 
   return (
     <ResumeStudioContext.Provider value={value}>
+      <AutoTailorListener onAutoTailor={handleAutoTailor} />
       {children}
     </ResumeStudioContext.Provider>
   );
+}
+
+function AutoTailorListener({ onAutoTailor }) {
+  const inRouter = useInRouterContext();
+  if (!inRouter) return null;
+  return <AutoTailorInner onAutoTailor={onAutoTailor} />;
+}
+
+function AutoTailorInner({ onAutoTailor }) {
+  const location = useLocation();
+  useEffect(() => {
+    if (location?.state?.autoTailorJob) {
+      onAutoTailor(location.state.autoTailorJob);
+    }
+  }, [location?.state, onAutoTailor]);
+  return null;
 }
 
 export function useResumeStudio() {

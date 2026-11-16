@@ -23,7 +23,7 @@ public class SecurityAuditServiceImpl implements SecurityAuditService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void recordEvent(SecurityAuditEventType eventType, UUID userId, String email,
                             String ipAddress, String userAgent, String status, String details) {
         try {
@@ -41,7 +41,7 @@ public class SecurityAuditServiceImpl implements SecurityAuditService {
                     status != null ? status : "SUCCESS",
                     safeDetails
             );
-            auditRepository.save(auditLog);
+            auditRepository.saveAndFlush(auditLog);
 
             log.info("[AUDIT] Event: {} | User: {} | Email: {} | Status: {}",
                     eventType, userId != null ? userId : "ANONYMOUS", email, status);
@@ -52,7 +52,7 @@ public class SecurityAuditServiceImpl implements SecurityAuditService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void recordSuccess(SecurityAuditEventType eventType, UUID userId, String email, String details) {
         String ip = extractClientIp();
         String ua = extractUserAgent();
@@ -60,7 +60,7 @@ public class SecurityAuditServiceImpl implements SecurityAuditService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void recordFailure(SecurityAuditEventType eventType, UUID userId, String email, String reason) {
         String ip = extractClientIp();
         String ua = extractUserAgent();

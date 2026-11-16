@@ -16,7 +16,7 @@ export function PersonalInfoEditor({ formData, onChange }) {
             value={formData.fullName || ''}
             onChange={(e) => updateField('fullName', e.target.value)}
             className="w-full text-xs p-2 bg-background border border-border rounded-lg focus:ring-1 focus:ring-primary"
-            placeholder="e.g. Jane Doe"
+            placeholder="e.g. Aarav Sharma"
           />
         </div>
         <div className="space-y-1">

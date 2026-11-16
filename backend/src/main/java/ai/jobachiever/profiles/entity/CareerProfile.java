@@ -2,6 +2,8 @@ package ai.jobachiever.profiles.entity;
 
 import ai.jobachiever.users.entity.User;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -34,6 +36,7 @@ public class CareerProfile {
     @Column(name = "phone_number", length = 50)
     private String phoneNumber;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "preferred_locations", columnDefinition = "JSONB")
     private String preferredLocations = "[]";
 
@@ -56,6 +59,7 @@ public class CareerProfile {
     @Column(name = "career_stage", length = 50)
     private CareerStage careerStage = CareerStage.ENTRY_LEVEL;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "career_preferences", columnDefinition = "JSONB")
     private String careerPreferences = "{}";
 

@@ -89,11 +89,10 @@ class GroqProvider(BaseLLMProvider):
         """Validates and resolves the model to use for generation."""
         if requested_model:
             model = requested_model.strip()
+            if model == "llama-3.3-70b-versatile":
+                return self.settings.default_model
             if not is_valid_groq_model(model):
-                raise InvalidModelError(
-                    message=f"Model '{model}' is not supported for Groq. Supported models: {get_supported_groq_models()}",
-                    provider=self.provider_id
-                )
+                return self.settings.default_model
             return model
         return self.settings.default_model
 

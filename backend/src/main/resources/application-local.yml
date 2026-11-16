@@ -5,7 +5,7 @@
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:jobachiever}}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:jobachiever}?stringtype=unspecified}
     username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:jobachiever}}
     password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:jobachiever_dev_password}}
     driver-class-name: org.postgresql.Driver

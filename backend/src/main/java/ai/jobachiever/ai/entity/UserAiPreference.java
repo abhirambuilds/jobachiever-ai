@@ -50,7 +50,7 @@ public class UserAiPreference {
     public UserAiPreference(UUID userId) {
         this.userId = userId;
         this.selectedProvider = "GROQ";
-        this.preferredModel = "llama-3.3-70b-versatile";
+        this.preferredModel = "openai/gpt-oss-120b";
         this.temperature = 0.2;
         this.maxTokens = 2048;
         this.externalProcessingConsent = false;

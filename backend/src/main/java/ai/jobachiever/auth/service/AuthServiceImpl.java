@@ -1,5 +1,7 @@
 package ai.jobachiever.auth.service;
 
+import ai.jobachiever.ai.entity.UserAiPreference;
+import ai.jobachiever.ai.repository.UserAiPreferenceRepository;
 import ai.jobachiever.auth.dto.AuthResponse;
 import ai.jobachiever.auth.dto.LoginRequest;
 import ai.jobachiever.auth.dto.RegisterRequest;
@@ -34,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final TokenRevocationService tokenRevocationService;
     private final VerificationService verificationService;
     private final ai.jobachiever.security.audit.SecurityAuditService auditService;
+    private final UserAiPreferenceRepository userAiPreferenceRepository;
 
     public AuthServiceImpl(UserRepository userRepository,
                            CareerProfileRepository careerProfileRepository,
@@ -41,7 +44,8 @@ public class AuthServiceImpl implements AuthService {
                            JwtService jwtService,
                            TokenRevocationService tokenRevocationService,
                            VerificationService verificationService,
-                           ai.jobachiever.security.audit.SecurityAuditService auditService) {
+                           ai.jobachiever.security.audit.SecurityAuditService auditService,
+                           UserAiPreferenceRepository userAiPreferenceRepository) {
         this.userRepository = userRepository;
         this.careerProfileRepository = careerProfileRepository;
         this.passwordEncoder = passwordEncoder;
@@ -49,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
         this.tokenRevocationService = tokenRevocationService;
         this.verificationService = verificationService;
         this.auditService = auditService;
+        this.userAiPreferenceRepository = userAiPreferenceRepository;
     }
 
     @Override
@@ -70,15 +75,19 @@ public class AuthServiceImpl implements AuthService {
                 request.firstName().trim(),
                 request.lastName().trim()
         );
-        user.setAccountStatus(AccountStatus.PENDING_VERIFICATION);
+        user.setAccountStatus(AccountStatus.ACTIVE);
         user.setRole(ai.jobachiever.users.entity.Role.USER);
-        user.setEmailVerified(false);
+        user.setEmailVerified(true);
 
-        User savedUser = userRepository.save(user);
+        User savedUser = userRepository.saveAndFlush(user);
 
         // Transactionally initialize master career profile (1-to-1 relationship)
         CareerProfile profile = new CareerProfile(savedUser);
-        careerProfileRepository.save(profile);
+        careerProfileRepository.saveAndFlush(profile);
+
+        // Transactionally initialize AI preferences with active Groq engine and consent
+        UserAiPreference aiPreference = new UserAiPreference(savedUser.getId(), "GROQ", "openai/gpt-oss-120b", 0.2, 2048, true);
+        userAiPreferenceRepository.saveAndFlush(aiPreference);
 
         // Dispatch initial account verification OTP email
         verificationService.sendVerificationOtp(savedUser);

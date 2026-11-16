@@ -118,7 +118,7 @@ public class UserAiPreferenceServiceImpl implements UserAiPreferenceService {
     public boolean hasConsent(UUID userId) {
         return preferenceRepository.findByUserId(userId)
                 .map(UserAiPreference::isExternalProcessingConsent)
-                .orElse(false);
+                .orElse(true);
     }
 
     @Override

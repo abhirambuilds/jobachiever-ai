@@ -29,11 +29,10 @@ export function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-200 ${
-        isScrolled
-          ? 'border-b border-border/70 bg-background/85 backdrop-blur-md shadow-sm'
-          : 'border-b border-transparent bg-background/50 backdrop-blur-sm'
-      }`}
+      className={`sticky top-0 z-50 w-full transition-all duration-200 ${isScrolled
+        ? 'border-b border-border/70 bg-background/85 backdrop-blur-md shadow-sm'
+        : 'border-b border-transparent bg-background/50 backdrop-blur-sm'
+        }`}
     >
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-8">
         {/* Brand Logo */}

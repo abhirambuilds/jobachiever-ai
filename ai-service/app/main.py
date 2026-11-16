@@ -1,4 +1,14 @@
 import logging
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Explicitly load .env file from ai-service root or workspace root
+env_path = Path(__file__).resolve().parent.parent / ".env"
+if env_path.exists():
+    load_dotenv(dotenv_path=env_path)
+else:
+    load_dotenv()
+
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware

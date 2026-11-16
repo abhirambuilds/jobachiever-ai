@@ -39,7 +39,7 @@ export function PersonalInfoForm({ onNext }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           label="Full Legal / Professional Name *"
-          placeholder="e.g. Jane Doe"
+          placeholder="e.g. Aarav Sharma"
           leftIcon={User}
           error={errors.fullName?.message}
           {...register('fullName')}

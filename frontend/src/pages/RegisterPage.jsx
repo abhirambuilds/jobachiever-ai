@@ -80,7 +80,7 @@ export function RegisterPage() {
               {/* Full Name */}
               <Input
                 label="Full Name"
-                placeholder="Jane Doe"
+                placeholder="Aarav Sharma"
                 leftIcon={User}
                 error={errors.fullName?.message}
                 {...register('fullName')}
@@ -90,7 +90,7 @@ export function RegisterPage() {
               <Input
                 label="Email Address"
                 type="email"
-                placeholder="jane.doe@example.com"
+                placeholder="aarav.sharma@example.com"
                 leftIcon={Mail}
                 error={errors.email?.message}
                 {...register('email')}

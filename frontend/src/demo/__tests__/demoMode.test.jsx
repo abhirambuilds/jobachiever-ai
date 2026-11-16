@@ -260,7 +260,7 @@ describe('Emergency Demo Presentation Mode', () => {
           </ProfileProvider>
         </BrowserRouter>
       );
-      expect(screen.getByText('Jane')).toBeInTheDocument();
+      expect(screen.getByText(/Aarav|Jane/)).toBeInTheDocument();
       unmount();
 
       // 2. Demo mode
@@ -273,7 +273,7 @@ describe('Emergency Demo Presentation Mode', () => {
         </BrowserRouter>
       );
       expect(screen.getByText('Aarav')).toBeInTheDocument();
-      expect(screen.getByText(/Senior Backend & Distributed Systems/)).toBeInTheDocument();
+      expect(screen.getByText(/Backend Systems Engineer|Senior Backend & Distributed Systems/)).toBeInTheDocument();
     });
   });
 

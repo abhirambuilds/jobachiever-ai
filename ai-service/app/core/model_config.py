@@ -14,6 +14,24 @@ class ModelInfo(BaseModel):
 
 # Supported models for Groq provider
 GROQ_SUPPORTED_MODELS: Dict[str, ModelInfo] = {
+    "openai/gpt-oss-120b": ModelInfo(
+        id="openai/gpt-oss-120b",
+        name="GPT-OSS 120B",
+        provider="GROQ",
+        context_window=131072,
+        max_output_tokens=8192,
+        description="High-performance open weights 120B model on Groq LPUs.",
+        is_default=True,
+    ),
+    "openai/gpt-oss-20b": ModelInfo(
+        id="openai/gpt-oss-20b",
+        name="GPT-OSS 20B",
+        provider="GROQ",
+        context_window=131072,
+        max_output_tokens=4096,
+        description="Fast low-latency open weights 20B model on Groq LPUs.",
+        is_default=False,
+    ),
     "llama-3.3-70b-versatile": ModelInfo(
         id="llama-3.3-70b-versatile",
         name="Llama 3.3 70B Versatile",
@@ -21,7 +39,7 @@ GROQ_SUPPORTED_MODELS: Dict[str, ModelInfo] = {
         context_window=131072,
         max_output_tokens=32768,
         description="State-of-the-art multilingual model with 128k context; recommended default for complex career advisory and resume optimization.",
-        is_default=True,
+        is_default=False,
     ),
     "llama-3.1-8b-instant": ModelInfo(
         id="llama-3.1-8b-instant",
@@ -52,7 +70,7 @@ GROQ_SUPPORTED_MODELS: Dict[str, ModelInfo] = {
     ),
 }
 
-DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile"
+DEFAULT_GROQ_MODEL = "openai/gpt-oss-120b"
 
 
 # Supported models for Google Gemini provider
