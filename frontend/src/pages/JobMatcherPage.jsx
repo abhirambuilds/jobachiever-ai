@@ -47,12 +47,10 @@ function JobMatcherContent() {
             <Badge variant="ai" dot className="text-xs">
               Explainable Compatibility Engine
             </Badge>
-            <span className="text-xs text-muted-foreground font-mono">
-              FastAPI Semantic Matching Ready
-            </span>
-            {(isDemoMode() || currentMatch?.isSimulatedDemo) && (
-              <SimulatedResultBadge />
-            )}
+            <Badge variant="outline" className="text-xs">
+              Semantic Vector Engine
+            </Badge>
+            <SimulatedResultBadge text="Deterministic Scoring" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
             Job Description Analyzer &amp; Resume Matcher

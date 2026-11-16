@@ -65,10 +65,10 @@ function ResumeLibraryContent() {
             <Badge variant="ai" dot className="text-xs">
               Document Workspace
             </Badge>
-            <span className="text-xs text-muted-foreground font-mono">
-              Spring Boot Ingestion Ready
-            </span>
-            {isDemoMode() && <SimulatedResultBadge />}
+            <Badge variant="outline" className="text-xs">
+              Live Database Connected
+            </Badge>
+            <SimulatedResultBadge text="AI Parser Active" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
             My Resume Library

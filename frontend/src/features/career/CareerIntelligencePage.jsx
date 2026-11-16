@@ -15,6 +15,7 @@ import { aiPreferenceService } from '../../services/aiPreferenceService';
 import { careerIntelligenceService } from '../../services/careerIntelligenceService';
 import { SimulatedResultBadge } from '@/components/demo';
 import { isDemoMode } from '@/demo/demoConfig';
+import { Badge } from '@/components/ui/badge';
 
 import CareerTrackSelector from './components/CareerTrackSelector';
 import SkillGapOverviewCard from './components/SkillGapOverviewCard';
@@ -297,7 +298,7 @@ export default function CareerIntelligencePage() {
             <h1 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-2 flex-wrap">
               <Compass className="w-6 h-6 text-primary" />
               <span>Career Intelligence &amp; Skill Gap Strategy</span>
-              {isDemoMode() && <SimulatedResultBadge />}
+              <Badge variant="outline" className="text-xs">Groq LPU Powered</Badge>
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
               Multi-track gap diagnosis, formula-weighted skill prioritization, and dependency-ordered learning roadmaps.

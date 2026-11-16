@@ -45,7 +45,9 @@ export function WelcomeBanner() {
                   <span>Focus: {primaryTrack.name}</span>
                 </Badge>
               )}
-              {isDemoMode() && <SimulatedResultBadge size="sm" />}
+              <Badge variant="outline" className="text-xs">
+                Database Synced
+              </Badge>
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">

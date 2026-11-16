@@ -45,7 +45,7 @@ export function CareerOverviewCards() {
       iconColor: 'text-primary',
       badge: 'Primary Active',
       badgeVariant: 'secondary',
-      link: '/profile',
+      link: '/career-tracks',
       linkText: 'Manage Tracks',
     },
     {
@@ -66,7 +66,7 @@ export function CareerOverviewCards() {
       title: 'Active Applications',
       numValue: 6,
       suffix: '',
-      subtitle: '1 in Interview (Stripe), 1 Offer',
+      subtitle: '1 in Interview (Razorpay), 1 Offer (Swiggy)',
       icon: Kanban,
       iconColor: 'text-amber-500',
       badge: 'In Pipeline',

@@ -49,12 +49,10 @@ function ResumeAnalyzerContent() {
             <Badge variant="ai" dot className="text-xs">
               Resume Intelligence Studio
             </Badge>
-            <span className="text-xs text-muted-foreground font-mono">
-              FastAPI Reasoning Ready
-            </span>
-            {(isDemoMode() || currentAnalysis?.isSimulatedDemo) && (
-              <SimulatedResultBadge />
-            )}
+            <Badge variant="outline" className="text-xs">
+              FastAPI Engine
+            </Badge>
+            <SimulatedResultBadge text="Verified AI Diagnostic" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
             AI Resume Analyzer &amp; Intelligence

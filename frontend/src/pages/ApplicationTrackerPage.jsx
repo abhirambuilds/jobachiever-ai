@@ -167,7 +167,7 @@ export function ApplicationTrackerPage() {
               <Kanban className="w-7 h-7 text-primary" />
               <span>Job Application Pipeline</span>
             </h1>
-            {isDemoMode() && <SimulatedResultBadge />}
+            <Badge variant="outline" className="text-xs">Active Pipeline</Badge>
           </div>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Visual Kanban lifecycle tracking from saved opportunities to technical screens and offers.

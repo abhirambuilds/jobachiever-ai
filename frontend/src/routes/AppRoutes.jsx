@@ -58,7 +58,9 @@ export function AppRoutes() {
         <Route path="/resume-studio" element={<ResumeStudioPage />} />
         <Route path="/studio" element={<ResumeStudioPage />} />
         <Route path="/resume-analyzer" element={<ResumeAnalyzerPage />} />
+        <Route path="/analyzer" element={<ResumeAnalyzerPage />} />
         <Route path="/jobs" element={<JobDiscoveryPage />} />
+        <Route path="/jobs/discover" element={<JobDiscoveryPage />} />
         <Route path="/jd-analyzer" element={<JobDescriptionAnalyzerPage />} />
         <Route path="/jobs/analyze" element={<JobDescriptionAnalyzerPage />} />
         <Route path="/job-match" element={<JobMatcherPage />} />
@@ -98,6 +100,8 @@ export function AppRoutes() {
             />
           }
         />
+        <Route path="/career" element={<CareerIntelligencePage />} />
+        <Route path="/career-intelligence" element={<CareerIntelligencePage />} />
         <Route path="/career/intelligence" element={<CareerIntelligencePage />} />
         <Route path="/career-assistant" element={<CareerIntelligencePage />} />
         <Route path="/settings" element={<AiSettingsPage />} />

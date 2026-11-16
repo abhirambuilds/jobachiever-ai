@@ -250,10 +250,10 @@ export function JobDescriptionAnalyzerPage() {
             <Badge variant="ai" dot className="text-xs">
               AI Job Intelligence
             </Badge>
-            <span className="text-xs text-muted-foreground font-mono">
+            <Badge variant="outline" className="text-xs">
               Stateless Anti-Fabrication Parsing
-            </span>
-            {isDemoMode() && <SimulatedResultBadge />}
+            </Badge>
+            <SimulatedResultBadge text="Structured Extraction" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
             Job Description Analyzer

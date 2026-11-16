@@ -122,7 +122,7 @@ export function CenterPreviewPanel() {
 
         {/* Center: Save Status Indicator */}
         <div className="hidden md:flex items-center gap-2 text-xs">
-          {isDemoMode() && <SimulatedResultBadge size="sm" />}
+          <Badge variant="outline" className="text-[10px]">ATS Canvas</Badge>
           {isSaving ? (
             <span className="flex items-center gap-1.5 text-muted-foreground">
               <Clock className="w-3.5 h-3.5 animate-spin text-primary" />

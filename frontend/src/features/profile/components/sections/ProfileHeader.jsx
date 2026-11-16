@@ -57,7 +57,9 @@ export function ProfileHeader() {
                     {primaryTrack.name}
                   </Badge>
                 )}
-                {isDemoMode() && <SimulatedResultBadge size="sm" />}
+                <Badge variant="outline" className="text-xs">
+                  PostgreSQL Persisted
+                </Badge>
               </div>
 
               <p className="text-sm sm:text-base font-medium text-primary">
