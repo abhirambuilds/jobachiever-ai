@@ -2,6 +2,9 @@ package ai.jobachiever.profiles.repository;
 
 import ai.jobachiever.profiles.entity.ProfileAchievement;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,5 +17,7 @@ public interface ProfileAchievementRepository extends JpaRepository<ProfileAchie
 
     List<ProfileAchievement> findByProfileId(UUID profileId);
 
-    void deleteByProfileId(UUID profileId);
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM ProfileAchievement pa WHERE pa.profile.id = :profileId")
+    void deleteByProfileId(@Param("profileId") UUID profileId);
 }

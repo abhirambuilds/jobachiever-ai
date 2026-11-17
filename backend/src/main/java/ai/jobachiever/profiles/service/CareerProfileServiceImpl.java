@@ -99,34 +99,40 @@ public class CareerProfileServiceImpl implements CareerProfileService {
         if (request.getEducation() != null) {
             validateEducations(request.getEducation());
             educationRepository.deleteByProfileId(profile.getId());
+            educationRepository.flush();
             saveEducations(profile, request.getEducation());
         }
 
         if (request.getSkills() != null) {
             skillRepository.deleteByProfileId(profile.getId());
+            skillRepository.flush();
             saveSkills(profile, request.getSkills());
         }
 
         if (request.getExperience() != null) {
             validateExperiences(request.getExperience());
             experienceRepository.deleteByProfileId(profile.getId());
+            experienceRepository.flush();
             saveExperiences(profile, request.getExperience());
         }
 
         if (request.getProjects() != null) {
             validateProjects(request.getProjects());
             projectRepository.deleteByProfileId(profile.getId());
+            projectRepository.flush();
             saveProjects(profile, request.getProjects());
         }
 
         if (request.getCertifications() != null) {
             validateCertifications(request.getCertifications());
             certificationRepository.deleteByProfileId(profile.getId());
+            certificationRepository.flush();
             saveCertifications(profile, request.getCertifications());
         }
 
         if (request.getAchievements() != null) {
             achievementRepository.deleteByProfileId(profile.getId());
+            achievementRepository.flush();
             saveAchievements(profile, request.getAchievements());
         }
 
@@ -187,34 +193,40 @@ public class CareerProfileServiceImpl implements CareerProfileService {
         if (request.getEducation() != null) {
             validateEducations(request.getEducation());
             educationRepository.deleteByProfileId(profile.getId());
+            educationRepository.flush();
             saveEducations(profile, request.getEducation());
         }
 
         if (request.getSkills() != null) {
             skillRepository.deleteByProfileId(profile.getId());
+            skillRepository.flush();
             saveSkills(profile, request.getSkills());
         }
 
         if (request.getExperience() != null) {
             validateExperiences(request.getExperience());
             experienceRepository.deleteByProfileId(profile.getId());
+            experienceRepository.flush();
             saveExperiences(profile, request.getExperience());
         }
 
         if (request.getProjects() != null) {
             validateProjects(request.getProjects());
             projectRepository.deleteByProfileId(profile.getId());
+            projectRepository.flush();
             saveProjects(profile, request.getProjects());
         }
 
         if (request.getCertifications() != null) {
             validateCertifications(request.getCertifications());
             certificationRepository.deleteByProfileId(profile.getId());
+            certificationRepository.flush();
             saveCertifications(profile, request.getCertifications());
         }
 
         if (request.getAchievements() != null) {
             achievementRepository.deleteByProfileId(profile.getId());
+            achievementRepository.flush();
             saveAchievements(profile, request.getAchievements());
         }
 

@@ -20,7 +20,7 @@ export const authService = {
     const emailPrefix = data.email ? data.email.split('@')[0] : 'User';
     const fallbackName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
     const firstName = parts[0] || fallbackName;
-    const lastName = parts.slice(1).join(' ') || '';
+    const lastName = parts.slice(1).join(' ').trim() || parts[0] || 'User';
 
     try {
       const response = await fetch(`${AUTH_API_BASE}/auth/register`, {
