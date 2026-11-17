@@ -17,6 +17,18 @@ export default defineConfig({
   server: {
     port: 3000,
     open: false,
+    proxy: {
+      '/ai-proxy': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ai-proxy/, ''),
+      },
+      '/groq-direct': {
+        target: 'https://api.groq.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/groq-direct/, ''),
+      },
+    },
   },
   preview: {
     port: 3000,

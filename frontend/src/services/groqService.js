@@ -8,7 +8,9 @@
 
 const AI_SERVICE_BASE =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_AI_SERVICE_URL) ||
-  'http://127.0.0.1:8000/api/v1';
+  '/ai-proxy/api/v1';
+
+const FALLBACK_DIRECT_AI_SERVICE = 'http://127.0.0.1:8000/api/v1';
 
 const getClientGroqKey = () =>
   (typeof localStorage !== 'undefined' && localStorage.getItem('jobachiever_groq_api_key')) ||
@@ -20,16 +22,56 @@ export const groqService = {
    * Core chat completion method using Groq
    */
   async chat(messages, options = {}) {
-    const { temperature = 0.3, maxTokens = 2048, model = 'llama-3.3-70b-versatile' } = options;
+    const { temperature = 0.3, maxTokens = 2048, model = 'openai/gpt-oss-120b' } = options;
+    const modelToUse = model || 'openai/gpt-oss-120b';
 
-    // 1. Try local FastAPI AI microservice
+    // Inject live current time and location awareness into system prompt
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    const dateStr = now.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const timeContext = `[Live Indian Standard Time: ${timeStr} IST on ${dateStr}. Candidate Location: India (Bengaluru/Hyderabad).]`;
+
+    const enrichedMessages = [...messages];
+    const sysIdx = enrichedMessages.findIndex((m) => m.role === 'system');
+    if (sysIdx >= 0) {
+      enrichedMessages[sysIdx] = {
+        ...enrichedMessages[sysIdx],
+        content: `${enrichedMessages[sysIdx].content}\n\n${timeContext}`,
+      };
+    } else {
+      enrichedMessages.unshift({ role: 'system', content: timeContext });
+    }
+
+    // 1. Try Vite local AI proxy first (same-origin, zero CORS issues)
     try {
       const res = await fetch(`${AI_SERVICE_BASE}/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages,
-          model: model === 'openai/gpt-oss-120b' ? 'llama-3.3-70b-versatile' : model,
+          messages: enrichedMessages,
+          model: modelToUse,
+          temperature,
+          max_tokens: maxTokens,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.content && data.content.trim()) {
+          return data.content;
+        }
+      }
+    } catch {
+      // try direct host
+    }
+
+    // 1b. Try direct local FastAPI microservice URL
+    try {
+      const res = await fetch(`${FALLBACK_DIRECT_AI_SERVICE}/ai/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: enrichedMessages,
+          model: modelToUse,
           temperature,
           max_tokens: maxTokens,
         }),
@@ -47,29 +89,31 @@ export const groqService = {
     // 2. Direct Groq Cloud fallback
     const key = getClientGroqKey();
     if (key) {
-      try {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${key}`,
-          },
-          body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages,
-            temperature,
-            max_tokens: maxTokens,
-          }),
-        });
-        if (res.ok) {
-          const json = await res.json();
-          const content = json.choices?.[0]?.message?.content;
-          if (content && content.trim()) {
-            return content;
+      for (const m of ['openai/gpt-oss-120b', 'openai/gpt-oss-20b']) {
+        try {
+          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${key}`,
+            },
+            body: JSON.stringify({
+              model: m,
+              messages: enrichedMessages,
+              temperature,
+              max_tokens: maxTokens,
+            }),
+          });
+          if (res.ok) {
+            const json = await res.json();
+            const content = json.choices?.[0]?.message?.content;
+            if (content && content.trim()) {
+              return content;
+            }
           }
+        } catch {
+          // ignore and try next
         }
-      } catch {
-        // ignore
       }
     }
 
@@ -252,9 +296,50 @@ Output pure JSON only.`;
 };
 
 function generateIntelligentCareerResponse(query = '') {
-  const q = query.toLowerCase();
+  const q = query.toLowerCase().trim();
 
-  // 1. STAR Behavioral Interview Rehearsal
+  // 1. Live Time / Date queries
+  if (q.includes('time') || q.includes('clock') || q.includes('date') || q.includes('day is today') || q === 'what is today') {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    const dateStr = now.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    return `The current time in India (IST) is **${timeStr}** on **${dateStr}**.\n\nLet me know if you would like to run a mock interview, optimize your ATS resume, or review Bangalore/Hyderabad tech compensation benchmarks!`;
+  }
+
+  // 2. Natural Greetings & Introductions
+  if (q === 'hi' || q === 'hello' || q === 'hey' || q.startsWith('hi ') || q.startsWith('hello ') || q.startsWith('hey ') || q === 'hola' || q === 'namaste' || q.includes('who are you') || q.includes('what can you do')) {
+    return `Hello! I'm your **JobAchiever AI Career Copilot**, powered by real-time Groq LPU inference.
+
+I have full contextual awareness of your verified credentials, active career tracks, and target roles in the Indian tech market. How can I help you today? You can ask about:
+- **Mock Interviews & STAR Framing**
+- **System Design & Coding Deep Dives**
+- **Bangalore/Hyderabad Salary Benchmarks (INR)**
+- **Resume Impact Statement Optimization**`;
+  }
+
+  // 3. Fresher / Entry-Level Salary Landscape India
+  if ((q.includes('fresher') || q.includes('entry') || q.includes('intern') || q.includes('college') || q.includes('0 yoe') || q.includes('graduate')) && (q.includes('salary') || q.includes('package') || q.includes('ctc') || q.includes('inr') || q.includes('lpa') || q.includes('pay') || q.includes('compensation'))) {
+    return `### **2026 Fresher / Entry-Level Tech Salary Landscape (India)**
+
+For fresh graduates and early career professionals (0–1 Year of Experience) in tech hubs like Bengaluru, Hyderabad, and Pune:
+
+| Company Tier & Category | Target Roles | Base Salary (INR) | Total First-Year CTC |
+| :--- | :--- | :--- | :--- |
+| **Tier-1 Big Tech / MNCs** *(Google, Microsoft, Amazon, Uber, Atlassian)* | SDE-1 / Software Engineer | ₹16 LPA – ₹24 LPA | **₹20 LPA – ₹42 LPA** *(incl. joining bonus + RSUs)* |
+| **Tier-1 Indian Unicorns & Fintech** *(Razorpay, Swiggy, Cred, Zerodha, PhonePe)* | Backend / Full-Stack Engineer | ₹14 LPA – ₹22 LPA | **₹16 LPA – ₹28 LPA** |
+| **High-Growth Product Startups** *(Series A–C SaaS / AI firms)* | Software Engineer | ₹8 LPA – ₹15 LPA | **₹10 LPA – ₹18 LPA** |
+| **IT Services & GCCs (Specialist)** *(TCS Digital, Cognizant GenC Next, Infosys SP)* | Systems / Specialist Programmer | ₹7 LPA – ₹10 LPA | **₹7.5 LPA – ₹11 LPA** |
+| **Standard Mass Hiring** *(TCS Ninja, Wipro, Infosys SE)* | Associate Software Engineer | ₹3.5 LPA – ₹4.5 LPA | **₹3.6 LPA – ₹4.5 LPA** |
+
+---
+
+#### **Key Levers to Land Tier-1 Fresher Offers:**
+1. **Core DSA Proficiency:** Strong command over Arrays, HashMaps, Two-Pointers, BFS/DFS, and dynamic programming patterns (Blind 75).
+2. **Production-Grade Project:** Rather than boilerplate todo apps, showcase an end-to-end distributed backend (e.g., Spring Boot 3 + PostgreSQL + Redis caching + Docker) with unit tests.
+3. **ATS Resume Single-Column Format:** Ensure your metrics highlight latency improvements, throughput, or data integrity.`;
+  }
+
+  // 4. STAR Behavioral Interview Rehearsal
   if (q.includes('star') || q.includes('behavioral') || q.includes('interview question') || q.includes('rehearsal')) {
     return `### **Challenging STAR Behavioral Question (SDE 2 / Senior Role)**
 

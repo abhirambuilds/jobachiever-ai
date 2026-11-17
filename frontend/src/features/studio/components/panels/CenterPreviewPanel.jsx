@@ -46,6 +46,9 @@ export function CenterPreviewPanel() {
     setShowDesignPanel,
     updateDesignSettings,
     setTemplate,
+    toggleSectionVisibility,
+    removeSection,
+    setResume,
   } = useResumeStudio();
 
   const [promptText, setPromptText] = useState('');
@@ -58,7 +61,118 @@ export function CenterPreviewPanel() {
 
     setIsPrompting(true);
     try {
-      // 1. Direct heuristic: change/update name
+      const qLower = query.toLowerCase();
+
+      // 1. Direct heuristic: REMOVE / DELETE / HIDE section or specific items
+      if (qLower.includes('remove') || qLower.includes('delete') || qLower.includes('hide') || qLower.includes('drop')) {
+        if (qLower.includes('experience') || qLower.includes('work') || qLower.includes('job') || qLower.includes('employment')) {
+          const expSec = resume.sections?.find((s) => s.type === 'experience' || s.id?.includes('exp'));
+          if (expSec) {
+            toggleSectionVisibility(expSec.id);
+            toast.success('Professional Experience section visibility toggled/removed!');
+            setPromptText('');
+            setIsPrompting(false);
+            return;
+          }
+        }
+
+        if (qLower.includes('project')) {
+          const projSec = resume.sections?.find((s) => s.type === 'projects' || s.id?.includes('proj'));
+          if (projSec) {
+            toggleSectionVisibility(projSec.id);
+            toast.success('Key Engineering Projects section visibility toggled/removed!');
+            setPromptText('');
+            setIsPrompting(false);
+            return;
+          }
+        }
+
+        if (qLower.includes('education') || qLower.includes('college') || qLower.includes('degree')) {
+          const eduSec = resume.sections?.find((s) => s.type === 'education' || s.id?.includes('edu'));
+          if (eduSec) {
+            toggleSectionVisibility(eduSec.id);
+            toast.success('Education section visibility toggled/removed!');
+            setPromptText('');
+            setIsPrompting(false);
+            return;
+          }
+        }
+
+        if (qLower.includes('certif')) {
+          const certSec = resume.sections?.find((s) => s.type === 'certifications' || s.id?.includes('cert'));
+          if (certSec) {
+            toggleSectionVisibility(certSec.id);
+            toast.success('Certifications section visibility toggled/removed!');
+            setPromptText('');
+            setIsPrompting(false);
+            return;
+          }
+        }
+
+        if (qLower.includes('skill')) {
+          const skillsSec = resume.sections?.find((s) => s.type === 'skills');
+          if (skillsSec) {
+            const skillMatch = query.match(/(?:remove|delete) ([\w\s.+#/-]+) from skills/i) || query.match(/(?:remove|delete) ([\w\s.+#/-]+) skill/i);
+            if (skillMatch) {
+              const skillToRemove = skillMatch[1].trim().toLowerCase();
+              const categories = (skillsSec.data?.categories || []).map((cat) => ({
+                ...cat,
+                skills: (cat.skills || []).filter((sk) => sk.toLowerCase() !== skillToRemove),
+              }));
+              updateSectionData(skillsSec.id, { ...skillsSec.data, categories });
+              toast.success(`Removed "${skillMatch[1].trim()}" from technical proficiencies!`);
+            } else {
+              toggleSectionVisibility(skillsSec.id);
+              toast.success('Technical Proficiencies section visibility toggled/removed!');
+            }
+            setPromptText('');
+            setIsPrompting(false);
+            return;
+          }
+        }
+
+        if (qLower.includes('summary') || qLower.includes('profile') || qLower.includes('objective')) {
+          const sumSec = resume.sections?.find((s) => s.type === 'summary');
+          if (sumSec) {
+            toggleSectionVisibility(sumSec.id);
+            toast.success('Executive Summary section visibility toggled/removed!');
+            setPromptText('');
+            setIsPrompting(false);
+            return;
+          }
+        }
+
+        if (qLower.includes('language')) {
+          const langSec = resume.sections?.find((s) => s.type === 'languages');
+          if (langSec) {
+            toggleSectionVisibility(langSec.id);
+            toast.success('Languages section visibility toggled/removed!');
+            setPromptText('');
+            setIsPrompting(false);
+            return;
+          }
+        }
+      }
+
+      // 2. Direct heuristic: RESTORE / SHOW section
+      if (qLower.includes('show') || qLower.includes('restore') || qLower.includes('enable')) {
+        const targetSec = resume.sections?.find((s) =>
+          (qLower.includes('experience') && (s.type === 'experience' || s.id?.includes('exp'))) ||
+          (qLower.includes('project') && (s.type === 'projects' || s.id?.includes('proj'))) ||
+          (qLower.includes('education') && (s.type === 'education' || s.id?.includes('edu'))) ||
+          (qLower.includes('certif') && (s.type === 'certifications' || s.id?.includes('cert'))) ||
+          (qLower.includes('skill') && (s.type === 'skills' || s.id?.includes('skill')))
+        );
+        if (targetSec && !targetSec.visible) {
+          toggleSectionVisibility(targetSec.id);
+          toast.success(`Restored section visibility on ATS canvas!`);
+          setPromptText('');
+          setIsPrompting(false);
+          return;
+        }
+      }
+
+      // 3. Direct heuristic: change/update name
       const nameMatch = query.match(/(?:change|set|update) (?:my )?name to ([\w\s.'-]+)/i);
       if (nameMatch) {
         const newName = nameMatch[1].trim();
@@ -77,7 +191,7 @@ export function CenterPreviewPanel() {
         return;
       }
 
-      // 2. Direct heuristic: add skills
+      // 4. Direct heuristic: add skills
       const skillsMatch = query.match(/(?:add|include) ([\w\s,+#/.-]+) to skills/i);
       if (skillsMatch) {
         const newSkillsStr = skillsMatch[1].trim();
@@ -176,12 +290,17 @@ Do not use markdown code block fencing. Return raw JSON only.`
         }
       }
 
-      // 4. Default fallback: apply to summary
-      const summarySec = resume.sections?.find((s) => s.type === 'summary');
-      if (summarySec) {
-        const fallbackText = `${summarySec.data?.summaryText || ''} Specialized focus: ${query}.`;
-        updateSectionData(summarySec.id, { summaryText: fallbackText });
-        toast.success('Resume updated live with Groq AI!');
+      // 4. Default fallback: apply to summary only if NOT a removal command
+      if (!qLower.includes('remove') && !qLower.includes('delete')) {
+        const summarySec = resume.sections?.find((s) => s.type === 'summary');
+        if (summarySec) {
+          const fallbackText = `${summarySec.data?.summaryText || ''} Specialized focus: ${query}.`;
+          updateSectionData(summarySec.id, { summaryText: fallbackText });
+          toast.success('Resume updated live with Groq AI!');
+          setPromptText('');
+        }
+      } else {
+        toast.info('Section already removed or hidden from resume view.');
         setPromptText('');
       }
     } catch (err) {

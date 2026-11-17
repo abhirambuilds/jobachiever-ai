@@ -117,8 +117,7 @@ export function JobMatcherProvider({ children }) {
     const sample = SAMPLE_JOB_DESCRIPTIONS.find((s) => s.id === sampleId);
     if (!sample) return;
 
-    setJobText(sample.text);
-    setJobDetails({
+    const newDetails = {
       company: sample.company,
       title: sample.title,
       location: sample.location,
@@ -127,9 +126,22 @@ export function JobMatcherProvider({ children }) {
       experienceLevel: sample.experienceLevel,
       deadline: sample.deadline,
       url: sample.url,
-    });
+    };
+
+    setJobText(sample.text);
+    setJobDetails(newDetails);
     setUploadedJdFile(null);
-    toast.info(`Loaded sample job description: "${sample.title}" at ${sample.company}.`);
+
+    // Immediately trigger match analysis so results update visually
+    const activeResume = selectedResume || initialResume || {
+      id: 'res-master',
+      name: `${profile?.personalInfo?.fullName || 'K. Abhiram Reddy'} — Master Profile`,
+      careerTrackName: 'Backend Software Engineer',
+    };
+    const updatedMatch = buildSimulatedMatchAnalysis(activeResume, newDetails);
+    setCurrentMatch(updatedMatch);
+
+    toast.success(`Loaded and analyzed: "${sample.title}" at ${sample.company}!`);
   };
 
   /**

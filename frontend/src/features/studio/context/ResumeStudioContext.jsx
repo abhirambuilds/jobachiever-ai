@@ -421,8 +421,17 @@ export function ResumeStudioProvider({ children }) {
 
   // Vector Print / Export trigger
   const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
+    const originalTitle = document.title;
+    const cleanTitle = (resume?.title || 'Abhiram_Reddy_ATS_Resume')
+      .replace(/[^\w\s-]/gi, '')
+      .replace(/\s+/g, '_');
+    document.title = cleanTitle;
+    setZoom(100);
+    setTimeout(() => {
+      window.print();
+      document.title = originalTitle;
+    }, 150);
+  }, [resume?.title]);
 
   // Export as JSON schema
   const exportAsJson = useCallback(() => {
@@ -467,6 +476,7 @@ export function ResumeStudioProvider({ children }) {
     versionModalOpen,
     setVersionModalOpen,
     tailorResumeForJob,
+    handleAutoTailor,
     handlePrint,
     exportAsJson,
     tracks,

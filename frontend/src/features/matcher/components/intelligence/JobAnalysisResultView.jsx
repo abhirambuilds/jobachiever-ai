@@ -162,7 +162,11 @@ export function JobAnalysisResultView({ analysis, rawText }) {
                       autoTailorJob: {
                         title: jobOverview.title,
                         company: jobOverview.companyName,
-                        skills: technicalSkills?.map((s) => s.name) || [],
+                        skills: Array.isArray(technicalSkills)
+                          ? technicalSkills.map((s) => (typeof s === 'string' ? s : s?.name || JSON.stringify(s)))
+                          : typeof technicalSkills === 'object' && technicalSkills !== null
+                          ? Object.values(technicalSkills).flat().map((s) => (typeof s === 'string' ? s : s?.name || ''))
+                          : [],
                         description: rawText || summary,
                       },
                     },

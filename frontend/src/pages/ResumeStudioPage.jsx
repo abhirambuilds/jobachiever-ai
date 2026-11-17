@@ -95,22 +95,36 @@ function ResumeStudioContent() {
       {/* Print CSS Injected for vector PDF export */}
       <style>{`
         @media print {
+          @page {
+            size: A4 portrait;
+            margin: 0mm;
+          }
+          html, body, #root {
+            background: #ffffff !important;
+            color: #000000 !important;
+            height: auto !important;
+            overflow: visible !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
           body * {
-            visibility: hidden;
+            visibility: hidden !important;
           }
           #resume-preview-sheet,
           #resume-preview-sheet * {
-            visibility: visible;
+            visibility: visible !important;
           }
           #resume-preview-sheet {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100% !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 210mm !important;
+            min-height: 297mm !important;
             margin: 0 !important;
-            padding: 12mm !important;
+            padding: 12mm 15mm !important;
             box-shadow: none !important;
-            border-radius: 0 !important;
+            border: none !important;
+            transform: none !important;
           }
         }
       `}</style>

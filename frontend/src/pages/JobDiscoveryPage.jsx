@@ -42,10 +42,10 @@ export function JobDiscoveryPage() {
     const city = qLower.includes('hyderabad')
       ? 'Hyderabad, India'
       : qLower.includes('pune')
-      ? 'Pune, India'
-      : qLower.includes('chennai')
-      ? 'Chennai, India'
-      : 'Bengaluru, India';
+        ? 'Pune, India'
+        : qLower.includes('chennai')
+          ? 'Chennai, India'
+          : 'Bengaluru, India';
     const isIntern = qLower.includes('intern');
     const roleTitle = isIntern ? 'Software Engineering Intern' : (searchQuery.length > 3 ? searchQuery : 'Senior Software Engineer');
 
@@ -265,41 +265,37 @@ export function JobDiscoveryPage() {
           <span className="text-xs text-muted-foreground font-medium shrink-0">Persona:</span>
           <button
             onClick={() => setSelectedTrack('all')}
-            className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
-              selectedTrack === 'all'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-background hover:bg-muted text-muted-foreground'
-            }`}
+            className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${selectedTrack === 'all'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-background hover:bg-muted text-muted-foreground'
+              }`}
           >
             All Tracks
           </button>
           <button
             onClick={() => setSelectedTrack('frontend')}
-            className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
-              selectedTrack === 'frontend'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-background hover:bg-muted text-muted-foreground'
-            }`}
+            className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${selectedTrack === 'frontend'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-background hover:bg-muted text-muted-foreground'
+              }`}
           >
             Frontend &amp; UI
           </button>
           <button
             onClick={() => setSelectedTrack('backend')}
-            className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
-              selectedTrack === 'backend'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-background hover:bg-muted text-muted-foreground'
-            }`}
+            className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${selectedTrack === 'backend'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-background hover:bg-muted text-muted-foreground'
+              }`}
           >
             Backend &amp; Cloud
           </button>
           <button
             onClick={() => setSelectedTrack('aiml')}
-            className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
-              selectedTrack === 'aiml'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-background hover:bg-muted text-muted-foreground'
-            }`}
+            className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${selectedTrack === 'aiml'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-background hover:bg-muted text-muted-foreground'
+              }`}
           >
             AI &amp; Data Science
           </button>
@@ -348,7 +344,7 @@ export function JobDiscoveryPage() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Briefcase className="w-3.5 h-3.5 text-muted-foreground/80" />
-                          <span>{job.experienceLevel || job.employmentType || '0-3 years'}</span>
+                          <span>{job.experienceLevel}</span>
                         </span>
                       </div>
                     </div>
@@ -356,11 +352,10 @@ export function JobDiscoveryPage() {
 
                   <div className="flex items-center gap-2 sm:self-start shrink-0">
                     <span
-                      className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg ${
-                        job.matchScore >= 90
-                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25'
-                          : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/25'
-                      }`}
+                      className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg ${job.matchScore >= 90
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25'
+                        : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/25'
+                        }`}
                     >
                       {job.matchScore}% Match
                     </span>
@@ -371,28 +366,24 @@ export function JobDiscoveryPage() {
                 <div className="space-y-1.5 pt-2 border-t border-border/50">
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground flex-wrap">
                     <span className="font-semibold text-foreground">Required Skills:</span>
-                    {(job.requiredSkills || []).map((sk, idx) => (
+                    {job.requiredSkills.map((sk) => (
                       <span
-                        key={`${sk}-${idx}`}
+                        key={sk}
                         className="px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 font-medium text-[11px]"
                       >
-                        {typeof sk === 'object' ? sk.name || JSON.stringify(sk) : sk}
+                        {sk}
                       </span>
                     ))}
-                    {(job.preferredSkills && job.preferredSkills.length > 0) && (
-                      <>
-                        <span className="text-muted-foreground/60">•</span>
-                        <span className="font-medium text-muted-foreground">Bonus:</span>
-                        {job.preferredSkills.map((sk, idx) => (
-                          <span
-                            key={`${sk}-${idx}`}
-                            className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-[11px]"
-                          >
-                            {typeof sk === 'object' ? sk.name || JSON.stringify(sk) : sk}
-                          </span>
-                        ))}
-                      </>
-                    )}
+                    <span className="text-muted-foreground/60">•</span>
+                    <span className="font-medium text-muted-foreground">Bonus:</span>
+                    {job.preferredSkills.map((sk) => (
+                      <span
+                        key={sk}
+                        className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-[11px]"
+                      >
+                        {sk}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
@@ -447,16 +438,6 @@ export function JobDiscoveryPage() {
             </motion.div>
           ))}
         </AnimatePresence>
-
-        {filteredJobs.length === 0 && (
-          <div className="text-center py-12 border border-dashed border-border/80 rounded-2xl p-8 bg-card/60 backdrop-blur-xs">
-            <Compass className="w-10 h-10 text-muted-foreground/60 mx-auto mb-3 animate-pulse" />
-            <h3 className="text-sm font-bold text-foreground">No matching engineering opportunities found</h3>
-            <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
-              Try adjusting your search query or selecting "All Tracks" to expand your active discovery radius.
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

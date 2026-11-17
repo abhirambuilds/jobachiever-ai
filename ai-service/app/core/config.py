@@ -52,13 +52,6 @@ class Settings(BaseSettings):
     groq_max_output_tokens: int = 4096
     groq_max_concurrency: int = 10
 
-    # Google Gemini AI Provider Configuration
-    gemini_api_key: Optional[str] = None
-    gemini_default_model: str = "gemini-2.0-flash"
-    gemini_timeout_seconds: float = 30.0
-    gemini_max_output_tokens: int = 4096
-    gemini_max_concurrency: int = 10
-
     @field_validator("cors_allowed_origins", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
