@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Target, MapPin, DollarSign, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -19,6 +20,7 @@ export function CareerPreferencesForm({ onNext, onBack }) {
     register,
     handleSubmit,
     setValue,
+    reset,
     watch,
     formState: { errors },
   } = useForm({
@@ -26,6 +28,12 @@ export function CareerPreferencesForm({ onNext, onBack }) {
     defaultValues: profile.careerPreferences,
     mode: 'onTouched',
   });
+
+  useEffect(() => {
+    if (profile?.careerPreferences) {
+      reset(profile.careerPreferences);
+    }
+  }, [profile?.careerPreferences, reset]);
 
   const selectedRoles = watch('targetRoles') || [];
   const selectedEmpTypes = watch('employmentTypes') || [];

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { User, Mail, Phone, Globe, Linkedin, Github, MapPin, ArrowRight } from 'lucide-react';
@@ -13,12 +14,19 @@ export function PersonalInfoForm({ onNext }) {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: profile.personalInfo,
     mode: 'onTouched',
   });
+
+  useEffect(() => {
+    if (profile?.personalInfo) {
+      reset(profile.personalInfo);
+    }
+  }, [profile?.personalInfo, reset]);
 
   const onSubmit = (data) => {
     updatePersonalInfo(data);

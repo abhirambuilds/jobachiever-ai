@@ -21,6 +21,7 @@ import { toast } from '@/components/ui/toast';
 
 export function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [dataVersion, setDataVersion] = useState(0);
   const { resetToDemo } = useProfile();
   const navigate = useNavigate();
 
@@ -41,7 +42,8 @@ export function OnboardingPage() {
 
   const handleLoadDemo = () => {
     resetToDemo();
-    toast.success('Loaded realistic demo master profile!');
+    setDataVersion((v) => v + 1);
+    toast.success('Loaded realistic master profile data from resumes!');
   };
 
   return (
@@ -104,7 +106,7 @@ export function OnboardingPage() {
           <CardContent className="p-6 sm:p-10">
             <AnimatePresence mode="wait">
               <motion.div
-                key={currentStep}
+                key={`${currentStep}-${dataVersion}`}
                 initial={{ opacity: 0, x: 15 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -15 }}
